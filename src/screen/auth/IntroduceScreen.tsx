@@ -7,12 +7,14 @@ import {
 	TouchableOpacity,
 } from "react-native";
 import React from "react";
-import { Colors } from "../../util/theme/Colors";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
+import ThemedView from "../../components/themed/ThemedView";
+import { ThemedText } from "components/themed";
 
 export default function IntroduceScreen() {
 	const { width } = useWindowDimensions();
 	const { navigate } = useNavigation<any>();
+	const { colors } = useTheme();
 
 	return (
 		<SafeAreaView
@@ -20,24 +22,27 @@ export default function IntroduceScreen() {
 		>
 			<Image
 				source={require("./../../../assets/img/walkthrought.png")}
-				style={{ width: width, height: 430 }}
+				style={{
+					width: width,
+					height: 430,
+				}}
 			></Image>
-			<Text style={{ fontSize: 20, fontWeight: "600", marginTop: 20 }}>
+			<ThemedText style={{ fontSize: 20, fontWeight: "600", marginTop: 20 }}>
 				Record your wonderful memories
-			</Text>
+			</ThemedText>
 
 			{/* Button  */}
 			<View style={{ marginTop: 40 }}>
 				<TouchableOpacity
 					style={{
-						backgroundColor: Colors.light.primary,
+						backgroundColor: colors.primary,
 						width: 216,
 						height: 60,
 						justifyContent: "center",
 						alignItems: "center",
 						borderRadius: 1000,
 					}}
-                    onPress={() => navigate('SignupScreen')}
+					onPress={() => navigate("SignupScreen")}
 				>
 					<Text
 						style={{
@@ -49,8 +54,11 @@ export default function IntroduceScreen() {
 						新規登録
 					</Text>
 				</TouchableOpacity>
-				<TouchableOpacity style={{ marginTop: 12 }} onPress={() => navigate('LoginScreen')}>
-					<Text
+				<TouchableOpacity
+					style={{ marginTop: 18 }}
+					onPress={() => navigate("LoginScreen")}
+				>
+					<ThemedText
 						style={{
 							fontSize: 18,
 							fontWeight: "500",
@@ -58,7 +66,7 @@ export default function IntroduceScreen() {
 						}}
 					>
 						ログイン
-					</Text>
+					</ThemedText>
 				</TouchableOpacity>
 			</View>
 		</SafeAreaView>
