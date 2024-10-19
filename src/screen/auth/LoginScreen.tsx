@@ -2,7 +2,6 @@ import {
 	View,
 	Text,
 	SafeAreaView,
-	TextInput,
 	Image,
 	TouchableWithoutFeedback,
 } from "react-native";
@@ -19,6 +18,7 @@ import { Controller, useForm } from "react-hook-form";
 import { IAuth } from "./SignupScreen";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { InputAuth } from "components/input";
+import { DIMENTIONS } from "constant/dimention";
 
 const loginScheme = Yup.object().shape({
 	email: Yup.string()
@@ -49,7 +49,6 @@ export default function LoginScreen() {
 		if (!isValid) {
 			return;
 		}
-		console.log(values);
 	};
 
 	return (
@@ -59,7 +58,7 @@ export default function LoginScreen() {
 					style={{
 						flex: 1,
 						justifyContent: "space-between",
-						marginHorizontal: 30,
+						marginHorizontal: DIMENTIONS.AUTH_PADDING,
 					}}
 				>
 					<View>
@@ -81,7 +80,7 @@ export default function LoginScreen() {
 									field: { onChange, onBlur, value },
 								}) => (
 									<InputAuth
-										placeholder="ユーザー名"
+										placeholder="メール"
 										onBlur={onBlur}
 										onChangeText={onChange}
 										value={value}
@@ -96,7 +95,7 @@ export default function LoginScreen() {
 									field: { onChange, onBlur, value },
 								}) => (
 									<InputAuth
-										placeholder="ユーザー名"
+										placeholder="パスワード"
 										onBlur={onBlur}
 										onChangeText={onChange}
 										value={value}
@@ -106,7 +105,10 @@ export default function LoginScreen() {
 								name="password"
 							/>
 						</View>
-						<CustomTouchableOpacity style={{marginTop: 22, marginLeft: 'auto'}}>
+						<CustomTouchableOpacity
+							style={{ marginTop: 22, marginLeft: "auto" }}
+							onPress={() => navigate("FindAccountScreen")}
+						>
 							<Text style={{ color: colors.primary }}>
 								パスワード忘れた方？
 							</Text>

@@ -18,6 +18,7 @@ import InputAuth from "../../components/input/InputAuth";
 import * as Yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { DIMENTIONS } from "constant/dimention";
 
 export interface IAuth {
 	email: string;
@@ -69,7 +70,7 @@ const SignupScreen = () => {
 					style={{
 						flex: 1,
 						justifyContent: "space-between",
-						marginHorizontal: 30,
+						marginHorizontal: DIMENTIONS.AUTH_PADDING,
 					}}
 				>
 					<View>

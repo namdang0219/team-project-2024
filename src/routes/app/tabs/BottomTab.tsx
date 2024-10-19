@@ -1,7 +1,7 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import AlbumScreen from "../../../screen/app/tabs/album/AlbumScreen";
-import MapScreen from "../../../screen/app/tabs/map/MapScreen";
+import AlbumScreen from "screen/app/tabs/album/AlbumScreen";
+import MapScreen from "screen/app/tabs/map/MapScreen";
 
 const Tab = createBottomTabNavigator();
 
