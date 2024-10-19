@@ -1,25 +1,16 @@
-import {
-	View,
-	Text,
-	SafeAreaView,
-	Image,
-	useWindowDimensions,
-	TouchableOpacity,
-} from "react-native";
+import { View, SafeAreaView, Image, useWindowDimensions } from "react-native";
 import React from "react";
-import { useNavigation, useTheme } from "@react-navigation/native";
-import ThemedView from "../../components/themed/ThemedView";
+import { useNavigation } from "@react-navigation/native";
 import { ThemedText } from "components/themed";
+import { CustomTouchableOpacity } from "components/custom";
+import { Button } from "components/button";
 
 export default function IntroduceScreen() {
 	const { width } = useWindowDimensions();
 	const { navigate } = useNavigation<any>();
-	const { colors } = useTheme();
 
 	return (
-		<SafeAreaView
-			style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-		>
+		<SafeAreaView style={{ flex: 1, justifyContent: "center" }}>
 			<Image
 				source={require("./../../../assets/img/walkthrought.png")}
 				style={{
@@ -27,34 +18,26 @@ export default function IntroduceScreen() {
 					height: 430,
 				}}
 			></Image>
-			<ThemedText style={{ fontSize: 20, fontWeight: "600", marginTop: 20 }}>
+			<ThemedText
+				style={{
+					fontSize: 20,
+					fontWeight: "600",
+					marginTop: 20,
+					textAlign: "center",
+				}}
+			>
 				Record your wonderful memories
 			</ThemedText>
 
 			{/* Button  */}
 			<View style={{ marginTop: 40 }}>
-				<TouchableOpacity
-					style={{
-						backgroundColor: colors.primary,
-						width: 216,
-						height: 60,
-						justifyContent: "center",
-						alignItems: "center",
-						borderRadius: 1000,
-					}}
+				<Button
+					style={{ height: 60, width: 240, marginHorizontal: "auto" }}
 					onPress={() => navigate("SignupScreen")}
 				>
-					<Text
-						style={{
-							color: "white",
-							fontSize: 18,
-							fontWeight: "600",
-						}}
-					>
-						新規登録
-					</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
+					新規登録
+				</Button>
+				<CustomTouchableOpacity
 					style={{ marginTop: 18 }}
 					onPress={() => navigate("LoginScreen")}
 				>
@@ -67,7 +50,7 @@ export default function IntroduceScreen() {
 					>
 						ログイン
 					</ThemedText>
-				</TouchableOpacity>
+				</CustomTouchableOpacity>
 			</View>
 		</SafeAreaView>
 	);

@@ -6,6 +6,7 @@ export type ThemeTypes = Theme & {
 	colors: {
 		primary: string;
 		background: string;
+		error: string; // Red
 		text: string;
 		icon: string; // Middle Gray
 		input: string; // Light Gray
@@ -17,8 +18,9 @@ export const lightTheme: ThemeTypes = {
 	...DefaultTheme,
 	colors: {
 		...DefaultTheme.colors,
-		primary: "#9A33EF", 
+		primary: "#9A33EF",
 		background: "#FFFFFF",
+		error: "#FF4141",
 		text: "#000000",
 		icon: "#A2A2A8",
 		input: "#F4F4F4",
@@ -32,6 +34,7 @@ export const darkTheme: ThemeTypes = {
 		...DefaultTheme.colors,
 		primary: "#9A33EF",
 		background: "#13131A",
+		error: "#FF4141",
 		text: "#FFFFFF",
 		icon: "#A2A2A8",
 		input: "#262626",

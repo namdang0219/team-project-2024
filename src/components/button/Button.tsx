@@ -3,7 +3,7 @@ import React from "react";
 import { useTheme } from "@react-navigation/native";
 import { CustomTouchableOpacity } from "components/custom";
 
-const Button = ({ children, style }: TouchableOpacityProps) => {
+const Button = ({ children, style, ...props }: TouchableOpacityProps) => {
 	const { colors } = useTheme();
 
 	return (
@@ -14,11 +14,11 @@ const Button = ({ children, style }: TouchableOpacityProps) => {
 					justifyContent: "center",
 					height: 50,
 					backgroundColor: colors.primary,
-					marginHorizontal: 30,
 					borderRadius: 1000,
 				},
 				style,
 			]}
+			{...props}
 		>
 			<Text
 				style={{

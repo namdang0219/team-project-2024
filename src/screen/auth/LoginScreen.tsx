@@ -14,10 +14,43 @@ import LoginMethod from "../../module/auth/LoginMethod";
 import { ThemedText, ThemedView } from "components/themed";
 import handlePressBackground from "util/func/handlePressBackground";
 import { CustomTouchableOpacity } from "components/custom";
+import * as Yup from "yup";
+import { Controller, useForm } from "react-hook-form";
+import { IAuth } from "./SignupScreen";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { InputAuth } from "components/input";
+
+const loginScheme = Yup.object().shape({
+	email: Yup.string()
+		.email("メールを正しく入力しださい")
+		.required("メールを入力しださい"),
+	password: Yup.string()
+		.required("メールを入力しださい")
+		.min(6, "パスワード名を6文字以上入力してください")
+		.max(10, "パスワード名を10文字以下入力してください"),
+});
 
 export default function LoginScreen() {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
+	const {
+		handleSubmit,
+		control,
+		formState: { isValid, errors },
+	} = useForm<IAuth>({
+		defaultValues: {
+			email: "",
+			password: "",
+		},
+		resolver: yupResolver(loginScheme),
+	});
+
+	const handleLogin = (values: IAuth) => {
+		if (!isValid) {
+			return;
+		}
+		console.log(values);
+	};
 
 	return (
 		<ThemedView style={{ flex: 1 }}>
@@ -26,6 +59,7 @@ export default function LoginScreen() {
 					style={{
 						flex: 1,
 						justifyContent: "space-between",
+						marginHorizontal: 30,
 					}}
 				>
 					<View>
@@ -41,35 +75,54 @@ export default function LoginScreen() {
 							}}
 						></Image>
 						<View style={{ gap: 22, marginTop: 20 }}>
-							<TextInput
-								placeholder="メール"
-								style={{
-									padding: 16,
-									borderWidth: 1,
-									borderColor: colors.primary,
-									marginHorizontal: 30,
-									borderRadius: 8,
-								}}
-							></TextInput>
-							<TextInput
-								placeholder="パスワード"
-								style={{
-									padding: 16,
-									borderWidth: 1,
-									borderColor: colors.primary,
-									marginHorizontal: 30,
-									borderRadius: 8,
-								}}
-							></TextInput>
+							<Controller
+								control={control}
+								render={({
+									field: { onChange, onBlur, value },
+								}) => (
+									<InputAuth
+										placeholder="ユーザー名"
+										onBlur={onBlur}
+										onChangeText={onChange}
+										value={value}
+										errorMessage={errors.email?.message}
+									/>
+								)}
+								name="email"
+							/>
+							<Controller
+								control={control}
+								render={({
+									field: { onChange, onBlur, value },
+								}) => (
+									<InputAuth
+										placeholder="ユーザー名"
+										onBlur={onBlur}
+										onChangeText={onChange}
+										value={value}
+										errorMessage={errors.password?.message}
+									/>
+								)}
+								name="password"
+							/>
 						</View>
+						<CustomTouchableOpacity style={{marginTop: 22, marginLeft: 'auto'}}>
+							<Text style={{ color: colors.primary }}>
+								パスワード忘れた方？
+							</Text>
+						</CustomTouchableOpacity>
 						{/* button  */}
-						<Button style={{ marginTop: 24 }}>ログイン</Button>
+						<Button
+							style={{ marginTop: 10 }}
+							onPress={handleSubmit(handleLogin)}
+						>
+							ログイン
+						</Button>
 						<View
 							style={{
 								flexDirection: "row",
 								alignItems: "center",
 								gap: 4,
-								marginHorizontal: 30,
 								justifyContent: "center",
 								marginTop: 15,
 							}}

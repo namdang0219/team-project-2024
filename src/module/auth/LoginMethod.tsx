@@ -9,7 +9,7 @@ const LoginMethod = () => {
 	const { colors } = useTheme();
 
 	return (
-		<View style={{ marginHorizontal: 30, marginBottom: 60, gap: 14 }}>
+		<View style={{ marginBottom: 60, gap: 14 }}>
 			{/* google login  */}
 			<CustomTouchableOpacity
 				style={{
