@@ -1,3 +1,4 @@
 export const DIMENTIONS = {
 	AUTH_PADDING: 30,
+	AUTH_INPUT_BORDER_RADIUS: 8,
 };

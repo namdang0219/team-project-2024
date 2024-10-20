@@ -9,7 +9,7 @@ import React from "react";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { TitleAuth } from "components/title";
 import { Button } from "components/button";
-import LoginMethod from "../../module/auth/LoginMethod";
+import LoginMethod from "module/auth/LoginMethod";
 import { ThemedText, ThemedView } from "components/themed";
 import handlePressBackground from "util/func/handlePressBackground";
 import { CustomTouchableOpacity } from "components/custom";
@@ -116,7 +116,8 @@ export default function LoginScreen() {
 						{/* button  */}
 						<Button
 							style={{ marginTop: 10 }}
-							onPress={handleSubmit(handleLogin)}
+							// onPress={handleSubmit(handleLogin)}x
+							onPress={() => navigate("UserInfoScreen")}
 						>
 							ログイン
 						</Button>

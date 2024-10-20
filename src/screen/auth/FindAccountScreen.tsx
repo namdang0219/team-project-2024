@@ -12,6 +12,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { InputAuth } from "components/input";
 import { Button } from "components/button";
 import handlePressBackground from "util/func/handlePressBackground";
+import HeaderWithBack from "module/auth/HeaderWithBack";
 
 const schema = Yup.object().shape({
 	email: Yup.string()
@@ -20,7 +21,7 @@ const schema = Yup.object().shape({
 });
 
 const FindAccountScreen = () => {
-	const { goBack, navigate } = useNavigation<any>();
+	const { navigate } = useNavigation<any>();
 	const {
 		control,
 		handleSubmit,
@@ -42,16 +43,10 @@ const FindAccountScreen = () => {
 		<SafeAreaView style={{ flex: 1 }}>
 			<TouchableWithoutFeedback onPress={handlePressBackground}>
 				<View style={{ flex: 1 }}>
-					<CustomTouchableOpacity
-						style={{ marginHorizontal: 20, marginTop: 10 }}
-						onPress={() => goBack()}
-					>
-						<IconArrowLeft />
-					</CustomTouchableOpacity>
+					<HeaderWithBack />
 					<View
 						style={{
 							marginHorizontal: DIMENTIONS.AUTH_PADDING,
-							marginTop: 30,
 						}}
 					>
 						{/* title  */}

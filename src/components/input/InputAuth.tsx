@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { useTheme } from "@react-navigation/native";
 import Svg, { G, Path } from "react-native-svg";
 import { CustomTouchableOpacity } from "components/custom";
+import { DIMENTIONS } from "constant/dimention";
 
 type InputAuth = { errorMessage: string | undefined };
 
@@ -23,7 +24,7 @@ const InputAuth = ({
 					padding: 16,
 					borderWidth: 1,
 					borderColor: colors.primary,
-					borderRadius: 8,
+					borderRadius: DIMENTIONS.AUTH_INPUT_BORDER_RADIUS,
 					color: colors.text,
 				}}
 				secureTextEntry={

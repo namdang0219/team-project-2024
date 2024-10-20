@@ -5,6 +5,7 @@ import SignupScreen from "screen/auth/SignupScreen";
 import IntroduceScreen from "screen/auth/IntroduceScreen";
 import FindAccountScreen from "screen/auth/FindAccountScreen";
 import VerifyCodeScreen from "screen/auth/VerifyCodeScreen";
+import UserInfoScreen from "screen/auth/UserInfoScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +23,7 @@ const AuthStack = () => {
 				name="VerifyCodeScreen"
 				component={VerifyCodeScreen}
 			/>
+			<Stack.Screen name="UserInfoScreen" component={UserInfoScreen} />
 		</Stack.Navigator>
 	);
 };
