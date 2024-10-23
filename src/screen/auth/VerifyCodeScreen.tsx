@@ -111,9 +111,7 @@ const VerifyCodeScreen = () => {
 							marginHorizontal: DIMENTIONS.AUTH_PADDING,
 						}}
 						// onPress={handleSubmit(handleFindAccount)}
-						onPress={() =>
-							navigate("AppStack", { screen: "AlbumScreen" })
-						}
+						onPress={() => navigate("UserInfoScreen")}
 					>
 						次へ
 					</Button>

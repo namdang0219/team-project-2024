@@ -57,10 +57,10 @@ const SignupScreen = () => {
 	});
 
 	const handleSignup = (values: IAuth) => {
-		if (isValid) {
+		if (!isValid) {
 			return;
 		}
-		console.log(values);
+		navigate("VerifyCodeScreen");
 	};
 
 	return (

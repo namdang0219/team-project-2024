@@ -117,7 +117,9 @@ export default function LoginScreen() {
 						<Button
 							style={{ marginTop: 10 }}
 							// onPress={handleSubmit(handleLogin)}x
-							onPress={() => navigate("UserInfoScreen")}
+							onPress={() =>
+								navigate("AppStack", { screen: "AlbumStack" })
+							}
 						>
 							ログイン
 						</Button>

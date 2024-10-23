@@ -4,6 +4,7 @@ import {
 	TouchableWithoutFeedback,
 	Text,
 	useWindowDimensions,
+	StyleSheet,
 } from "react-native";
 import React, { useState } from "react";
 import { ThemedView } from "components/themed";
@@ -14,12 +15,11 @@ import handlePressBackground from "util/func/handlePressBackground";
 import { Button } from "components/button";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import Svg, { Circle, Ellipse, G, Mask, Path, Rect } from "react-native-svg";
 import { CustomTouchableOpacity } from "components/custom";
 import { LabelInputAuth } from "components/label";
 import { ActionSheet, DateTimePicker } from "react-native-ui-lib";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { IconArrowDown } from "icon/auth";
+import { AvatarDefault, IconArrowDown } from "icon/auth";
 
 const UserInfoScreen = () => {
 	const { navigate } = useNavigation<any>();
@@ -33,6 +33,35 @@ const UserInfoScreen = () => {
 	>("japan");
 	const { bottom } = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
+
+	const styles = StyleSheet.create({
+		avatarContainerGradient: {
+			width: 160,
+			height: 160,
+			borderRadius: 1000,
+			alignItems: "center",
+			justifyContent: "center",
+			marginHorizontal: "auto",
+			marginTop: 30,
+		},
+		avatarContainerWhite: {
+			width: 152,
+			height: 152,
+			borderRadius: 1000,
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		inputContainer: {
+			height: 50,
+			borderRadius: DIMENTIONS.AUTH_INPUT_BORDER_RADIUS,
+			borderColor: colors.primary,
+			borderWidth: 1,
+			flexDirection: "row",
+			alignItems: "center",
+			paddingHorizontal: 16,
+			justifyContent: "space-between",
+		},
+	});
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>
@@ -54,27 +83,11 @@ const UserInfoScreen = () => {
 						{/* avatar  */}
 						<LinearGradient
 							colors={["#D823FF", "#9A33EF"]}
-							style={{
-								width: 160,
-								height: 160,
-								borderRadius: 1000,
-								alignItems: "center",
-								justifyContent: "center",
-								marginHorizontal: "auto",
-								marginTop: 30,
-							}}
+							style={styles.avatarContainerGradient}
 							start={{ x: 0, y: 0 }}
 							end={{ x: 1, y: 1 }}
 						>
-							<ThemedView
-								style={{
-									width: 152,
-									height: 152,
-									borderRadius: 1000,
-									alignItems: "center",
-									justifyContent: "center",
-								}}
-							>
+							<ThemedView style={styles.avatarContainerWhite}>
 								<CustomTouchableOpacity>
 									<AvatarDefault></AvatarDefault>
 								</CustomTouchableOpacity>
@@ -88,17 +101,7 @@ const UserInfoScreen = () => {
 								<LabelInputAuth>性別</LabelInputAuth>
 								<CustomTouchableOpacity
 									onPress={() => setShowSexSheet(true)}
-									style={{
-										height: 50,
-										borderRadius:
-											DIMENTIONS.AUTH_INPUT_BORDER_RADIUS,
-										borderColor: colors.primary,
-										borderWidth: 1,
-										flexDirection: "row",
-										alignItems: "center",
-										paddingHorizontal: 16,
-										justifyContent: "space-between",
-									}}
+									style={styles.inputContainer}
 								>
 									<Text style={{ color: colors.subGray }}>
 										{sex == "male" ? "男性" : "女性"}
@@ -135,17 +138,7 @@ const UserInfoScreen = () => {
 								<LabelInputAuth>生年月日</LabelInputAuth>
 								<CustomTouchableOpacity
 									// onPress={() => setShowSexSheet(true)}
-									style={{
-										height: 50,
-										borderRadius:
-											DIMENTIONS.AUTH_INPUT_BORDER_RADIUS,
-										borderColor: colors.primary,
-										borderWidth: 1,
-										flexDirection: "row",
-										alignItems: "center",
-										paddingHorizontal: 16,
-										justifyContent: "space-between",
-									}}
+									style={styles.inputContainer}
 								>
 									<DateTimePicker
 										editable={true}
@@ -168,17 +161,7 @@ const UserInfoScreen = () => {
 									onPress={() =>
 										setShowNationalitySheet(true)
 									}
-									style={{
-										height: 50,
-										borderRadius:
-											DIMENTIONS.AUTH_INPUT_BORDER_RADIUS,
-										borderColor: colors.primary,
-										borderWidth: 1,
-										flexDirection: "row",
-										alignItems: "center",
-										paddingHorizontal: 16,
-										justifyContent: "space-between",
-									}}
+									style={styles.inputContainer}
 								>
 									<Text style={{ color: colors.subGray }}>
 										{nationality == "japan"
@@ -228,7 +211,7 @@ const UserInfoScreen = () => {
 						<Button
 							style={{ marginTop: 32 }}
 							// onPress={handleSubmit(handleFindAccount)}
-							onPress={() => navigate("VerifyCodeScreen")}
+							onPress={() => navigate('AppStack', {screen: 'AlbumStack'})}
 						>
 							次へ
 						</Button>
@@ -236,49 +219,6 @@ const UserInfoScreen = () => {
 				</View>
 			</TouchableWithoutFeedback>
 		</SafeAreaView>
-	);
-};
-
-const AvatarDefault = () => {
-	return (
-		<Svg width="146" height="146" viewBox="0 0 146 146" fill="none">
-			<Mask
-				id="mask0_131_1342"
-				maskUnits="userSpaceOnUse"
-				x="0"
-				y="0"
-				width="146"
-				height="146"
-			>
-				<Circle
-					cx="72.9185"
-					cy="72.9186"
-					r="71.8073"
-					fill="#E37171"
-					stroke="black"
-				/>
-			</Mask>
-			<G mask="url(#mask0_131_1342)">
-				<Rect
-					x="-0.564453"
-					y="0.611328"
-					width="145.79"
-					height="145.79"
-					fill="#9B9B9B"
-				/>
-				<Ellipse
-					cx="72.3307"
-					cy="61.7492"
-					rx="28.2175"
-					ry="28.2175"
-					fill="white"
-				/>
-				<Path
-					d="M125.238 140.48C125.238 167.752 103.762 194.563 72.9185 194.563C42.075 194.563 20.5986 167.752 20.5986 140.48C20.5986 113.208 42.075 95.802 72.9185 95.802C103.762 95.802 125.238 113.208 125.238 140.48Z"
-					fill="white"
-				/>
-			</G>
-		</Svg>
 	);
 };
 
