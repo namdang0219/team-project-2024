@@ -1,15 +1,15 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import EditPhotoScreen from "screen/app/tabs/camera/EditPhotoScreen";
+import CameraScreen from "screen/app/global/CameraScreen";
 
 const Stack = createNativeStackNavigator();
 
-const CameraStack = () => {
+const GlobalStack = () => {
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
-			<Stack.Screen name="EditPhotoScreen" component={EditPhotoScreen} />
+			<Stack.Screen name="CameraScreen" component={CameraScreen} />
 		</Stack.Navigator>
 	);
 };
 
-export default CameraStack;
+export default GlobalStack;
