@@ -49,6 +49,7 @@ export default function LoginScreen() {
 		if (!isValid) {
 			return;
 		}
+		navigate("AppStack", { screen: "AlbumStack" });
 	};
 
 	return (
@@ -99,6 +100,7 @@ export default function LoginScreen() {
 										onBlur={onBlur}
 										onChangeText={onChange}
 										value={value}
+										secureTextEntry
 										errorMessage={errors.password?.message}
 									/>
 								)}
@@ -116,10 +118,8 @@ export default function LoginScreen() {
 						{/* button  */}
 						<Button
 							style={{ marginTop: 10 }}
-							// onPress={handleSubmit(handleLogin)}x
-							onPress={() =>
-								navigate("AppStack", { screen: "AlbumStack" })
-							}
+							
+							onPress={handleSubmit(handleLogin)}
 						>
 							ログイン
 						</Button>

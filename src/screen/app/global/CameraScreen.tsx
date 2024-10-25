@@ -1,59 +1,14 @@
-import {
-	View,
-	Text,
-	StyleSheet,
-	Image,
-	useWindowDimensions,
-	ActivityIndicator,
-	Linking,
-} from "react-native";
-import React, { useEffect, useState } from "react";
+import { View, StyleSheet, Image, useWindowDimensions } from "react-native";
+import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { CustomTouchableOpacity } from "components/custom";
 import { IconCameraRotate } from "icon/camera";
-import * as FaceDetector from "expo-face-detector";
-import { Camera, CameraType, useCameraPermissions } from "expo-camera";
-import { Button } from "components/button";
 
 const CameraScreen = () => {
 	const { colors } = useTheme();
-	const [facing, setFacing] = useState<CameraType>("front");
 	const { width: screenWidth } = useWindowDimensions();
-
-	const [permission, requestPermission] = useCameraPermissions();
-
-	if (!permission) {
-		// Camera permissions are still loading.
-		return <ActivityIndicator />;
-	}
-
-	if (!permission.granted) {
-		// Camera permissions are not granted yet.
-		return (
-			<View
-				style={{
-					flex: 1,
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<Text>No permission to launch camera!</Text>
-				<Button onPress={() => Linking.openSettings()}>
-					Open setting
-				</Button>
-			</View>
-		);
-	}
-
-	function toggleCameraFacing() {
-		setFacing((current) => (current === "back" ? "front" : "back"));
-	}
-
-	const handleFacesDetected = ({ faces }: { faces: any }) => {
-		console.log(faces);
-	};
 
 	const styles = StyleSheet.create({
 		cameraContainer: {
@@ -107,6 +62,10 @@ const CameraScreen = () => {
 		},
 	});
 
+	const handleFacesDetected = ({ faces }: { faces: any }) => {
+		console.log(faces);
+	};
+
 	return (
 		<>
 			<StatusBar style="light" />
@@ -115,25 +74,12 @@ const CameraScreen = () => {
 			>
 				<View style={styles.cameraContainer}>
 					{/* camera view  */}
-					{/* <Image
+					<Image
 						source={{
 							uri: "https://images.unsplash.com/photo-1646187548162-6ab403781597?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 						}}
 						style={{ aspectRatio: "9/16" }}
-					/> */}
-
-					{/* <Camera
-						onFacesDetected={handleFacesDetected}
-						faceDetectorSettings={{
-							mode: FaceDetector.FaceDetectorMode.fast,
-							detectLandmarks:
-								FaceDetector.FaceDetectorLandmarks.none,
-							runClassifications:
-								FaceDetector.FaceDetectorClassifications.none,
-							minDetectionInterval: 100,
-							tracking: true,
-						}}
-					/> */}
+					/>
 
 					{/* camera features overlay  */}
 					<View style={styles.cameraFeatureContainer}>

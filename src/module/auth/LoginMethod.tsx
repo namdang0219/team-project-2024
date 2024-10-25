@@ -1,4 +1,4 @@
-import { StyleSheet, View } from "react-native";
+import { Alert, StyleSheet, View } from "react-native";
 import React from "react";
 import { ThemedText } from "components/themed";
 import { useTheme } from "@react-navigation/native";
@@ -24,10 +24,17 @@ const LoginMethod = () => {
 		},
 	});
 
+	const onPressMethod = () => {
+		Alert.alert("In Development");
+	};
+
 	return (
-		<View style={{ marginBottom: 60, gap: 14 }}>
+		<View style={{ marginBottom: 30, gap: 14 }}>
 			{/* google login  */}
-			<CustomTouchableOpacity style={styles.buttonContainer}>
+			<CustomTouchableOpacity
+				style={styles.buttonContainer}
+				onPress={onPressMethod}
+			>
 				<View style={styles.icon}>
 					<IconGoogle></IconGoogle>
 				</View>
@@ -35,7 +42,10 @@ const LoginMethod = () => {
 			</CustomTouchableOpacity>
 
 			{/* fb login  */}
-			<CustomTouchableOpacity style={styles.buttonContainer}>
+			<CustomTouchableOpacity
+				style={styles.buttonContainer}
+				onPress={onPressMethod}
+			>
 				<View style={styles.icon}>
 					<IconFacebook></IconFacebook>
 				</View>
