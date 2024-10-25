@@ -17,7 +17,7 @@
 				"NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
 				"NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
 			},
-			"bundleIdentifier": "com.anonymous.app"
+			"bundleIdentifier": "com.nekopanman.app"
 		},
 		"android": {
 			"adaptiveIcon": {
@@ -28,7 +28,7 @@
 				"android.permission.RECORD_AUDIO",
 				"android.permission.CAMERA"
 			],
-			"package": "com.anonymous.app"
+			"package": "com.nekopanman.app"
 		},
 		"web": {
 			"favicon": "./assets/favicon.png"
@@ -46,6 +46,15 @@
 					"cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
 					"microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
 					"recordAudioAndroid": true
+				}
+			],
+			[
+				"react-native-vision-camera",
+				{
+					"cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera."
+					// optionally, if you want to record audio:
+					// "enableMicrophonePermission": true,
+					// "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
 				}
 			]
 		]

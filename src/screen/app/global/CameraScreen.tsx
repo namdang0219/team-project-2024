@@ -1,14 +1,81 @@
-import { View, StyleSheet, Image, useWindowDimensions } from "react-native";
-import React from "react";
+import {
+	View,
+	StyleSheet,
+	Image,
+	useWindowDimensions,
+	Text,
+} from "react-native";
+import React, { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { CustomTouchableOpacity } from "components/custom";
 import { IconCameraRotate } from "icon/camera";
+import {
+	Camera,
+	CameraProps,
+	useCameraDevice,
+	useCameraPermission,
+} from "react-native-vision-camera";
+
+import Reanimated, {
+	Extrapolation,
+	interpolate,
+	useAnimatedProps,
+	useSharedValue,
+} from "react-native-reanimated";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+
+Reanimated.addWhitelistedNativeProps({
+	zoom: true,
+});
+const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 
 const CameraScreen = () => {
 	const { colors } = useTheme();
 	const { width: screenWidth } = useWindowDimensions();
+	const { hasPermission, requestPermission } = useCameraPermission();
+
+	useEffect(() => {
+		requestPermission();
+	}, []);
+
+	const cameraRef = useRef<Camera>(null);
+
+	const device = useCameraDevice("back", {
+		physicalDevices: [
+			"ultra-wide-angle-camera",
+			"wide-angle-camera",
+			"telephoto-camera",
+		],
+	});
+
+	const zoom = useSharedValue(device ? device.neutralZoom : 1);
+
+	const zoomOffset = useSharedValue(0);
+	const gesture = Gesture.Pinch()
+		.onBegin(() => {
+			zoomOffset.value = zoom.value;
+		})
+		.onUpdate((event) => {
+			const z = zoomOffset.value * event.scale;
+			if (device) {
+				zoom.value = interpolate(
+					z,
+					[1, 10],
+					[device.minZoom, device.maxZoom],
+					Extrapolation.CLAMP
+				);
+			}
+		});
+
+	const animatedProps = useAnimatedProps<CameraProps>(
+		() => ({ zoom: zoom.value }),
+		[zoom]
+	);
+
+	if (!hasPermission) return <Text>No permisson to access camera</Text>;
+	if (device == null) return <Text>No devices found</Text>;
 
 	const styles = StyleSheet.create({
 		cameraContainer: {
@@ -39,7 +106,7 @@ const CameraScreen = () => {
 			borderRadius: 8,
 		},
 		captureButtonContainer: {
-			width: 65,
+			width: 60,
 			aspectRatio: "1/1",
 			backgroundColor: colors.text,
 			borderRadius: 1000,
@@ -47,7 +114,7 @@ const CameraScreen = () => {
 			justifyContent: "center",
 		},
 		captureButtonSpacing: {
-			width: 60,
+			width: 55,
 			aspectRatio: "1/1",
 			backgroundColor: colors.background,
 			borderRadius: 1000,
@@ -55,36 +122,37 @@ const CameraScreen = () => {
 			justifyContent: "center",
 		},
 		captureButton: {
-			width: 55,
+			width: 50,
 			aspectRatio: "1/1",
 			backgroundColor: colors.text,
 			borderRadius: 1000,
 		},
 	});
 
-	const handleFacesDetected = ({ faces }: { faces: any }) => {
-		console.log(faces);
-	};
-
 	return (
 		<>
-			<StatusBar style="light" />
+			<StatusBar style="dark" />
 			<SafeAreaView
 				style={{ flex: 1, backgroundColor: colors.background }}
 			>
 				<View style={styles.cameraContainer}>
 					{/* camera view  */}
-					<Image
+					{/* <Image
 						source={{
 							uri: "https://images.unsplash.com/photo-1646187548162-6ab403781597?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
 						}}
 						style={{ aspectRatio: "9/16" }}
-					/>
+					/> */}
 
 					{/* camera features overlay  */}
-					<View style={styles.cameraFeatureContainer}>
-						<View></View>
-					</View>
+					<GestureDetector gesture={gesture}>
+						<ReanimatedCamera
+							style={StyleSheet.absoluteFill}
+							device={device}
+							isActive={true}
+							animatedProps={animatedProps}
+						/>
+					</GestureDetector>
 				</View>
 
 				{/* bottom container  */}
