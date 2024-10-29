@@ -43,3 +43,8 @@ export const darkTheme: ThemeTypes = {
 		subGray: "#868686",
 	},
 };
+
+export const GLOBAL_GRADIENT = {
+	STOP_1: "#D823FF",
+	STOP_2: "#9A33EF",
+};

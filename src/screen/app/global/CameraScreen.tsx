@@ -4,13 +4,13 @@ import {
 	Image,
 	useWindowDimensions,
 	Text,
+	ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useTheme } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { CustomTouchableOpacity } from "components/custom";
-import { IconCameraRotate } from "icon/camera";
 import {
 	Camera,
 	CameraProps,
@@ -25,6 +25,20 @@ import Reanimated, {
 	useSharedValue,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { darkTheme } from "util/theme/themeColors";
+import {
+	Feather,
+	MaterialCommunityIcons,
+	Ionicons,
+	MaterialIcons,
+} from "@expo/vector-icons";
+import {
+	IconExposure,
+	IconFlash,
+	IconFrame,
+	IconGrid,
+	IconRotate,
+} from "icon/camera";
 
 Reanimated.addWhitelistedNativeProps({
 	zoom: true,
@@ -75,15 +89,28 @@ const CameraScreen = () => {
 	);
 
 	if (!hasPermission) return <Text>No permisson to access camera</Text>;
-	if (device == null) return <Text>No devices found</Text>;
+	if (!device == null)
+		return (
+			<View
+				style={{
+					flex: 1,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<Text>No devices found</Text>
+			</View>
+		);
 
 	const styles = StyleSheet.create({
 		cameraContainer: {
-			backgroundColor: "cyan",
+			backgroundColor: darkTheme.colors.background,
 			aspectRatio: "9/16",
 			borderRadius: 10,
 			overflow: "hidden",
 			position: "relative",
+			alignItems: "center",
+			justifyContent: "center",
 		},
 		cameraFeatureContainer: {
 			position: "absolute",
@@ -93,99 +120,165 @@ const CameraScreen = () => {
 			aspectRatio: "9/16",
 			width: screenWidth,
 		},
-		bottomContainer: {
-			flex: 1,
-			flexDirection: "row",
-			alignItems: "center",
-			justifyContent: "space-between",
-			paddingHorizontal: 16,
+		primaryShadow: {
+			shadowRadius: 8,
+			shadowOpacity: 0.6,
 		},
-		leftButtonImage: {
-			width: 50,
-			aspectRatio: "1/1",
-			borderRadius: 8,
-		},
-		captureButtonContainer: {
-			width: 60,
-			aspectRatio: "1/1",
-			backgroundColor: colors.text,
-			borderRadius: 1000,
+		featureItem: {
+			width: 40,
 			alignItems: "center",
 			justifyContent: "center",
-		},
-		captureButtonSpacing: {
-			width: 55,
-			aspectRatio: "1/1",
-			backgroundColor: colors.background,
-			borderRadius: 1000,
-			alignItems: "center",
-			justifyContent: "center",
-		},
-		captureButton: {
-			width: 50,
-			aspectRatio: "1/1",
-			backgroundColor: colors.text,
-			borderRadius: 1000,
 		},
 	});
 
 	return (
 		<>
-			<StatusBar style="dark" />
+			<StatusBar style="light" />
 			<SafeAreaView
-				style={{ flex: 1, backgroundColor: colors.background }}
+				style={{
+					flex: 1,
+					backgroundColor: darkTheme.colors.background,
+				}}
 			>
 				<View style={styles.cameraContainer}>
 					{/* camera view  */}
-					{/* <Image
+					<Image
 						source={{
-							uri: "https://images.unsplash.com/photo-1646187548162-6ab403781597?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+							uri: "https://i.pinimg.com/564x/35/82/60/3582606724d54222c0052990da2c1f0f.jpg",
 						}}
-						style={{ aspectRatio: "9/16" }}
-					/> */}
+						style={{ aspectRatio: "9/16", width: screenWidth }}
+					/>
 
-					{/* camera features overlay  */}
-					<GestureDetector gesture={gesture}>
-						<ReanimatedCamera
-							style={StyleSheet.absoluteFill}
-							device={device}
-							isActive={true}
-							animatedProps={animatedProps}
-						/>
-					</GestureDetector>
-				</View>
+					<View style={styles.cameraFeatureContainer}>
+						<View style={{ position: "relative", flex: 1 }}>
+							{/* top container  */}
+							<View
+								style={{
+									height: 50,
+									flexDirection: "row",
+									alignItems: "center",
+									justifyContent: "space-between",
+									paddingHorizontal: 10,
+								}}
+							>
+								{/* x mark  */}
+								<CustomTouchableOpacity>
+									<Feather
+										name="x"
+										size={30}
+										color={"white"}
+										style={styles.primaryShadow}
+									/>
+								</CustomTouchableOpacity>
+								{/* image flip  */}
+								<CustomTouchableOpacity>
+									<MaterialCommunityIcons
+										name="flip-horizontal"
+										size={26}
+										color={"white"}
+										style={styles.primaryShadow}
+									/>
+								</CustomTouchableOpacity>
+								{/* save button  */}
+								<CustomTouchableOpacity>
+									<Text
+										style={[
+											{
+												color: "white",
+												fontSize: 18,
+											},
+											styles.primaryShadow,
+										]}
+									>
+										保存
+									</Text>
+								</CustomTouchableOpacity>
+							</View>
 
-				{/* bottom container  */}
-				<View style={styles.bottomContainer}>
-					{/* left button  */}
-					<CustomTouchableOpacity
-						style={{ flex: 1, borderRadius: 8, overflow: "hidden" }}
-					>
-						<Image
-							source={{
-								uri: "https://images.unsplash.com/photo-1729590637106-f2982a7deabc?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-							}}
-							style={styles.leftButtonImage}
-						/>
-					</CustomTouchableOpacity>
-
-					{/* capture button  */}
-					<View style={styles.captureButtonContainer}>
-						<View style={styles.captureButtonSpacing}>
-							<CustomTouchableOpacity
-								style={styles.captureButton}
-							/>
+							{/* camera control  */}
+							<View
+								style={{
+									flexDirection: "row",
+									justifyContent: "center",
+									bottom: 10,
+									position: "absolute",
+									alignItems: "center",
+									width: screenWidth,
+								}}
+							>
+								<CustomTouchableOpacity>
+									<Ionicons
+										name="color-filter-outline"
+										size={28}
+										color={"white"}
+									/>
+								</CustomTouchableOpacity>
+								<View style={{ width: 120 }}>
+									<CustomTouchableOpacity
+										style={[
+											{
+												width: 66,
+												aspectRatio: "1/1",
+												borderWidth: 5,
+												borderColor: "white",
+												borderRadius: 1000,
+												marginHorizontal: "auto",
+											},
+										]}
+									/>
+								</View>
+								<CustomTouchableOpacity>
+									<MaterialIcons
+										name="face-retouching-natural"
+										size={30}
+										color={"white"}
+									/>
+								</CustomTouchableOpacity>
+							</View>
 						</View>
 					</View>
 
-					{/* right container  */}
-					<View style={{ flex: 1, flexDirection: "row-reverse" }}>
-						<CustomTouchableOpacity
-							style={{ marginRight: 10, opacity: 0.8 }}
-						>
-							<IconCameraRotate />
-						</CustomTouchableOpacity>
-					</View>
+					{/* {!device && <ActivityIndicator size={"large"} />} */}
+
+					{/* camera features overlay  */}
+					{/* {device && (
+						<GestureDetector gesture={gesture}>
+							<ReanimatedCamera
+								style={StyleSheet.absoluteFill}
+								device={device}
+								isActive={true}
+								animatedProps={animatedProps}
+							/>
+						</GestureDetector>
+					)} */}
+				</View>
+
+				{/* camera features - bottom container  */}
+				<View
+					style={{
+						flexDirection: "row",
+						alignItems: "center",
+						justifyContent: "space-between",
+						flex: 1,
+						marginHorizontal: 40,
+						opacity: 0.85,
+					}}
+				>
+					<CustomTouchableOpacity style={styles.featureItem}>
+						<IconFrame gradient={false} />
+					</CustomTouchableOpacity>
+					<CustomTouchableOpacity style={styles.featureItem}>
+						<IconGrid gradient={false} />
+					</CustomTouchableOpacity>
+					<CustomTouchableOpacity style={styles.featureItem}>
+						<IconExposure gradient={false} />
+					</CustomTouchableOpacity>
+					<CustomTouchableOpacity style={styles.featureItem}>
+						<IconFlash gradient={false} />
+					</CustomTouchableOpacity>
+					<CustomTouchableOpacity style={styles.featureItem}>
+						<IconRotate gradient={false} />
+					</CustomTouchableOpacity>
 				</View>
 			</SafeAreaView>
 		</>
