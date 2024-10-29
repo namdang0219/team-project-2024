@@ -6,13 +6,11 @@ import {
 	Text,
 } from "react-native";
 import React, { useState } from "react";
-import { CustomTouchableOpacity } from "components/custom";
 import { ThemedText } from "components/themed";
 import { TitleAuth } from "components/title";
 import { DIMENTIONS } from "constant/dimention";
 import handlePressBackground from "util/func/handlePressBackground";
 import { useNavigation, useTheme } from "@react-navigation/native";
-import Svg, { ClipPath, Defs, G, Path, Rect } from "react-native-svg";
 import { Button } from "components/button";
 import {
 	CodeField,
@@ -20,7 +18,6 @@ import {
 	useBlurOnFulfill,
 	useClearByFocusCell,
 } from "react-native-confirmation-code-field";
-import { IconArrowLeft } from "icon/auth";
 import HeaderWithBack from "module/auth/HeaderWithBack";
 
 const CELL_COUNT = 4;

@@ -15,20 +15,25 @@ const Button = ({ children, style, ...props }: TouchableOpacityProps) => {
 					height: 50,
 					backgroundColor: colors.primary,
 					borderRadius: 1000,
+					position: "relative",
 				},
 				style,
 			]}
 			{...props}
 		>
-			<Text
-				style={{
-					fontSize: 16,
-					fontWeight: "600",
-					color: "white",
-				}}
-			>
-				{children}
-			</Text>
+			{typeof children === "string" ? (
+				<Text
+					style={{
+						fontSize: 16,
+						fontWeight: "600",
+						color: "white",
+					}}
+				>
+					{children}
+				</Text>
+			) : (
+				children
+			)}
 		</CustomTouchableOpacity>
 	);
 };

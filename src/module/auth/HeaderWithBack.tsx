@@ -1,8 +1,8 @@
 import { View } from "react-native";
 import React from "react";
 import { CustomTouchableOpacity } from "components/custom";
-import { IconArrowLeft } from "icon/auth";
 import { useNavigation } from "@react-navigation/native";
+import { IconArrowLeft } from "icon/global";
 
 const HeaderWithBack = () => {
 	const { goBack } = useNavigation<any>();

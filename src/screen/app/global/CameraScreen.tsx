@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import React, { useEffect, useRef } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { CustomTouchableOpacity } from "components/custom";
 import {
@@ -47,6 +47,7 @@ const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 
 const CameraScreen = () => {
 	const { colors } = useTheme();
+	const { goBack, navigate } = useNavigation();
 	const { width: screenWidth } = useWindowDimensions();
 	const { hasPermission, requestPermission } = useCameraPermission();
 
@@ -162,7 +163,7 @@ const CameraScreen = () => {
 								}}
 							>
 								{/* x mark  */}
-								<CustomTouchableOpacity>
+								<CustomTouchableOpacity onPress={goBack}>
 									<Feather
 										name="x"
 										size={30}
@@ -180,7 +181,11 @@ const CameraScreen = () => {
 									/>
 								</CustomTouchableOpacity>
 								{/* save button  */}
-								<CustomTouchableOpacity>
+								<CustomTouchableOpacity
+									onPress={() =>
+										navigate("SavePhotoScreen" as never)
+									}
+								>
 									<Text
 										style={[
 											{
