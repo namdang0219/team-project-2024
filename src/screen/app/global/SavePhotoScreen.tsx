@@ -24,7 +24,7 @@ import Svg, {
 } from "react-native-svg";
 const SavePhotoScreen = () => {
 	const { width: screenWidth } = useWindowDimensions();
-	const { goBack } = useNavigation();
+	const { goBack, navigate } = useNavigation<any>();
 
 	const styles = StyleSheet.create({
 		topbar: {
@@ -146,7 +146,12 @@ const SavePhotoScreen = () => {
 					</CustomTouchableOpacity>
 
 					{/* download button  */}
-					<Button style={{ marginTop: 16 }}>
+					<Button
+						style={{ marginTop: 16 }}
+						onPress={() =>
+							navigate("AlbumStack", { screen: "AlbumScreen" })
+						}
+					>
 						<View style={styles.buttonContent}>
 							<Feather
 								name="download"

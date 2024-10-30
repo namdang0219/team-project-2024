@@ -7,7 +7,7 @@ const CustomTouchableOpacity = ({
 	...props
 }: TouchableOpacityProps) => {
 	return (
-		<TouchableOpacity activeOpacity={0.6} style={[{}, style]} {...props}>
+		<TouchableOpacity activeOpacity={0.75} style={[{}, style]} {...props}>
 			{children}
 		</TouchableOpacity>
 	);

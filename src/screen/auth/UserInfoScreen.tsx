@@ -5,6 +5,7 @@ import {
 	Text,
 	useWindowDimensions,
 	StyleSheet,
+	Image,
 } from "react-native";
 import React, { useState } from "react";
 import { ThemedView } from "components/themed";
@@ -20,6 +21,9 @@ import { LabelInputAuth } from "components/label";
 import { ActionSheet, DateTimePicker } from "react-native-ui-lib";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AvatarDefault, IconArrowDown } from "icon/auth";
+import * as ImagePicker from "expo-image-picker";
+import { GLOBAL_GRADIENT } from "util/theme/themeColors";
+import { AntDesign } from "@expo/vector-icons";
 
 const UserInfoScreen = () => {
 	const { navigate } = useNavigation<any>();
@@ -33,6 +37,23 @@ const UserInfoScreen = () => {
 	>("japan");
 	const { bottom } = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
+	const [image, setImage] = useState<string | null>(null);
+
+	const pickImage = async () => {
+		// No permissions request is necessary for launching the image library
+		let result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.All,
+			allowsEditing: true,
+			aspect: [4, 3],
+			quality: 1,
+		});
+
+		console.log(result);
+
+		if (!result.canceled) {
+			setImage(result.assets[0].uri);
+		}
+	};
 
 	const styles = StyleSheet.create({
 		avatarContainerGradient: {
@@ -81,18 +102,66 @@ const UserInfoScreen = () => {
 						</TitleAuth>
 
 						{/* avatar  */}
-						<LinearGradient
-							colors={["#D823FF", "#9A33EF"]}
-							style={styles.avatarContainerGradient}
-							start={{ x: 0, y: 0 }}
-							end={{ x: 1, y: 1 }}
+						<View
+							style={{
+								position: "relative",
+								marginHorizontal: "auto",
+							}}
 						>
-							<ThemedView style={styles.avatarContainerWhite}>
-								<CustomTouchableOpacity>
-									<AvatarDefault></AvatarDefault>
-								</CustomTouchableOpacity>
-							</ThemedView>
-						</LinearGradient>
+							<LinearGradient
+								colors={["#D823FF", "#9A33EF"]}
+								style={styles.avatarContainerGradient}
+								start={{ x: 0, y: 0 }}
+								end={{ x: 1, y: 1 }}
+							>
+								<ThemedView style={styles.avatarContainerWhite}>
+									{image ? (
+										<Image
+											source={{ uri: image }}
+											style={{ width: 146, height: 146, borderRadius: 1000 }}
+										/>
+									) : (
+										<AvatarDefault></AvatarDefault>
+									)}
+								</ThemedView>
+							</LinearGradient>
+							<View
+								style={{
+									width: 35,
+									height: 35,
+									position: "absolute",
+									bottom: 0,
+									right: 10,
+									backgroundColor: "white",
+									borderRadius: 1000,
+									zIndex: 50,
+									alignItems: "center",
+									justifyContent: "center",
+								}}
+							>
+								<LinearGradient
+									colors={[
+										GLOBAL_GRADIENT.STOP_1,
+										GLOBAL_GRADIENT.STOP_2,
+									]}
+									style={{
+										borderRadius: 1000,
+										width: 30,
+										height: 30,
+										alignItems: "center",
+										justifyContent: "center",
+									}}
+								>
+									<CustomTouchableOpacity onPress={pickImage}>
+										<AntDesign
+											name="plus"
+											size={25}
+											color={"white"}
+										/>
+									</CustomTouchableOpacity>
+								</LinearGradient>
+							</View>
+						</View>
 
 						{/* input  */}
 						<View style={{ marginTop: 8, gap: 16 }}>
@@ -211,7 +280,9 @@ const UserInfoScreen = () => {
 						<Button
 							style={{ marginTop: 32 }}
 							// onPress={handleSubmit(handleFindAccount)}
-							onPress={() => navigate('AppStack', {screen: 'AlbumStack'})}
+							onPress={() =>
+								navigate("AppStack", { screen: "AlbumStack" })
+							}
 						>
 							次へ
 						</Button>

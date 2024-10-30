@@ -4,6 +4,7 @@ import {
 	Image,
 	SafeAreaView,
 	TouchableWithoutFeedback,
+	Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { Checkbox } from "react-native-ui-lib";
@@ -59,6 +60,10 @@ const SignupScreen = () => {
 	const handleSignup = (values: IAuth) => {
 		if (!isValid) {
 			return;
+		}
+		if (!isChecked) {
+			Alert.alert("利用規約に同意してください");
+            return;
 		}
 		navigate("VerifyCodeScreen");
 	};
