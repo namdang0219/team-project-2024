@@ -1,12 +1,13 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text } from "react-native";
+import React from "react";
 
 const AlbumScreen = () => {
-  return (
-    <View>
-      <Text>AlbumScreen</Text>
-    </View>
-  )
-}
+	return (
+		<View>
+			<View style={{ height: 34, backgroundColor: "cyan" }} />
+			<Text>AlbumScreen</Text>
+		</View>
+	);
+};
 
-export default AlbumScreen
+export default AlbumScreen;
