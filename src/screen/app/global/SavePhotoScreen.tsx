@@ -5,6 +5,7 @@ import {
 	useWindowDimensions,
 	Image,
 	StyleSheet,
+	Alert,
 } from "react-native";
 import React from "react";
 import { darkTheme } from "util/theme/themeColors";
@@ -22,10 +23,22 @@ import Svg, {
 	RadialGradient,
 	Stop,
 } from "react-native-svg";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 const SavePhotoScreen = ({ route }: { route: any }) => {
-	const { photoUri } = route.params;
+	const { capturedUri } = route.params;
 	const { width: screenWidth } = useWindowDimensions();
 	const { goBack, navigate } = useNavigation<any>();
+
+	const savePhotoToCameraRoll = async (photoUri: string) => {
+		try {
+			const result = await CameraRoll.save(photoUri, { type: "photo" });
+			if (result) {
+				Alert.alert("CameraRoll saved successfully");
+			}
+		} catch (error) {
+			console.error("Error saving photo to Camera Roll:", error);
+		}
+	};
 
 	const styles = StyleSheet.create({
 		topbar: {
@@ -98,10 +111,10 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 			<View style={styles.mainContainer}>
 				<View>
 					<View style={styles.imageContainer}>
-						{photoUri ? (
+						{capturedUri ? (
 							<Image
 								source={{
-									uri: photoUri,
+									uri: capturedUri,
 								}}
 								style={styles.image}
 							/>
@@ -146,6 +159,9 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 					{/* add to album button   */}
 					<CustomTouchableOpacity
 						style={{ marginHorizontal: "auto" }}
+						onPress={() =>
+							navigate("AlbumStack", { screen: "AlbumScreen" })
+						}
 					>
 						<Text style={{ color: "white", fontSize: 16 }}>
 							アルバムに追加
@@ -155,9 +171,7 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 					{/* download button  */}
 					<Button
 						style={{ marginTop: 16 }}
-						onPress={() =>
-							navigate("AlbumStack", { screen: "AlbumScreen" })
-						}
+						onPress={() => savePhotoToCameraRoll(capturedUri)}
 					>
 						<View style={styles.buttonContent}>
 							<Feather

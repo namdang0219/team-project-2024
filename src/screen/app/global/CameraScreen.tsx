@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { CustomTouchableOpacity } from "components/custom";
 import {
@@ -41,9 +41,7 @@ import {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { Animated as RNAnimated } from "react-native";
-import { Button } from "components/button";
 import { BlurView } from "expo-blur";
-import { TabController } from "react-native-ui-lib";
 import {
 	Route,
 	SceneMap,
@@ -51,6 +49,7 @@ import {
 	TabBarProps,
 	TabView,
 } from "react-native-tab-view";
+import { captureRef } from "react-native-view-shot";
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 Reanimated.addWhitelistedNativeProps({
@@ -65,21 +64,32 @@ const CameraScreen = () => {
 	const { goBack, navigate } = useNavigation<any>();
 	const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 	const { hasPermission, requestPermission } = useCameraPermission();
-	const [isFlashOn, setIsFlashOn] = useState<boolean>(false);
+	const [isFlashOn, setIsFlashOn] = useState<
+		"on" | "off" | "auto" | undefined
+	>("off");
 	const [showGrid, setShowGrid] = useState<boolean>(false);
 	const [isExposureSliderVisible, setIsExposureSliderVisible] =
 		useState<boolean>(false);
 	const [showEffectModal, setShowEffectModal] = useState<boolean>(false);
-	const [photoUri, setPhotoUri] = useState<string | null>(
-		"https://i.pinimg.com/564x/f3/92/97/f3929715310a8ec0a8e6d41f86c09794.jpg"
-	);
-
+	const [photoUri, setPhotoUri] = useState<string | null>(null);
+	const [previewPhotoUri, setPreviewPhotoUri] = useState<string | null>(null);
+	const viewRef = useRef<View>(null);
 	const fadeAnim = useRef(new RNAnimated.Value(0)).current;
 	const translateYAnim = useRef(new RNAnimated.Value(20)).current;
 	const [cameraSide, setCameraSide] = useState<"front" | "back">("front");
+	const isFocused = useIsFocused();
 
 	const toogleCameraSide = () => {
 		setCameraSide((current) => (current === "front" ? "back" : "front"));
+	};
+
+	const takePhoto = async () => {
+		if (cameraRef.current) {
+			const photo = await cameraRef.current.takePhoto({
+				flash: isFlashOn,
+			});
+			setPreviewPhotoUri(photo.path);
+		}
 	};
 
 	useEffect(() => {
@@ -136,6 +146,19 @@ const CameraScreen = () => {
 			"telephoto-camera",
 		],
 	});
+
+	const handleNavigateToSave = async () => {
+		try {
+			const capturedUri = await captureRef(viewRef, {
+				format: "jpg",
+				quality: 0.8,
+			});
+			setPhotoUri(capturedUri);
+			navigate("SavePhotoScreen", { capturedUri });
+		} catch (error) {
+			console.error("Lỗi khi chụp ảnh màn hình:", error);
+		}
+	};
 
 	if (!hasPermission) return <Text>No permisson to access camera</Text>;
 	if (!device == null)
@@ -259,12 +282,12 @@ const CameraScreen = () => {
 					backgroundColor: darkTheme.colors.background,
 				}}
 			>
-				<View style={styles.cameraContainer}>
+				<View style={styles.cameraContainer} ref={viewRef}>
 					{/* camera view  */}
-					{photoUri && (
+					{previewPhotoUri && (
 						<Image
 							source={{
-								uri: photoUri,
+								uri: previewPhotoUri,
 							}}
 							style={{ aspectRatio: "9/16", width: screenWidth }}
 						/>
@@ -318,7 +341,16 @@ const CameraScreen = () => {
 								}}
 							>
 								{/* x mark  */}
-								<CustomTouchableOpacity onPress={goBack}>
+								<CustomTouchableOpacity
+									onPress={() => {
+										if (previewPhotoUri || photoUri) {
+											setPreviewPhotoUri(null);
+											setPhotoUri(null);
+										} else {
+											goBack();
+										}
+									}}
+								>
 									<Feather
 										name="x"
 										size={30}
@@ -327,7 +359,7 @@ const CameraScreen = () => {
 									/>
 								</CustomTouchableOpacity>
 								{/* image flip  */}
-								{photoUri && (
+								{previewPhotoUri && (
 									<CustomTouchableOpacity>
 										<MaterialCommunityIcons
 											name="flip-horizontal"
@@ -338,13 +370,9 @@ const CameraScreen = () => {
 									</CustomTouchableOpacity>
 								)}
 								{/* save button  */}
-								{photoUri && (
+								{previewPhotoUri && (
 									<CustomTouchableOpacity
-										onPress={() =>
-											navigate("SavePhotoScreen", {
-												photoUri,
-											})
-										}
+										onPress={handleNavigateToSave}
 									>
 										<Text
 											style={[
@@ -437,6 +465,7 @@ const CameraScreen = () => {
 								<View style={{ width: 120 }}>
 									<CustomTouchableOpacity
 										style={[styles.shutterButton]}
+										onPress={takePhoto}
 									/>
 								</View>
 								<CustomTouchableOpacity
@@ -452,11 +481,11 @@ const CameraScreen = () => {
 						</View>
 					</View>
 
-					{!photoUri && !device && (
+					{!previewPhotoUri && !device && (
 						<ActivityIndicator size={"large"} />
 					)}
 
-					{!photoUri && device && (
+					{!previewPhotoUri && isFocused && device && (
 						<ReanimatedCamera
 							ref={cameraRef}
 							style={StyleSheet.absoluteFill}
@@ -500,9 +529,15 @@ const CameraScreen = () => {
 					</Pressable>
 					<Pressable
 						style={styles.featureItem}
-						onPress={() => setIsFlashOn(!isFlashOn)}
+						onPress={() =>
+							setIsFlashOn((prev) =>
+								prev == "on" ? "off" : "on"
+							)
+						}
 					>
-						<IconFlash gradient={isFlashOn ? true : false} />
+						<IconFlash
+							gradient={isFlashOn == "on" ? true : false}
+						/>
 					</Pressable>
 					<Pressable
 						style={styles.featureItem}
