@@ -22,7 +22,8 @@ import Svg, {
 	RadialGradient,
 	Stop,
 } from "react-native-svg";
-const SavePhotoScreen = () => {
+const SavePhotoScreen = ({ route }: { route: any }) => {
+	const { photoUri } = route.params;
 	const { width: screenWidth } = useWindowDimensions();
 	const { goBack, navigate } = useNavigation<any>();
 
@@ -43,6 +44,8 @@ const SavePhotoScreen = () => {
 			width: (screenWidth / 5) * 4,
 			aspectRatio: "1/1",
 			marginHorizontal: "auto",
+			alignItems: "center",
+			justifyContent: "center",
 		},
 		image: {
 			width: "100%",
@@ -95,12 +98,16 @@ const SavePhotoScreen = () => {
 			<View style={styles.mainContainer}>
 				<View>
 					<View style={styles.imageContainer}>
-						<Image
-							source={{
-								uri: "https://i.pinimg.com/564x/35/82/60/3582606724d54222c0052990da2c1f0f.jpg",
-							}}
-							style={styles.image}
-						/>
+						{photoUri ? (
+							<Image
+								source={{
+									uri: photoUri,
+								}}
+								style={styles.image}
+							/>
+						) : (
+							<Text>写真がありません</Text>
+						)}
 					</View>
 
 					{/* share method  */}

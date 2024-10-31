@@ -5,6 +5,9 @@ import {
 	Text,
 	ActivityIndicator,
 	Image,
+	Pressable,
+	Modal,
+	FlatList,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -38,6 +41,16 @@ import {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import { Animated as RNAnimated } from "react-native";
+import { Button } from "components/button";
+import { BlurView } from "expo-blur";
+import { TabController } from "react-native-ui-lib";
+import {
+	Route,
+	SceneMap,
+	TabBar,
+	TabBarProps,
+	TabView,
+} from "react-native-tab-view";
 
 const ReanimatedCamera = Reanimated.createAnimatedComponent(Camera);
 Reanimated.addWhitelistedNativeProps({
@@ -49,17 +62,25 @@ function clamp(val: number, min: number, max: number) {
 }
 
 const CameraScreen = () => {
-	const { colors } = useTheme();
-	const { goBack, navigate } = useNavigation();
-	const { width: screenWidth } = useWindowDimensions();
+	const { goBack, navigate } = useNavigation<any>();
+	const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 	const { hasPermission, requestPermission } = useCameraPermission();
 	const [isFlashOn, setIsFlashOn] = useState<boolean>(false);
 	const [showGrid, setShowGrid] = useState<boolean>(false);
 	const [isExposureSliderVisible, setIsExposureSliderVisible] =
 		useState<boolean>(false);
+	const [showEffectModal, setShowEffectModal] = useState<boolean>(false);
+	const [photoUri, setPhotoUri] = useState<string | null>(
+		"https://i.pinimg.com/564x/f3/92/97/f3929715310a8ec0a8e6d41f86c09794.jpg"
+	);
 
-	const fadeAnim = useRef(new RNAnimated.Value(0)).current; // Giá trị cho opacity
-	const translateYAnim = useRef(new RNAnimated.Value(20)).current; // Giá trị cho vị trí
+	const fadeAnim = useRef(new RNAnimated.Value(0)).current;
+	const translateYAnim = useRef(new RNAnimated.Value(20)).current;
+	const [cameraSide, setCameraSide] = useState<"front" | "back">("front");
+
+	const toogleCameraSide = () => {
+		setCameraSide((current) => (current === "front" ? "back" : "front"));
+	};
 
 	useEffect(() => {
 		if (isExposureSliderVisible) {
@@ -108,7 +129,7 @@ const CameraScreen = () => {
 
 	const cameraRef = useRef<Camera>(null);
 
-	const device = useCameraDevice("front", {
+	const device = useCameraDevice(cameraSide, {
 		physicalDevices: [
 			"ultra-wide-angle-camera",
 			"wide-angle-camera",
@@ -184,6 +205,7 @@ const CameraScreen = () => {
 			position: "absolute",
 			alignItems: "center",
 			width: screenWidth,
+			zIndex: 1000,
 		},
 		exposureIndicator: {
 			borderTopWidth: 10,
@@ -212,15 +234,19 @@ const CameraScreen = () => {
 		},
 		line: {
 			position: "absolute",
-			backgroundColor: "rgba(255, 255, 255, 0.5)", // Màu trắng nhạt với độ trong suốt
+			backgroundColor: "rgba(255, 255, 255, 0.5)",
 		},
 		horizontalLine: {
 			width: "100%",
-			height: 1, // Độ dày của đường kẻ
+			height: 1,
 		},
 		verticalLine: {
 			height: "100%",
-			width: 1, // Độ dày của đường kẻ
+			width: 1,
+		},
+		modalOverlay: {
+			flex: 1,
+			backgroundColor: "transparent",
 		},
 	});
 
@@ -235,15 +261,18 @@ const CameraScreen = () => {
 			>
 				<View style={styles.cameraContainer}>
 					{/* camera view  */}
-					<Image
-						source={{
-							uri: "https://i.pinimg.com/564x/35/82/60/3582606724d54222c0052990da2c1f0f.jpg",
-						}}
-						style={{ aspectRatio: "9/16", width: screenWidth }}
-					/>
+					{photoUri && (
+						<Image
+							source={{
+								uri: photoUri,
+							}}
+							style={{ aspectRatio: "9/16", width: screenWidth }}
+						/>
+					)}
 
+					{/* grid ui  */}
 					{showGrid && (
-						<View style={StyleSheet.absoluteFill}>
+						<View style={[{ zIndex: 1 }, StyleSheet.absoluteFill]}>
 							<View
 								style={[
 									styles.line,
@@ -298,32 +327,38 @@ const CameraScreen = () => {
 									/>
 								</CustomTouchableOpacity>
 								{/* image flip  */}
-								<CustomTouchableOpacity>
-									<MaterialCommunityIcons
-										name="flip-horizontal"
-										size={26}
-										color={"white"}
-										style={styles.primaryShadow}
-									/>
-								</CustomTouchableOpacity>
+								{photoUri && (
+									<CustomTouchableOpacity>
+										<MaterialCommunityIcons
+											name="flip-horizontal"
+											size={26}
+											color={"white"}
+											style={styles.primaryShadow}
+										/>
+									</CustomTouchableOpacity>
+								)}
 								{/* save button  */}
-								<CustomTouchableOpacity
-									onPress={() =>
-										navigate("SavePhotoScreen" as never)
-									}
-								>
-									<Text
-										style={[
-											{
-												color: "white",
-												fontSize: 18,
-											},
-											styles.primaryShadow,
-										]}
+								{photoUri && (
+									<CustomTouchableOpacity
+										onPress={() =>
+											navigate("SavePhotoScreen", {
+												photoUri,
+											})
+										}
 									>
-										保存
-									</Text>
-								</CustomTouchableOpacity>
+										<Text
+											style={[
+												{
+													color: "white",
+													fontSize: 18,
+												},
+												styles.primaryShadow,
+											]}
+										>
+											保存
+										</Text>
+									</CustomTouchableOpacity>
+								)}
 							</View>
 
 							{/* camera control  */}
@@ -404,7 +439,9 @@ const CameraScreen = () => {
 										style={[styles.shutterButton]}
 									/>
 								</View>
-								<CustomTouchableOpacity>
+								<CustomTouchableOpacity
+									onPress={() => setShowEffectModal(true)}
+								>
 									<MaterialIcons
 										name="face-retouching-natural"
 										size={30}
@@ -415,14 +452,18 @@ const CameraScreen = () => {
 						</View>
 					</View>
 
-					{/* {!device && <ActivityIndicator size={"large"} />} */}
+					{!photoUri && !device && (
+						<ActivityIndicator size={"large"} />
+					)}
 
-					{device && (
+					{!photoUri && device && (
 						<ReanimatedCamera
 							ref={cameraRef}
 							style={StyleSheet.absoluteFill}
 							device={device}
-							isActive={false}
+							isActive={true}
+							photo
+							exposure={exposureValue * -0.01}
 						/>
 					)}
 				</View>
@@ -438,39 +479,202 @@ const CameraScreen = () => {
 						opacity: 0.85,
 					}}
 				>
-					<CustomTouchableOpacity style={styles.featureItem}>
+					<Pressable style={styles.featureItem}>
 						<IconFrame gradient={false} />
-					</CustomTouchableOpacity>
-					<CustomTouchableOpacity
+					</Pressable>
+					<Pressable
 						style={styles.featureItem}
 						onPress={() => setShowGrid(!showGrid)}
 					>
 						<IconGrid gradient={showGrid ? true : false} />
-					</CustomTouchableOpacity>
-					<CustomTouchableOpacity
+					</Pressable>
+					<Pressable
 						style={styles.featureItem}
-						onPress={() => {
-							setIsExposureSliderVisible(
-								!isExposureSliderVisible
-							);
-						}}
+						onPress={() =>
+							setIsExposureSliderVisible(!isExposureSliderVisible)
+						}
 					>
 						<IconExposure
 							gradient={isExposureSliderVisible ? true : false}
 						/>
-					</CustomTouchableOpacity>
-					<CustomTouchableOpacity
+					</Pressable>
+					<Pressable
 						style={styles.featureItem}
 						onPress={() => setIsFlashOn(!isFlashOn)}
 					>
 						<IconFlash gradient={isFlashOn ? true : false} />
-					</CustomTouchableOpacity>
-					<CustomTouchableOpacity style={styles.featureItem}>
+					</Pressable>
+					<Pressable
+						style={styles.featureItem}
+						onPress={toogleCameraSide}
+					>
 						<IconRotate gradient={false} />
-					</CustomTouchableOpacity>
+					</Pressable>
 				</View>
 			</SafeAreaView>
+
+			{/* modal  */}
+			<Modal
+				transparent={true}
+				visible={showEffectModal}
+				animationType="slide"
+				onRequestClose={() => setShowEffectModal(false)}
+			>
+				<View style={styles.modalOverlay}>
+					{/* backdrop  */}
+					<Pressable
+						style={{ flex: 1 }}
+						onPress={() => setShowEffectModal(false)}
+					/>
+
+					{/* modal content  */}
+					{/* <View style={[styles.modalContent, { height: 350 }]}>
+						
+					</View> */}
+					<BlurView
+						tint="dark"
+						style={{
+							overflow: "hidden",
+							height: screenWidth,
+							borderTopLeftRadius: 15,
+							borderTopRightRadius: 15,
+							backgroundColor: "rgba(0,0,0,0.2)",
+						}}
+					>
+						<EffectModalContent />
+					</BlurView>
+				</View>
+			</Modal>
 		</>
+	);
+};
+
+const EffectModalContent = () => {
+	const layout = useWindowDimensions();
+
+	const padding = 10;
+
+	const gap = 10;
+	const numColumns = 4;
+
+	const availableSpace = layout.width - (numColumns - 1) * gap - padding * 2;
+	const itemSize = availableSpace / numColumns;
+
+	const FirstRoute = () => {
+		return (
+			<View
+				style={{
+					flex: 1,
+					backgroundColor: "transparent",
+					paddingHorizontal: padding,
+				}}
+			>
+				<FlatList
+					data={new Array(18).fill(0)}
+					keyExtractor={(item, index) => index.toString()}
+					numColumns={numColumns}
+					contentContainerStyle={{ gap, paddingTop: padding }}
+					columnWrapperStyle={{ gap }}
+					renderItem={({ item, index }) => (
+						<View key={index}>
+							<Image
+								source={{
+									uri: "https://i.pinimg.com/736x/bc/b4/b8/bcb4b89ed0a80184c54db62d0a5cf179.jpg",
+								}}
+								style={{ width: itemSize, aspectRatio: "1/1" }}
+							></Image>
+						</View>
+					)}
+				/>
+			</View>
+		);
+	};
+
+	const SecondRoute = () => {
+		return (
+			<View
+				style={{
+					flex: 1,
+					backgroundColor: "transparent",
+					paddingHorizontal: padding,
+				}}
+			>
+				<FlatList
+					data={new Array(18).fill(0)}
+					keyExtractor={(item, index) => index.toString()}
+					numColumns={numColumns}
+					contentContainerStyle={{ gap, paddingTop: padding }}
+					columnWrapperStyle={{ gap }}
+					renderItem={({ item, index }) => (
+						<View key={index}>
+							<Image
+								source={{
+									uri: "https://i.pinimg.com/originals/03/9f/54/039f546ad4bd2a52ea4da370035e5b73.gif",
+								}}
+								style={{
+									width: itemSize,
+									aspectRatio: "1/1",
+									objectFit: "cover",
+								}}
+							></Image>
+						</View>
+					)}
+				/>
+			</View>
+		);
+	};
+
+	const renderScene = SceneMap({
+		first: FirstRoute,
+		second: SecondRoute,
+	});
+
+	const [index, setIndex] = React.useState(0);
+	const [routes] = React.useState([
+		{ key: "first", title: "保存済み" },
+		{ key: "second", title: "流行中" },
+	]);
+
+	const renderTabBar = (props: TabBarProps<Route>) => (
+		<TabBar
+			{...props}
+			indicatorStyle={{
+				backgroundColor: "white",
+				height: 2,
+			}}
+			contentContainerStyle={{
+				borderBottomColor: "#d3d3d3",
+				borderBottomWidth: 0.5,
+			}}
+			tabStyle={{ width: 90 }}
+			labelStyle={{
+				fontSize: 16,
+				fontWeight: "500",
+				color: "white",
+			}}
+			renderLabel={({ route, focused, color }) => (
+				<Text
+					style={{ color: "white", fontSize: 15, fontWeight: "500" }}
+				>
+					{route.title}
+				</Text>
+			)}
+			style={{
+				backgroundColor: "transparent",
+				elevation: 0,
+				shadowOpacity: 0,
+			}}
+		/>
+	);
+
+	return (
+		<TabView
+			navigationState={{ index, routes }}
+			renderScene={renderScene}
+			onIndexChange={setIndex}
+			initialLayout={{ width: layout.width }}
+			renderTabBar={renderTabBar}
+		/>
 	);
 };
 
