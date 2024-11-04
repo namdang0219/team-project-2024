@@ -6,8 +6,9 @@ import {
 	Image,
 	StyleSheet,
 	Alert,
+	Share,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { darkTheme } from "util/theme/themeColors";
 import { IconBack } from "icon/global";
 import { DIMENTIONS } from "constant/dimention";
@@ -24,19 +25,51 @@ import Svg, {
 	Stop,
 } from "react-native-svg";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { useToast } from "react-native-toast-notifications";
+
 const SavePhotoScreen = ({ route }: { route: any }) => {
 	const { capturedUri } = route.params;
 	const { width: screenWidth } = useWindowDimensions();
 	const { goBack, navigate } = useNavigation<any>();
+	const toast = useToast();
+	const [loading, setLoading] = useState<boolean>(false);
 
 	const savePhotoToCameraRoll = async (photoUri: string) => {
 		try {
+			setLoading(true);
 			const result = await CameraRoll.save(photoUri, { type: "photo" });
 			if (result) {
-				Alert.alert("CameraRoll saved successfully");
+				setLoading(false);
+				toast.show("保存済み！🎉", {
+					type: "custom_type",
+				});
 			}
+
+			navigate("AlbumStack", { screen: "AlbumScreen" });
 		} catch (error) {
 			console.error("Error saving photo to Camera Roll:", error);
+		}
+	};
+
+	const onShare = async () => {
+		try {
+			const result = await Share.share({
+				message: "写真をシェアしましょう",
+				url: capturedUri,
+				title: "写真シェア",
+			});
+
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					Alert.alert("シェアずみ");
+				} else {
+					Alert.alert("シェアずみ");
+				}
+			} else if (result.action === Share.dismissedAction) {
+				return null;
+			}
+		} catch (error: any) {
+			console.error(error.message);
 		}
 	};
 
@@ -97,6 +130,10 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 		},
 	});
 
+	const handleShare = () => {
+		Alert.alert("Opp!", "開発中🥲");
+	};
+
 	return (
 		<SafeAreaView
 			style={{ flex: 1, backgroundColor: darkTheme.colors.background }}
@@ -126,7 +163,10 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 					{/* share method  */}
 					<View style={{ gap: 16, marginTop: 25 }}>
 						{/* insta  */}
-						<CustomTouchableOpacity style={styles.methodContainer}>
+						<CustomTouchableOpacity
+							style={styles.methodContainer}
+							onPress={handleShare}
+						>
 							<View style={styles.methodIcon}>
 								<IconInsta />
 							</View>
@@ -135,7 +175,10 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 							</Text>
 						</CustomTouchableOpacity>
 						{/* facebook  */}
-						<CustomTouchableOpacity style={styles.methodContainer}>
+						<CustomTouchableOpacity
+							style={styles.methodContainer}
+							onPress={handleShare}
+						>
 							<View style={styles.methodIcon}>
 								<IconFacebook />
 							</View>
@@ -144,13 +187,14 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 							</Text>
 						</CustomTouchableOpacity>
 						{/* facebook  */}
-						<CustomTouchableOpacity style={styles.methodContainer}>
+						<CustomTouchableOpacity
+							style={styles.methodContainer}
+							onPress={onShare}
+						>
 							<View style={styles.methodIcon}>
 								<IconShare />
 							</View>
-							<Text style={styles.methodText}>
-								Facebookに共有
-							</Text>
+							<Text style={styles.methodText}>他に共有</Text>
 						</CustomTouchableOpacity>
 					</View>
 				</View>
@@ -171,6 +215,7 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 					{/* download button  */}
 					<Button
 						style={{ marginTop: 16 }}
+						loading={loading}
 						onPress={() => savePhotoToCameraRoll(capturedUri)}
 					>
 						<View style={styles.buttonContent}>

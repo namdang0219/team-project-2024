@@ -62,7 +62,7 @@ function clamp(val: number, min: number, max: number) {
 
 const CameraScreen = () => {
 	const { goBack, navigate } = useNavigation<any>();
-	const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+	const { width: screenWidth } = useWindowDimensions();
 	const { hasPermission, requestPermission } = useCameraPermission();
 	const [isFlashOn, setIsFlashOn] = useState<
 		"on" | "off" | "auto" | undefined
@@ -76,7 +76,7 @@ const CameraScreen = () => {
 	const viewRef = useRef<View>(null);
 	const fadeAnim = useRef(new RNAnimated.Value(0)).current;
 	const translateYAnim = useRef(new RNAnimated.Value(20)).current;
-	const [cameraSide, setCameraSide] = useState<"front" | "back">("front");
+	const [cameraSide, setCameraSide] = useState<"front" | "back">("back");
 	const isFocused = useIsFocused();
 
 	const toogleCameraSide = () => {
@@ -87,6 +87,7 @@ const CameraScreen = () => {
 		if (cameraRef.current) {
 			const photo = await cameraRef.current.takePhoto({
 				flash: isFlashOn,
+				enableShutterSound: false,
 			});
 			setPreviewPhotoUri(photo.path);
 		}
@@ -282,15 +283,20 @@ const CameraScreen = () => {
 					backgroundColor: darkTheme.colors.background,
 				}}
 			>
-				<View style={styles.cameraContainer} ref={viewRef}>
+				<View style={styles.cameraContainer}>
 					{/* camera view  */}
 					{previewPhotoUri && (
-						<Image
-							source={{
-								uri: previewPhotoUri,
-							}}
-							style={{ aspectRatio: "9/16", width: screenWidth }}
-						/>
+						<View ref={viewRef}>
+							<Image
+								source={{
+									uri: previewPhotoUri,
+								}}
+								style={{
+									aspectRatio: "9/16",
+									width: screenWidth,
+								}}
+							/>
+						</View>
 					)}
 
 					{/* grid ui  */}
