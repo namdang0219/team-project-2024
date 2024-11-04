@@ -1,5 +1,5 @@
-import { View, Text } from "react-native";
-import React, { useState } from "react";
+import { View, Text, Alert } from "react-native";
+import React from "react";
 import { Button } from "components/button";
 import { useToast } from "react-native-toast-notifications";
 
@@ -11,7 +11,7 @@ const NotificationScreen = () => {
 		>
 			<Button
 				onPress={() => {
-					toast.show("success", { type: "custom_type" });
+					toast.show('OK!', { type: "custom_type" });
 				}}
 				style={{ paddingHorizontal: 20 }}
 			>

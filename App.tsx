@@ -44,14 +44,14 @@ const App = () => {
 					custom_type: (toast) => (
 						<View
 							style={{
-								width: (width / 5) * 4,
+								width: (width / 5) * 3,
 								shadowColor: "#000",
 								shadowOffset: { width: 0, height: 5 },
-								shadowOpacity: 0.1,
-								shadowRadius: 5,
+								shadowOpacity: 0.05,
+								shadowRadius: 3,
 								elevation: 3,
 								backgroundColor: "white",
-								borderRadius: 10,
+								borderRadius: 1000,
 								height: 50,
 								flexDirection: "row",
 								borderWidth: 1,
@@ -60,18 +60,9 @@ const App = () => {
 						>
 							<View
 								style={{
-									width: 5,
-									backgroundColor: toast.successColor,
-									height: 50,
-									borderTopLeftRadius: 10,
-									borderBottomLeftRadius: 10,
-								}}
-							/>
-							<View
-								style={{
 									flex: 1,
 									justifyContent: "center",
-									paddingHorizontal: 10,
+									alignItems: "center",
 								}}
 							>
 								<Text
