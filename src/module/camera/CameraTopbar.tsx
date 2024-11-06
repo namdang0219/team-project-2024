@@ -1,15 +1,17 @@
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, ViewProps } from "react-native";
 import React from "react";
 import { CustomTouchableOpacity } from "components/custom";
 import { useNavigation } from "@react-navigation/native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { captureRef } from "react-native-view-shot";
+import { ISticker } from "./CaptureArea";
 
 type CameraTopbarProps = {
 	previewPhotoUri: string | null;
 	photoUri: string | null;
 	setPreviewPhotoUri: React.Dispatch<React.SetStateAction<string | null>>;
 	setPhotoUri: React.Dispatch<React.SetStateAction<string | null>>;
+	setStickers: React.Dispatch<React.SetStateAction<ISticker[]>>;
 	viewRef: React.RefObject<View>;
 };
 
@@ -19,13 +21,17 @@ const CameraTopbar = ({
 	viewRef,
 	setPreviewPhotoUri,
 	setPhotoUri,
-}: CameraTopbarProps) => {
+	setStickers,
+	style,
+	...props
+}: CameraTopbarProps & ViewProps) => {
 	const { goBack, navigate } = useNavigation<any>();
 
 	const handleBackButton = () => {
 		if (previewPhotoUri || photoUri) {
 			setPreviewPhotoUri(null);
 			setPhotoUri(null);
+			setStickers([]);
 		} else {
 			goBack();
 		}
@@ -46,13 +52,17 @@ const CameraTopbar = ({
 
 	return (
 		<View
-			style={{
-				height: 50,
-				flexDirection: "row",
-				alignItems: "center",
-				justifyContent: "space-between",
-				paddingHorizontal: 10,
-			}}
+			style={[
+				{
+					height: 50,
+					flexDirection: "row",
+					alignItems: "center",
+					justifyContent: "space-between",
+					paddingHorizontal: 10,
+				},
+				style,
+			]}
+			{...props}
 		>
 			{/* x mark  */}
 			<CustomTouchableOpacity onPress={handleBackButton}>

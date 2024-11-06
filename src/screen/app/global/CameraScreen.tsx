@@ -4,22 +4,14 @@ import {
 	useWindowDimensions,
 	Text,
 	Animated,
-	NativeScrollEvent,
-	Button,
 	TextInput,
-	TouchableWithoutFeedback,
 	Image,
 	Modal,
 	Pressable,
 	FlatList,
+	ImageBackground,
 } from "react-native";
-import React, {
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
 	SafeAreaView,
 	useSafeAreaInsets,
@@ -39,7 +31,7 @@ import {
 } from "icon/camera-edit";
 import GridSection from "module/camera/GridSection";
 import CameraSection from "module/camera/CameraSection";
-import CaptureArea from "module/camera/CaptureArea";
+import { ISticker, Sticker } from "module/camera/CaptureArea";
 import NonePhotoBottomFeature from "module/camera/NonePhotoBottomFeature";
 import { useToggle } from "hook/useToggle";
 import EffectModal from "module/camera/EffectModal";
@@ -53,14 +45,8 @@ import {
 	IconSticker,
 	IconText,
 } from "icon/camera-edit/add-item";
-import { Dialog, PanningProvider } from "react-native-ui-lib";
-import BottomSheet, {
-	BottomSheetFlatList,
-	BottomSheetTextInput,
-} from "@gorhom/bottom-sheet";
 import { BlurView } from "expo-blur";
 import { Feather } from "@expo/vector-icons";
-import handlePressBackground from "util/func/handlePressBackground";
 
 const CameraScreen = () => {
 	const { hasPermission, requestPermission } = useCameraPermission();
@@ -68,11 +54,17 @@ const CameraScreen = () => {
 	const insets = useSafeAreaInsets();
 	const [photoUri, setPhotoUri] = useState<string | null>(null); // photoUri is image link of captured view after edit
 	const [previewPhotoUri, setPreviewPhotoUri] = useState<string | null>(
+		// null
 		"https://i.pinimg.com/736x/0e/c3/11/0ec311868b1d93c17786c69adc54bcb1.jpg"
 	); // previewPhotoUri is image link after press shutter button and before edit
 	const viewRef = useRef<View>(null);
 	const [exposureValue, setExposureValue] = useState<number>(0);
 	const isFocused = useIsFocused();
+	const [stickers, setStickers] = useState<ISticker[]>([]);
+
+	const addSticker = (stickerSource: string) => {
+		setStickers([...stickers, { source: stickerSource, id: Date.now() }]);
+	};
 
 	// toggle function to toggle show and hide (none preview image)
 	const [grid, toggleGrid] = useToggle(false);
@@ -82,7 +74,7 @@ const CameraScreen = () => {
 	const [effectModal, toggleEffectModal] = useToggle(false);
 
 	// toggle function to toggle show and hide (have preview image)
-	const [showAddItem, toggleShowAddItem] = useToggle(false);
+	const [showAddItem, toggleShowAddItem, setShowAddItem] = useToggle(false);
 	const [stikerModal, toggleStickerModal] = useToggle(false);
 
 	const translateYAnim = useRef(new Animated.Value(75)).current;
@@ -181,15 +173,6 @@ const CameraScreen = () => {
 				}}
 			>
 				<View style={styles.cameraContainer}>
-					{/* camera view  */}
-					{previewPhotoUri && (
-						// capture area
-						<CaptureArea
-							viewRef={viewRef}
-							previewPhotoUri={previewPhotoUri}
-						/>
-					)}
-
 					{/* grid ui  */}
 					{grid && <GridSection></GridSection>}
 
@@ -197,11 +180,18 @@ const CameraScreen = () => {
 						<View style={{ position: "relative", flex: 1 }}>
 							{/* top container  */}
 							<CameraTopbar
+								style={{
+									position: "absolute",
+									left: 0,
+									right: 0,
+									zIndex: 1000,
+								}}
 								photoUri={photoUri}
 								previewPhotoUri={previewPhotoUri}
 								setPhotoUri={setPhotoUri}
 								setPreviewPhotoUri={setPreviewPhotoUri}
 								viewRef={viewRef}
+								setStickers={setStickers}
 							/>
 
 							{/* exposure slider  */}
@@ -221,6 +211,7 @@ const CameraScreen = () => {
 										width: 320,
 										left: "50%",
 										justifyContent: "space-between",
+										zIndex: 1000,
 									},
 									{
 										transform: [
@@ -293,8 +284,43 @@ const CameraScreen = () => {
 									setShowEffectModal={toggleEffectModal}
 								/>
 							)}
+
+							{previewPhotoUri && (
+								<View
+									ref={viewRef}
+									style={StyleSheet.absoluteFill}
+								>
+									<ImageBackground
+										source={{ uri: previewPhotoUri }}
+										style={[
+											{
+												aspectRatio: "9/16",
+												width: screenWidth,
+											},
+										]}
+									>
+										{stickers &&
+											stickers.map((sticker) => (
+												<Sticker
+													key={sticker.id}
+													source={sticker.source}
+												/>
+											))}
+									</ImageBackground>
+								</View>
+							)}
 						</View>
 					</View>
+
+					{/* camera view  */}
+					{/* {previewPhotoUri && (
+						// capture area
+						<CaptureArea
+							previewPhotoUri={previewPhotoUri}
+							stickers={stickers}
+							viewRef={viewRef}
+						></CaptureArea>
+					)} */}
 
 					{!previewPhotoUri && isFocused && (
 						<CameraSection
@@ -340,6 +366,7 @@ const CameraScreen = () => {
 						<CustomTouchableOpacity
 							style={styles.featureItem}
 							onPress={toggleShowAddItem}
+							// onPress={toggleStickerModal}
 						>
 							<IconPlus gradient={showAddItem} />
 						</CustomTouchableOpacity>
@@ -461,7 +488,7 @@ const CameraScreen = () => {
 														<Image
 															key={index}
 															source={{
-																uri: "https://i.pinimg.com/originals/4d/10/ed/4d10ed69da423bf0608624025986d98b.gif",
+																uri: "https://i.pinimg.com/564x/ef/15/bc/ef15bc6dc6c2391d3fbdd0e8ec696016.jpg",
 															}}
 															style={{
 																width: itemSize,
@@ -484,22 +511,32 @@ const CameraScreen = () => {
 									contentContainerStyle={{
 										paddingHorizontal: padding,
 										gap,
-										paddingBottom: 150
+										paddingBottom: 150,
 									}}
 									columnWrapperStyle={{ gap }}
 									numColumns={numColumns}
 									renderItem={({ item, index }) => (
-										<Image
-											key={index}
-											source={{
-												uri: "https://i.pinimg.com/564x/75/b4/c8/75b4c83dfe17d884bf1a338a362f3033.jpg",
+										<CustomTouchableOpacity
+											onPress={() => {
+												addSticker(
+													"https://i.pinimg.com/564x/75/b4/c8/75b4c83dfe17d884bf1a338a362f3033.jpg"
+												);
+												toggleStickerModal();
+												setShowAddItem(false);
 											}}
-											style={{
-												width: itemSize,
-												height: itemSize,
-												objectFit: "cover",
-											}}
-										/>
+										>
+											<Image
+												key={index}
+												source={{
+													uri: "https://i.pinimg.com/564x/75/b4/c8/75b4c83dfe17d884bf1a338a362f3033.jpg",
+												}}
+												style={{
+													width: itemSize,
+													height: itemSize,
+													objectFit: "cover",
+												}}
+											/>
+										</CustomTouchableOpacity>
 									)}
 								/>
 							</View>
