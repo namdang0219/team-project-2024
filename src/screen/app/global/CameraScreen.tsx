@@ -47,6 +47,7 @@ import {
 } from "icon/camera-edit/add-item";
 import { BlurView } from "expo-blur";
 import { Feather } from "@expo/vector-icons";
+import { recentStickers, stickerList } from "mock/stickerMocks";
 
 const CameraScreen = () => {
 	const { hasPermission, requestPermission } = useCameraPermission();
@@ -192,6 +193,7 @@ const CameraScreen = () => {
 								setPreviewPhotoUri={setPreviewPhotoUri}
 								viewRef={viewRef}
 								setStickers={setStickers}
+								setShowAddItem={setShowAddItem}
 							/>
 
 							{/* exposure slider  */}
@@ -312,16 +314,6 @@ const CameraScreen = () => {
 						</View>
 					</View>
 
-					{/* camera view  */}
-					{/* {previewPhotoUri && (
-						// capture area
-						<CaptureArea
-							previewPhotoUri={previewPhotoUri}
-							stickers={stickers}
-							viewRef={viewRef}
-						></CaptureArea>
-					)} */}
-
 					{!previewPhotoUri && isFocused && (
 						<CameraSection
 							cameraSide={backCamera ? "back" : "front"}
@@ -413,7 +405,7 @@ const CameraScreen = () => {
 						{/* cancel button  */}
 						<View
 							style={{
-								height: 36,
+								height: 40,
 								alignItems: "center",
 								paddingLeft: 14,
 								flexDirection: "row",
@@ -423,7 +415,7 @@ const CameraScreen = () => {
 							<CustomTouchableOpacity
 								onPress={toggleStickerModal}
 							>
-								<Text style={{ color: "white" }}>
+								<Text style={{ color: "white", fontSize: 16 }}>
 									キャンセル
 								</Text>
 							</CustomTouchableOpacity>
@@ -465,7 +457,7 @@ const CameraScreen = () => {
 							{/* sticker list  */}
 							<View style={{ marginTop: 10 }}>
 								<FlatList
-									data={new Array(50).fill(null)}
+									data={stickerList || []}
 									ListHeaderComponent={
 										<View style={{ gap }}>
 											<Text
@@ -482,21 +474,37 @@ const CameraScreen = () => {
 													gap,
 												}}
 											>
-												{new Array(8)
-													.fill(null)
-													.map((item, index) => (
-														<Image
-															key={index}
-															source={{
-																uri: "https://i.pinimg.com/564x/ef/15/bc/ef15bc6dc6c2391d3fbdd0e8ec696016.jpg",
+												{stickerList
+													.filter((s) =>
+														recentStickers.includes(
+															s.id
+														)
+													)
+													.map((item: ISticker) => (
+														<CustomTouchableOpacity
+															key={item.id}
+															onPress={() => {
+																addSticker(
+																	item.source
+																);
+																toggleStickerModal();
+																setShowAddItem(
+																	false
+																);
 															}}
-															style={{
-																width: itemSize,
-																height: itemSize,
-																objectFit:
-																	"cover",
-															}}
-														/>
+														>
+															<Image
+																source={{
+																	uri: item.source,
+																}}
+																style={{
+																	width: itemSize,
+																	height: itemSize,
+																	objectFit:
+																		"contain",
+																}}
+															/>
+														</CustomTouchableOpacity>
 													))}
 											</View>
 											<Text
@@ -515,25 +523,23 @@ const CameraScreen = () => {
 									}}
 									columnWrapperStyle={{ gap }}
 									numColumns={numColumns}
-									renderItem={({ item, index }) => (
+									renderItem={({ item }) => (
 										<CustomTouchableOpacity
+											key={item.id}
 											onPress={() => {
-												addSticker(
-													"https://i.pinimg.com/564x/75/b4/c8/75b4c83dfe17d884bf1a338a362f3033.jpg"
-												);
+												addSticker(item.source);
 												toggleStickerModal();
 												setShowAddItem(false);
 											}}
 										>
 											<Image
-												key={index}
 												source={{
-													uri: "https://i.pinimg.com/564x/75/b4/c8/75b4c83dfe17d884bf1a338a362f3033.jpg",
+													uri: item.source,
 												}}
 												style={{
 													width: itemSize,
 													height: itemSize,
-													objectFit: "cover",
+													objectFit: "contain",
 												}}
 											/>
 										</CustomTouchableOpacity>

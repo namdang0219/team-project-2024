@@ -13,6 +13,7 @@ type CameraTopbarProps = {
 	setPhotoUri: React.Dispatch<React.SetStateAction<string | null>>;
 	setStickers: React.Dispatch<React.SetStateAction<ISticker[]>>;
 	viewRef: React.RefObject<View>;
+	setShowAddItem: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const CameraTopbar = ({
@@ -23,6 +24,7 @@ const CameraTopbar = ({
 	setPhotoUri,
 	setStickers,
 	style,
+	setShowAddItem,
 	...props
 }: CameraTopbarProps & ViewProps) => {
 	const { goBack, navigate } = useNavigation<any>();
@@ -32,6 +34,7 @@ const CameraTopbar = ({
 			setPreviewPhotoUri(null);
 			setPhotoUri(null);
 			setStickers([]);
+			setShowAddItem(false);
 		} else {
 			goBack();
 		}
