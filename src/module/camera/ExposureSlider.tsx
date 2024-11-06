@@ -5,7 +5,7 @@ import {
 	useWindowDimensions,
 	StyleSheet,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
 	useAnimatedStyle,

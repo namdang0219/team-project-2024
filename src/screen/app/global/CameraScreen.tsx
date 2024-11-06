@@ -1,6 +1,29 @@
-import { View, StyleSheet, useWindowDimensions, Text } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+	View,
+	StyleSheet,
+	useWindowDimensions,
+	Text,
+	Animated,
+	NativeScrollEvent,
+	Button,
+	TextInput,
+	TouchableWithoutFeedback,
+	Image,
+	Modal,
+	Pressable,
+	FlatList,
+} from "react-native";
+import React, {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import {
+	SafeAreaView,
+	useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { useIsFocused } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import { CustomTouchableOpacity } from "components/custom";
@@ -23,25 +46,87 @@ import EffectModal from "module/camera/EffectModal";
 import CameraTopbar from "module/camera/CameraTopbar";
 import ExposureSlider from "module/camera/ExposureSlider";
 import CameraControl from "module/camera/CameraControl";
+import {
+	IconDraw,
+	IconEffect,
+	IconImage,
+	IconSticker,
+	IconText,
+} from "icon/camera-edit/add-item";
+import { Dialog, PanningProvider } from "react-native-ui-lib";
+import BottomSheet, {
+	BottomSheetFlatList,
+	BottomSheetTextInput,
+} from "@gorhom/bottom-sheet";
+import { BlurView } from "expo-blur";
+import { Feather } from "@expo/vector-icons";
+import handlePressBackground from "util/func/handlePressBackground";
 
 const CameraScreen = () => {
-	const { width: screenWidth } = useWindowDimensions();
 	const { hasPermission, requestPermission } = useCameraPermission();
-	const [showEffectModal, setShowEffectModal] = useState<boolean>(false);
+	const { width: screenWidth, height } = useWindowDimensions();
+	const insets = useSafeAreaInsets();
 	const [photoUri, setPhotoUri] = useState<string | null>(null); // photoUri is image link of captured view after edit
 	const [previewPhotoUri, setPreviewPhotoUri] = useState<string | null>(
 		"https://i.pinimg.com/736x/0e/c3/11/0ec311868b1d93c17786c69adc54bcb1.jpg"
 	); // previewPhotoUri is image link after press shutter button and before edit
 	const viewRef = useRef<View>(null);
 	const [exposureValue, setExposureValue] = useState<number>(0);
-
 	const isFocused = useIsFocused();
 
-	// toggle function to toggle show and hide
+	// toggle function to toggle show and hide (none preview image)
 	const [grid, toggleGrid] = useToggle(false);
 	const [backCamera, toggleCamera] = useToggle(false);
 	const [flash, toggleFlash] = useToggle(false);
 	const [showExposureSlider, toggleExposureSlider] = useToggle(false);
+	const [effectModal, toggleEffectModal] = useToggle(false);
+
+	// toggle function to toggle show and hide (have preview image)
+	const [showAddItem, toggleShowAddItem] = useToggle(false);
+	const [stikerModal, toggleStickerModal] = useToggle(false);
+
+	const translateYAnim = useRef(new Animated.Value(75)).current;
+	const fadeAnim = useRef(new Animated.Value(0)).current;
+
+	const padding = 14;
+
+	const gap = 10;
+	const numColumns = 4;
+
+	const availableSpace = screenWidth - (numColumns - 1) * gap - padding * 2;
+	const itemSize = availableSpace / numColumns;
+
+	useEffect(() => {
+		if (showAddItem) {
+			Animated.parallel([
+				// container anim
+				Animated.timing(translateYAnim, {
+					toValue: -10,
+					duration: 300,
+					useNativeDriver: true,
+				}),
+				Animated.timing(fadeAnim, {
+					toValue: 1,
+					duration: 300,
+					delay: 150,
+					useNativeDriver: true,
+				}),
+			]).start();
+		} else {
+			Animated.parallel([
+				Animated.timing(translateYAnim, {
+					toValue: 75,
+					duration: 300,
+					useNativeDriver: true,
+				}),
+				Animated.timing(fadeAnim, {
+					toValue: 0,
+					duration: 300,
+					useNativeDriver: true,
+				}),
+			]).start();
+		}
+	}, [showAddItem]);
 
 	useEffect(() => {
 		if (!hasPermission) {
@@ -73,6 +158,14 @@ const CameraScreen = () => {
 		},
 		featureItem: {
 			width: 40,
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		itemContainer: {
+			backgroundColor: "white",
+			width: 48,
+			height: 48,
+			borderRadius: 1000,
 			alignItems: "center",
 			justifyContent: "center",
 		},
@@ -118,13 +211,86 @@ const CameraScreen = () => {
 								showExposureSlider={showExposureSlider}
 							/>
 
+							{/* add item  */}
+							<Animated.View
+								style={[
+									{
+										flexDirection: "row",
+										position: "absolute",
+										bottom: 0,
+										width: 320,
+										left: "50%",
+										justifyContent: "space-between",
+									},
+									{
+										transform: [
+											{ translateX: -160 },
+											{ translateY: translateYAnim },
+										],
+										opacity: fadeAnim,
+									},
+								]}
+							>
+								<CustomTouchableOpacity
+									style={[
+										styles.itemContainer,
+										{
+											transform: [{ translateY: -16 }],
+										},
+									]}
+								>
+									<IconImage gradient />
+								</CustomTouchableOpacity>
+								<CustomTouchableOpacity
+									style={[
+										styles.itemContainer,
+										{
+											transform: [{ translateY: -5 }],
+										},
+									]}
+								>
+									<IconText gradient />
+								</CustomTouchableOpacity>
+								<CustomTouchableOpacity
+									style={[
+										styles.itemContainer,
+										{
+											transform: [{ translateY: -0 }],
+										},
+									]}
+								>
+									<IconEffect gradient />
+								</CustomTouchableOpacity>
+								<CustomTouchableOpacity
+									style={[
+										styles.itemContainer,
+										{
+											transform: [{ translateY: -5 }],
+										},
+									]}
+								>
+									<IconDraw gradient />
+								</CustomTouchableOpacity>
+								<CustomTouchableOpacity
+									onPress={toggleStickerModal}
+									style={[
+										styles.itemContainer,
+										{
+											transform: [{ translateY: -16 }],
+										},
+									]}
+								>
+									<IconSticker gradient />
+								</CustomTouchableOpacity>
+							</Animated.View>
+
 							{/* camera control  */}
 							{!previewPhotoUri && (
 								<CameraControl
 									cameraRef={cameraRef}
 									flash={flash}
 									setPreviewPhotoUri={setPreviewPhotoUri}
-									setShowEffectModal={setShowEffectModal}
+									setShowEffectModal={toggleEffectModal}
 								/>
 							)}
 						</View>
@@ -171,8 +337,11 @@ const CameraScreen = () => {
 						<CustomTouchableOpacity style={styles.featureItem}>
 							<IconSlider gradient={false} />
 						</CustomTouchableOpacity>
-						<CustomTouchableOpacity style={styles.featureItem}>
-							<IconPlus gradient={false} />
+						<CustomTouchableOpacity
+							style={styles.featureItem}
+							onPress={toggleShowAddItem}
+						>
+							<IconPlus gradient={showAddItem} />
 						</CustomTouchableOpacity>
 						<CustomTouchableOpacity style={styles.featureItem}>
 							<IconTag gradient={false} />
@@ -186,9 +355,158 @@ const CameraScreen = () => {
 
 			{/* modal  */}
 			<EffectModal
-				showEffectModal={showEffectModal}
-				setShowEffectModal={setShowEffectModal}
+				showEffectModal={effectModal}
+				setShowEffectModal={toggleEffectModal}
 			/>
+
+			{/* sticker modal  */}
+			<Modal
+				transparent={true}
+				visible={stikerModal}
+				animationType="slide"
+				onRequestClose={toggleStickerModal}
+			>
+				<View style={{ flex: 1, backgroundColor: "transparent" }}>
+					{/* backdrop  */}
+					<Pressable
+						style={{ height: insets.top }}
+						onPress={toggleStickerModal}
+					/>
+
+					<BlurView
+						tint="dark"
+						style={{
+							overflow: "hidden",
+							flex: 1,
+							borderTopLeftRadius: 15,
+							borderTopRightRadius: 15,
+							backgroundColor: "rgba(0,0,0,0.35)",
+						}}
+					>
+						{/* cancel button  */}
+						<View
+							style={{
+								height: 36,
+								alignItems: "center",
+								paddingLeft: 14,
+								flexDirection: "row",
+								justifyContent: "space-between",
+							}}
+						>
+							<CustomTouchableOpacity
+								onPress={toggleStickerModal}
+							>
+								<Text style={{ color: "white" }}>
+									キャンセル
+								</Text>
+							</CustomTouchableOpacity>
+						</View>
+
+						{/* content  */}
+						<View>
+							{/* search input field  */}
+							<View
+								style={{
+									marginHorizontal: 14,
+									position: "relative",
+								}}
+							>
+								<TextInput
+									placeholder="ステッカーを検索"
+									placeholderTextColor={"#9ca3af"}
+									style={{
+										backgroundColor:
+											"rgba(255,255,255,0.15)",
+										height: 35,
+										paddingHorizontal: 14,
+										borderRadius: 6,
+										color: "white",
+									}}
+								/>
+								<Feather
+									name="search"
+									size={20}
+									style={{
+										position: "absolute",
+										right: 10,
+										top: 7,
+										color: "white",
+									}}
+								/>
+							</View>
+
+							{/* sticker list  */}
+							<View style={{ marginTop: 10 }}>
+								<FlatList
+									data={new Array(50).fill(null)}
+									ListHeaderComponent={
+										<View style={{ gap }}>
+											<Text
+												style={{
+													color: "white",
+												}}
+											>
+												最近使用したステッカー
+											</Text>
+											<View
+												style={{
+													flexDirection: "row",
+													flexWrap: "wrap",
+													gap,
+												}}
+											>
+												{new Array(8)
+													.fill(null)
+													.map((item, index) => (
+														<Image
+															key={index}
+															source={{
+																uri: "https://i.pinimg.com/originals/4d/10/ed/4d10ed69da423bf0608624025986d98b.gif",
+															}}
+															style={{
+																width: itemSize,
+																height: itemSize,
+																objectFit:
+																	"cover",
+															}}
+														/>
+													))}
+											</View>
+											<Text
+												style={{
+													color: "white",
+												}}
+											>
+												ステッカー一覧
+											</Text>
+										</View>
+									}
+									contentContainerStyle={{
+										paddingHorizontal: padding,
+										gap,
+										paddingBottom: 150
+									}}
+									columnWrapperStyle={{ gap }}
+									numColumns={numColumns}
+									renderItem={({ item, index }) => (
+										<Image
+											key={index}
+											source={{
+												uri: "https://i.pinimg.com/564x/75/b4/c8/75b4c83dfe17d884bf1a338a362f3033.jpg",
+											}}
+											style={{
+												width: itemSize,
+												height: itemSize,
+												objectFit: "cover",
+											}}
+										/>
+									)}
+								/>
+							</View>
+						</View>
+					</BlurView>
+				</View>
+			</Modal>
 		</>
 	);
 };
