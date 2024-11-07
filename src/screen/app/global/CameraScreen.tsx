@@ -10,6 +10,7 @@ import {
 	Pressable,
 	FlatList,
 	ImageBackground,
+	PanResponder,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -48,6 +49,8 @@ import {
 import { BlurView } from "expo-blur";
 import { Feather } from "@expo/vector-icons";
 import { recentStickers, stickerList } from "mock/stickerMocks";
+import { Canvas, Path, Skia, SkPath } from "@shopify/react-native-skia";
+import { IconRedo, IconUndo } from "icon/camera-edit/drawPad";
 
 const CameraScreen = () => {
 	const { hasPermission, requestPermission } = useCameraPermission();
@@ -77,6 +80,7 @@ const CameraScreen = () => {
 	// toggle function to toggle show and hide (have preview image)
 	const [showAddItem, toggleShowAddItem, setShowAddItem] = useToggle(false);
 	const [stikerModal, toggleStickerModal] = useToggle(false);
+	const [drawPad, toggleDrawPad, setDrawPad] = useToggle(false);
 
 	const translateYAnim = useRef(new Animated.Value(75)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -164,6 +168,67 @@ const CameraScreen = () => {
 		},
 	});
 
+	const [paths, setPaths] = useState<SkPath[]>([]); // save all paths
+	const [redoPaths, setRedoPaths] = useState<SkPath[]>([]); // save paths was undo
+	const [currentPath, setCurrentPath] = useState<SkPath | null>(null); // current path
+
+	// start new path when drawing
+	const startPath = (x: number, y: number) => {
+		const newPath = Skia.Path.Make();
+		newPath.moveTo(x, y);
+		setCurrentPath(newPath);
+	};
+
+	// update path when move finger
+	const updatePath = (x: number, y: number) => {
+		if (currentPath) {
+			currentPath.lineTo(x, y);
+			setCurrentPath(currentPath.copy()); // update path to current path
+		}
+	};
+
+	// finish path and save to current path
+	const endPath = () => {
+		if (currentPath) {
+			setPaths([...paths, currentPath]);
+			setCurrentPath(null);
+			setRedoPaths([]); // Reset redoPaths when have new path created
+		}
+	};
+
+	// undo last path
+	const undo = () => {
+		if (paths.length > 0) {
+			const newPaths = [...paths];
+			const lastPath = newPaths.pop();
+			setPaths(newPaths);
+			if (lastPath) setRedoPaths([...redoPaths, lastPath]);
+		}
+	};
+
+	// redo path when undo ed
+	const redo = () => {
+		if (redoPaths.length > 0) {
+			const newRedoPaths = [...redoPaths];
+			const restoredPath = newRedoPaths.pop();
+			setRedoPaths(newRedoPaths);
+			if (restoredPath) setPaths([...paths, restoredPath]);
+		}
+	};
+
+	const panResponder = PanResponder.create({
+		onStartShouldSetPanResponder: () => true,
+		onPanResponderGrant: (evt) => {
+			const { locationX, locationY } = evt.nativeEvent;
+			startPath(locationX, locationY);
+		},
+		onPanResponderMove: (evt) => {
+			const { locationX, locationY } = evt.nativeEvent;
+			updatePath(locationX, locationY);
+		},
+		onPanResponderRelease: endPath,
+	});
+
 	return (
 		<>
 			<StatusBar style="light" />
@@ -202,6 +267,42 @@ const CameraScreen = () => {
 								setExposureValue={setExposureValue}
 								showExposureSlider={showExposureSlider}
 							/>
+
+							{/* draw pad  */}
+							{drawPad && (
+								<View
+									style={[
+										StyleSheet.absoluteFill,
+										{ zIndex: 1000 },
+									]}
+									{...panResponder.panHandlers}
+								>
+									<CustomTouchableOpacity
+										style={{
+											position: "absolute",
+											bottom: 10,
+											left: screenWidth / 2 - 40,
+											zIndex: 100,
+										}}
+										onPress={undo}
+										disabled={paths.length === 0}
+									>
+										<IconUndo />
+									</CustomTouchableOpacity>
+									<CustomTouchableOpacity
+										style={{
+											position: "absolute",
+											bottom: 10,
+											right: screenWidth / 2 - 40,
+											zIndex: 100,
+										}}
+										onPress={redo}
+										disabled={redoPaths.length === 0}
+									>
+										<IconRedo />
+									</CustomTouchableOpacity>
+								</View>
+							)}
 
 							{/* add item  */}
 							<Animated.View
@@ -261,11 +362,19 @@ const CameraScreen = () => {
 											transform: [{ translateY: -5 }],
 										},
 									]}
+									onPress={() => {
+										// setPath(Skia.Path.Make());
+										toggleDrawPad();
+										setShowAddItem(false);
+									}}
 								>
 									<IconDraw gradient />
 								</CustomTouchableOpacity>
 								<CustomTouchableOpacity
-									onPress={toggleStickerModal}
+									onPress={() => {
+										toggleStickerModal();
+										setDrawPad(false);
+									}}
 									style={[
 										styles.itemContainer,
 										{
@@ -301,13 +410,37 @@ const CameraScreen = () => {
 											},
 										]}
 									>
-										{stickers &&
-											stickers.map((sticker) => (
-												<Sticker
-													key={sticker.id}
-													source={sticker.source}
+										{/* drawed pad  */}
+										<Canvas style={StyleSheet.absoluteFill}>
+											{paths.map((path, index) => (
+												<Path
+													key={index}
+													path={path}
+													color="white"
+													style="stroke"
+													strokeWidth={3}
 												/>
 											))}
+											{currentPath && (
+												<Path
+													path={currentPath}
+													color="white"
+													style="stroke"
+													strokeWidth={3}
+												/>
+											)}
+										</Canvas>
+
+										{/* sticker field  */}
+										<>
+											{stickers &&
+												stickers.map((sticker) => (
+													<Sticker
+														key={sticker.id}
+														source={sticker.source}
+													/>
+												))}
+										</>
 									</ImageBackground>
 								</View>
 							)}
