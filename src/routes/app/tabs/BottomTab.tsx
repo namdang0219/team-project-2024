@@ -12,9 +12,13 @@ const Tab = createBottomTabNavigator();
 const BottomTab = () => {
 	return (
 		<Tab.Navigator tabBar={(props) => <TabBar {...props} />}>
-			<Tab.Screen name="AlbumStack" component={AlbumStack} />
+			<Tab.Screen
+				name="AlbumStack"
+				component={AlbumStack}
+				options={{ headerShown: false }}
+			/>
 			<Tab.Screen name="MapStack" component={MapStack} />
-			<Tab.Screen name="CameraStack" component={CameraStack} options={{}} />
+			<Tab.Screen name="CameraStack" component={CameraStack} />
 			<Tab.Screen
 				name="NotificationStack"
 				component={NotificationStack}

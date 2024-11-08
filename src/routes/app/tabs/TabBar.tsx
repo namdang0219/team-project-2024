@@ -66,7 +66,7 @@ function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
 	const styles = StyleSheet.create({
 		container: {
-			bottom: insets.bottom + 10,
+			bottom: insets.bottom + 8,
 			position: "absolute",
 			backgroundColor: "white",
 			alignItems: "center",

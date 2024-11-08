@@ -7,7 +7,7 @@ const Stack = createNativeStackNavigator();
 const AlbumStack = () => {
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="AlbumScreen" component={AlbumScreen}/>
+			<Stack.Screen name="AlbumScreen" component={AlbumScreen} />
 		</Stack.Navigator>
 	);
 };
