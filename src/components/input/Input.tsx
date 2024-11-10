@@ -5,14 +5,14 @@ import Svg, { G, Path } from "react-native-svg";
 import { CustomTouchableOpacity } from "components/custom";
 import { DIMENTIONS } from "constant/dimention";
 
-type InputAuth = { errorMessage: string | undefined };
+type Input = { errorMessage?: string | undefined };
 
-const InputAuth = ({
+const Input = ({
 	placeholder = "",
 	errorMessage = "",
 	secureTextEntry = false,
 	...props
-}: TextInputProps & InputAuth) => {
+}: TextInputProps & Input) => {
 	const { colors } = useTheme();
 	const [showPassword, setShowPassword] = useState<boolean>(true);
 
@@ -91,4 +91,4 @@ const IconEyeOn = () => {
 	);
 };
 
-export default InputAuth;
+export default Input;

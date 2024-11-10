@@ -1,1 +1,1 @@
-export { default as LabelInputAuth } from "./LabelInputAuth";
+export { default as Label } from "./Label";

@@ -17,7 +17,7 @@ import * as Yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { IAuth } from "./SignupScreen";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { InputAuth } from "components/input";
+import { Input } from "components/input";
 import { DIMENTIONS } from "constant/dimention";
 
 const loginScheme = Yup.object().shape({
@@ -80,7 +80,7 @@ export default function LoginScreen() {
 								render={({
 									field: { onChange, onBlur, value },
 								}) => (
-									<InputAuth
+									<Input
 										placeholder="メール"
 										onBlur={onBlur}
 										onChangeText={onChange}
@@ -95,7 +95,7 @@ export default function LoginScreen() {
 								render={({
 									field: { onChange, onBlur, value },
 								}) => (
-									<InputAuth
+									<Input
 										placeholder="パスワード"
 										onBlur={onBlur}
 										onChangeText={onChange}

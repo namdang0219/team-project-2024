@@ -9,7 +9,7 @@ import { ThemedText } from "components/themed";
 import * as Yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { InputAuth } from "components/input";
+import { Input } from "components/input";
 import { Button } from "components/button";
 import handlePressBackground from "util/func/handlePressBackground";
 import HeaderWithBack from "module/auth/HeaderWithBack";
@@ -69,7 +69,7 @@ const FindAccountScreen = () => {
 							render={({
 								field: { onChange, onBlur, value },
 							}) => (
-								<InputAuth
+								<Input
 									placeholder="メール"
 									onBlur={onBlur}
 									onChangeText={onChange}

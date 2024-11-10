@@ -16,6 +16,7 @@ import {
 	TabBarProps,
 	TabView,
 } from "react-native-tab-view";
+import { DIMENTIONS } from "constant/dimention";
 
 type EffectModalProps = {
 	showEffectModal: boolean;
@@ -46,8 +47,8 @@ const EffectModal = ({
 					style={{
 						overflow: "hidden",
 						height: width,
-						borderTopLeftRadius: 15,
-						borderTopRightRadius: 15,
+						borderTopLeftRadius: DIMENTIONS.MODAL_BORDER_RADIUS,
+						borderTopRightRadius: DIMENTIONS.MODAL_BORDER_RADIUS,
 						backgroundColor: "rgba(0,0,0,0.2)",
 					}}
 				>

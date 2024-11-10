@@ -17,7 +17,11 @@ const BottomTab = () => {
 				component={AlbumStack}
 				options={{ headerShown: false }}
 			/>
-			<Tab.Screen name="MapStack" component={MapStack} />
+			<Tab.Screen
+				name="MapStack"
+				component={MapStack}
+				options={{ headerShown: false }}
+			/>
 			<Tab.Screen name="CameraStack" component={CameraStack} />
 			<Tab.Screen
 				name="NotificationStack"

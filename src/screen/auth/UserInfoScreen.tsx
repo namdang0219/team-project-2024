@@ -17,7 +17,7 @@ import { Button } from "components/button";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import { CustomTouchableOpacity } from "components/custom";
-import { LabelInputAuth } from "components/label";
+import { Label } from "components/label";
 import { ActionSheet, DateTimePicker } from "react-native-ui-lib";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AvatarDefault, IconArrowDown } from "icon/auth";
@@ -167,7 +167,7 @@ const UserInfoScreen = () => {
 						<View style={{ marginTop: 8, gap: 16 }}>
 							{/* sex  */}
 							<View>
-								<LabelInputAuth>性別</LabelInputAuth>
+								<Label>性別</Label>
 								<CustomTouchableOpacity
 									onPress={() => setShowSexSheet(true)}
 									style={styles.inputContainer}
@@ -204,7 +204,7 @@ const UserInfoScreen = () => {
 
 							{/* birthday  */}
 							<View>
-								<LabelInputAuth>生年月日</LabelInputAuth>
+								<Label>生年月日</Label>
 								<CustomTouchableOpacity
 									// onPress={() => setShowSexSheet(true)}
 									style={styles.inputContainer}
@@ -225,7 +225,7 @@ const UserInfoScreen = () => {
 
 							{/* nationality  */}
 							<View>
-								<LabelInputAuth>国籍</LabelInputAuth>
+								<Label>国籍</Label>
 								<CustomTouchableOpacity
 									onPress={() =>
 										setShowNationalitySheet(true)

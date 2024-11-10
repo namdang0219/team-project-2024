@@ -15,7 +15,7 @@ import LoginMethod from "../../module/auth/LoginMethod";
 import { ThemedText, ThemedView } from "components/themed";
 import handlePressBackground from "util/func/handlePressBackground";
 import { CustomTouchableOpacity } from "components/custom";
-import InputAuth from "../../components/input/InputAuth";
+import Input from "../../components/input/Input";
 import * as Yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -96,7 +96,7 @@ const SignupScreen = () => {
 								render={({
 									field: { onChange, onBlur, value },
 								}) => (
-									<InputAuth
+									<Input
 										placeholder="ユーザー名"
 										onBlur={onBlur}
 										onChangeText={onChange}
@@ -111,7 +111,7 @@ const SignupScreen = () => {
 								render={({
 									field: { onChange, onBlur, value },
 								}) => (
-									<InputAuth
+									<Input
 										placeholder="メール"
 										onBlur={onBlur}
 										onChangeText={onChange}
@@ -126,7 +126,7 @@ const SignupScreen = () => {
 								render={({
 									field: { onChange, onBlur, value },
 								}) => (
-									<InputAuth
+									<Input
 										placeholder="パスワード"
 										onBlur={onBlur}
 										onChangeText={onChange}

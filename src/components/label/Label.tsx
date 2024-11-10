@@ -2,7 +2,7 @@ import { Text, TextProps } from "react-native";
 import React from "react";
 import { useTheme } from "@react-navigation/native";
 
-const LabelInputAuth = ({ children, style }: TextProps) => {
+const Label = ({ children, style }: TextProps) => {
 	const { colors } = useTheme();
 
 	return (
@@ -23,4 +23,4 @@ const LabelInputAuth = ({ children, style }: TextProps) => {
 	);
 };
 
-export default LabelInputAuth;
+export default Label;
