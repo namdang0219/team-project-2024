@@ -25,13 +25,12 @@ import Svg, {
 	Stop,
 } from "react-native-svg";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
-import { useToast } from "react-native-toast-notifications";
+import { Toast } from "toastify-react-native";
 
 const SavePhotoScreen = ({ route }: { route: any }) => {
 	const { capturedUri } = route.params;
 	const { width: screenWidth } = useWindowDimensions();
 	const { goBack, navigate } = useNavigation<any>();
-	const toast = useToast();
 	const [loading, setLoading] = useState<boolean>(false);
 
 	const savePhotoToCameraRoll = async (photoUri: string) => {
@@ -40,9 +39,7 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 			const result = await CameraRoll.save(photoUri, { type: "photo" });
 			if (result) {
 				setLoading(false);
-				toast.show("保存済み！🎉", {
-					type: "custom_type",
-				});
+				Toast.success("保存済み！🎉");
 			}
 
 			navigate("AlbumStack", { screen: "AlbumScreen" });
