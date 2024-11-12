@@ -26,6 +26,8 @@ import { Input } from "components/input";
 import { Label } from "components/label";
 import handlePressBackground from "util/func/handlePressBackground";
 import * as ImagePicker from "expo-image-picker";
+import Header from "layout/Header";
+import Slider from "module/album/Slider";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
@@ -70,102 +72,96 @@ const AlbumScreen = () => {
 				tint="light"
 			>
 				{/* header container  */}
-				<View
-					style={[
-						{
-							height: DIMENTIONS.HEADER_HEIGHT,
-							flexDirection: "row",
-							alignItems: "center",
-							paddingHorizontal: DIMENTIONS.APP_PADDING + 6,
-							justifyContent: "space-between",
-						},
-					]}
-				>
-					<Text style={{ fontSize: 26, fontWeight: "600" }}>
-						Album
-					</Text>
-					<View
-						style={[
-							{
-								flexDirection: "row",
-								alignItems: "center",
-								gap: 20,
-							},
-						]}
-					>
-						{/* search  */}
-						<CustomTouchableOpacity>
-							<Feather name="search" size={24} />
-						</CustomTouchableOpacity>
 
-						{/* option  */}
-						<View>
-							<CustomTouchableOpacity
-								style={{ position: "relative" }}
-								onPress={toggleShowOption}
-							>
-								<Entypo
-									name="dots-three-horizontal"
-									size={20}
-								/>
+				<Header
+					title="Album"
+					rightContainer={
+						<View
+							style={[
+								{
+									flexDirection: "row",
+									alignItems: "center",
+									gap: 20,
+								},
+							]}
+						>
+							{/* search  */}
+							<CustomTouchableOpacity>
+								<Feather name="search" size={24} />
 							</CustomTouchableOpacity>
 
-							{/* option modal  */}
-							{showOption && (
-								<BlurView
-									style={{
-										width: (width / 3) * 1.6,
-										borderRadius: 10,
-										position: "absolute",
-										right: -10,
-										top: 30,
-										paddingHorizontal: 15,
-										overflow: "hidden",
-									}}
-									tint="extraLight"
-									intensity={95}
+							{/* option  */}
+							<View>
+								<CustomTouchableOpacity
+									style={{ position: "relative" }}
+									onPress={toggleShowOption}
 								>
-									<CustomTouchableOpacity
-										style={[
-											{
+									<Entypo
+										name="dots-three-horizontal"
+										size={20}
+									/>
+								</CustomTouchableOpacity>
+
+								{/* option modal  */}
+								{showOption && (
+									<BlurView
+										style={{
+											width: (width / 3) * 1.6,
+											borderRadius: 10,
+											position: "absolute",
+											right: -10,
+											top: 30,
+											paddingHorizontal: 15,
+											overflow: "hidden",
+										}}
+										tint="extraLight"
+										intensity={95}
+									>
+										<CustomTouchableOpacity
+											style={[
+												{
+													height: 48,
+													flexDirection: "row",
+													alignItems: "center",
+													justifyContent:
+														"space-between",
+													borderBottomColor: "white",
+													borderBottomWidth: 0.5,
+												},
+											]}
+											onPress={() =>
+												toggleCreateAlbumModal()
+											}
+										>
+											<Text>アルバム作成</Text>
+											<MaterialIcons
+												name="create"
+												color={"black"}
+												size={20}
+											/>
+										</CustomTouchableOpacity>
+
+										<CustomTouchableOpacity
+											style={{
 												height: 48,
 												flexDirection: "row",
 												alignItems: "center",
 												justifyContent: "space-between",
-												borderBottomColor: "white",
-												borderBottomWidth: 0.5,
-											},
-										]}
-										onPress={() => toggleCreateAlbumModal()}
-									>
-										<Text>アルバム作成</Text>
-										<MaterialIcons
-											name="create"
-											color={"black"}
-											size={20}
-										/>
-									</CustomTouchableOpacity>
-
-									<CustomTouchableOpacity
-										style={{
-											height: 48,
-											flexDirection: "row",
-											alignItems: "center",
-											justifyContent: "space-between",
-										}}
-									>
-										<Text>アルバム作成</Text>
-										<MaterialIcons
-											name="create"
-											color={"black"}
-											size={20}
-										/>
-									</CustomTouchableOpacity>
-								</BlurView>
-							)}
+											}}
+										>
+											<Text>アルバム作成</Text>
+											<MaterialIcons
+												name="create"
+												color={"black"}
+												size={20}
+											/>
+										</CustomTouchableOpacity>
+									</BlurView>
+								)}
+							</View>
 						</View>
-					</View>
-				</View>
+					}
+				/>
 			</BlurView>
 			<ScrollView
 				style={{
@@ -178,14 +174,15 @@ const AlbumScreen = () => {
 			>
 				<View style={{ flex: 1, gap: 35, paddingBottom: 250 }}>
 					{/* slider  */}
-					<View>
+					{/* <View>
 						<Image
 							source={{
 								uri: "https://i.pinimg.com/736x/0a/27/fc/0a27fcae94d93113d2a9f326d7ea04a1.jpg",
 							}}
 							style={{ height: 220, width }}
 						/>
-					</View>
+					</View> */}
+					<Slider />
 
 					{/* recent album  */}
 					<View>
@@ -669,7 +666,7 @@ const AlbumScreen = () => {
 
 							<FlatList
 								data={new Array(20).fill(null)}
-								style={{marginTop: 6}}
+								style={{ marginTop: 6 }}
 								contentContainerStyle={{
 									paddingHorizontal: DIMENTIONS.APP_PADDING,
 									paddingVertical: 5,

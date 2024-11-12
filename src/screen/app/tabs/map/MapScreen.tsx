@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet } from "react-native";
 import React, { LegacyRef, useEffect, useRef, useState } from "react";
-import MapView, { Region } from "react-native-maps";
+import MapView, { PROVIDER_GOOGLE, Region } from "react-native-maps";
 import * as Location from "expo-location";
 
 export default function MapScreen() {
@@ -26,8 +26,6 @@ export default function MapScreen() {
 				longitudeDelta: 0.01,
 		  };
 
-	console.log(initialLocation);
-
 	const getLocationPermission = async () => {
 		let { status } = await Location.requestForegroundPermissionsAsync();
 		if (status !== "granted") {
@@ -47,11 +45,12 @@ export default function MapScreen() {
 		<View style={{ flex: 1 }}>
 			<MapView
 				ref={mapRef}
+				// provider={PROVIDER_GOOGLE}
 				style={{ flex: 1 }}
 				initialRegion={initialLocation}
 				showsUserLocation
 				showsMyLocationButton
-				onRegionChangeComplete={onRegionChanged}
+				// onRegionChangeComplete={onRegionChanged}
 			/>
 		</View>
 	);
