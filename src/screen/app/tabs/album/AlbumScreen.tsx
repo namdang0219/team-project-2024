@@ -10,9 +10,7 @@ import {
 	Modal,
 	Alert,
 	TouchableWithoutFeedback,
-	Pressable,
 	TextInput,
-	TouchableOpacity,
 } from "react-native";
 import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
