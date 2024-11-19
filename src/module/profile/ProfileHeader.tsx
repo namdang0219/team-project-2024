@@ -1,8 +1,8 @@
-import { View, TouchableOpacity, StyleSheet } from "react-native";
+import { View, TouchableOpacity, StyleSheet, Share } from "react-native";
 import React from "react";
 import ProfileAvatar from "./ProfileAvatar";
 import BaseInfo from "./BaseInfo";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { ThemedText } from "components/themed";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
@@ -13,6 +13,7 @@ const ProfileHeader = () => {
 	const { photoURL, displayName, email, posts, friends } = useSelector(
 		(state: RootState) => state.user
 	);
+	const { navigate } = useNavigation<any>();
 
 	const styles = StyleSheet.create({
 		analyticContainer: {
@@ -67,11 +68,23 @@ const ProfileHeader = () => {
 
 			{/* profile feature button  */}
 			<View style={styles.featureContainer}>
-				<TouchableOpacity style={styles.featureItem}>
+				<TouchableOpacity
+					style={styles.featureItem}
+					onPress={() => navigate("EditProfileScreen")}
+				>
 					<Feather name="edit" size={16} />
 					<ThemedText>情報を編集</ThemedText>
 				</TouchableOpacity>
-				<TouchableOpacity style={styles.featureItem}>
+				<TouchableOpacity
+					style={styles.featureItem}
+					onPress={() => {
+						Share.share({
+							message: "プロフィールをシェア",
+							title: displayName,
+							url: photoURL,
+						});
+					}}
+				>
 					<Feather name="share-2" size={16} />
 					<ThemedText>シェア</ThemedText>
 				</TouchableOpacity>

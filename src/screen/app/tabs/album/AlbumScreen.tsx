@@ -17,7 +17,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DIMENTIONS } from "constant/dimention";
 import { Feather, Entypo, MaterialIcons, AntDesign } from "@expo/vector-icons";
 import { CustomTouchableOpacity } from "components/custom";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { useToggle } from "hook/useToggle";
 import { Input } from "components/input";
@@ -26,11 +26,14 @@ import handlePressBackground from "util/func/handlePressBackground";
 import * as ImagePicker from "expo-image-picker";
 import Header from "layout/Header";
 import Slider from "module/album/Slider";
+import { Button } from "components/button";
+import Animated from "react-native-reanimated";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
 	const { colors } = useTheme();
+	const { navigate } = useNavigation<any>();
 
 	const [showOption, toggleShowOption, setShowOption] = useToggle(false);
 	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
@@ -38,6 +41,7 @@ const AlbumScreen = () => {
 	const [image, setImage] = useState<string>(
 		"https://i.pinimg.com/564x/a6/e9/2f/a6e92f1fd4af9c28fbc23f031f7c7419.jpg"
 	);
+	const [searchModal, toggleSearchModal] = useToggle(false);
 
 	const pickImage = async () => {
 		// No permissions request is necessary for launching the image library
@@ -84,7 +88,7 @@ const AlbumScreen = () => {
 							]}
 						>
 							{/* search  */}
-							<CustomTouchableOpacity>
+							<CustomTouchableOpacity onPress={toggleSearchModal}>
 								<Feather name="search" size={24} />
 							</CustomTouchableOpacity>
 
@@ -160,6 +164,15 @@ const AlbumScreen = () => {
 						</View>
 					}
 				/>
+				<Modal
+					visible={searchModal}
+					presentationStyle="fullScreen"
+					animationType="fade"
+				>
+					<View style={{ flex: 1, paddingTop: 100 }}>
+						<Button onPress={toggleSearchModal}>Cancel</Button>
+					</View>
+				</Modal>
 			</BlurView>
 			<ScrollView
 				style={{
@@ -222,8 +235,13 @@ const AlbumScreen = () => {
 							horizontal
 							showsHorizontalScrollIndicator={false}
 							renderItem={({ item, index }) => (
-								<CustomTouchableOpacity key={index}>
-									<Image
+								<CustomTouchableOpacity
+									onPress={() =>
+										navigate("AlbumDetailScreen")
+									}
+									key={index}
+								>
+									<Animated.Image
 										source={{
 											uri: "https://i.pinimg.com/736x/49/d7/e7/49d7e79e5ac4e3b40e7d0b1f1d91df8d.jpg",
 										}}
@@ -232,6 +250,7 @@ const AlbumScreen = () => {
 											height: 180,
 											borderRadius: 10,
 										}}
+										// sharedTransitionTag="tag"
 									/>
 								</CustomTouchableOpacity>
 							)}

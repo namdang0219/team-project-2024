@@ -63,7 +63,7 @@ const Slider = () => {
 					style={{
 						width: width,
 					}}
-					scrollAnimationDuration={850}
+					scrollAnimationDuration={2000}
 					mode="parallax"
 					modeConfig={{
 						parallaxScrollingScale: 0.9,
