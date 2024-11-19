@@ -19,7 +19,7 @@
 				"NSPhotoLibraryUsageDescription": "App needs access to save photos",
 				"NSPhotoLibraryAddUsageDescription": "App needs access to add photos"
 			},
-			"bundleIdentifier": "com.nekopanman.app",
+			"bundleIdentifier": "com.nekopanman.namdang",
 			"config": {
 				"googleMapsApiKey": "AIzaSyD7tvDd3VmyetDAQC6nfCp70B8uVkWBI1Y"
 			}
