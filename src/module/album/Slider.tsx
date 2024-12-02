@@ -16,6 +16,7 @@ import {
 } from "react-native-reanimated";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
 import SliderItem from "./SliderItem";
+import { albumMocks } from "mock/albumMocks";
 
 const defaultDataWith6Colors = [
 	"#B0604D",
@@ -27,12 +28,10 @@ const defaultDataWith6Colors = [
 ];
 
 const Slider = () => {
-	const ref = useRef<any>(null);
+	const ref = useRef<any>();
 	const progress = useSharedValue<number>(0);
 
 	const HEIGHT = 250;
-
-	const data = new Array(5).fill(null);
 
 	const { width } = Dimensions.get("window");
 
@@ -53,8 +52,8 @@ const Slider = () => {
 				<Carousel
 					autoPlay
 					ref={ref}
-					autoPlayInterval={2000}
-					data={data}
+					autoPlayInterval={3000}
+					data={albumMocks}
 					height={HEIGHT}
 					loop={true}
 					pagingEnabled={true}
@@ -71,20 +70,16 @@ const Slider = () => {
 						parallaxAdjacentItemScale: 0.72,
 					}}
 					onProgressChange={progress}
-					renderItem={(info: {
-						item: null;
-						index: number;
-						animationValue: SharedValue<number>;
-					}) => (
-						<SliderItem></SliderItem>
+					renderItem={({item}) => (
+						<SliderItem item={item}></SliderItem>
 					)}
 				/>
 			</View>
 
 			{/* pagination  */}
-			<Pagination.Basic<{ color: string }>
+			<Pagination.Basic
 				progress={progress}
-				data={data}
+				data={albumMocks}
 				size={7.5}
 				dotStyle={{
 					backgroundColor: "#ddd6fe",

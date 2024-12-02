@@ -13,12 +13,6 @@ const AlbumStack = () => {
 				component={AlbumScreen}
 				options={{ headerShown: false }}
 			/>
-			<Stack.Screen
-				name="AlbumDetailScreen"
-				component={AlbumDetailScreen}
-				options={{ headerShown: false }}
-
-			/>
 		</Stack.Navigator>
 	);
 };

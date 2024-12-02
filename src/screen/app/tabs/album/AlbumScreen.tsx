@@ -27,7 +27,7 @@ import * as ImagePicker from "expo-image-picker";
 import Header from "layout/Header";
 import Slider from "module/album/Slider";
 import { Button } from "components/button";
-import Animated from "react-native-reanimated";
+import { albumMocks } from "mock/albumMocks";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
@@ -184,15 +184,6 @@ const AlbumScreen = () => {
 				}}
 			>
 				<View style={{ flex: 1, gap: 35, paddingBottom: 250 }}>
-					{/* slider  */}
-					{/* <View>
-						<Image
-							source={{
-								uri: "https://i.pinimg.com/736x/0a/27/fc/0a27fcae94d93113d2a9f326d7ea04a1.jpg",
-							}}
-							style={{ height: 220, width }}
-						/>
-					</View> */}
 					<Slider />
 
 					{/* recent album  */}
@@ -226,7 +217,7 @@ const AlbumScreen = () => {
 							</CustomTouchableOpacity>
 						</View>
 						<FlatList
-							data={new Array(5).fill(null)}
+							data={albumMocks}
 							style={{ marginTop: 12 }}
 							contentContainerStyle={{
 								paddingHorizontal: DIMENTIONS.APP_PADDING,
@@ -237,20 +228,22 @@ const AlbumScreen = () => {
 							renderItem={({ item, index }) => (
 								<CustomTouchableOpacity
 									onPress={() =>
-										navigate("AlbumDetailScreen")
+										navigate("GlobalStack", {
+											screen: "AlbumDetailScreen",
+											params: { albumId: item.id },
+										})
 									}
 									key={index}
 								>
-									<Animated.Image
+									<Image
 										source={{
-											uri: "https://i.pinimg.com/736x/49/d7/e7/49d7e79e5ac4e3b40e7d0b1f1d91df8d.jpg",
+											uri: item.cover,
 										}}
 										style={{
 											width: 150,
 											height: 180,
 											borderRadius: 10,
 										}}
-										// sharedTransitionTag="tag"
 									/>
 								</CustomTouchableOpacity>
 							)}

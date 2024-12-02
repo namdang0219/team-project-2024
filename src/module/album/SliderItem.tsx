@@ -1,9 +1,19 @@
 import { View, Text, StyleSheet, ImageBackground } from "react-native";
 import React from "react";
+import { CustomTouchableOpacity } from "components/custom";
+import { useNavigation } from "@react-navigation/native";
 
-const SliderItem = () => {
+const SliderItem = ({ item }: { item: any }) => {
+	const { navigate } = useNavigation<any>();
+
 	return (
-		<View
+		<CustomTouchableOpacity
+			onPress={() =>
+				navigate("GlobalStack", {
+					screen: "AlbumDetailScreen",
+					params: { albumId: item.id },
+				})
+			}
 			style={{
 				flex: 1,
 				borderRadius: 10,
@@ -12,7 +22,7 @@ const SliderItem = () => {
 		>
 			<ImageBackground
 				source={{
-					uri: "https://i.pinimg.com/564x/93/b0/09/93b0094fba97730b6cd3c79794acfc0c.jpg",
+					uri: item.cover,
 				}}
 				style={{
 					flex: 1,
@@ -37,12 +47,12 @@ const SliderItem = () => {
 							fontWeight: "600",
 						}}
 					>
-						横浜旅行
+						{item.title}
 					</Text>
 					<Text style={{ color: "white", fontSize: 16 }}>26枚</Text>
 				</View>
 			</ImageBackground>
-		</View>
+		</CustomTouchableOpacity>
 	);
 };
 
