@@ -1,10 +1,13 @@
-export const albumMocks = [
+import { Album } from "types/Album";
+
+export const albumMocks: Album[] = [
 	{
 		id: 1,
 		title: "Album 1",
 		desc: "Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development to fill empty spaces in a layout that do not yet",
 		cover: "https://i.pinimg.com/736x/ad/6c/34/ad6c34d99197000f57891ef033cf3bbf.jpg",
 		favorite: true,
+		taggedFriends: [1, 2, 3, 4, 5],
 	},
 	{
 		id: 2,
@@ -12,6 +15,7 @@ export const albumMocks = [
 		desc: "Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development to fill empty spaces in a layout that do not yet",
 		cover: "https://i.pinimg.com/736x/da/7c/e8/da7ce881bb1c58f3568dcad560c557b8.jpg",
 		favorite: false,
+		taggedFriends: [2, 3],
 	},
 	{
 		id: 3,
@@ -19,6 +23,7 @@ export const albumMocks = [
 		desc: "Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development to fill empty spaces in a layout that do not yet",
 		cover: "https://i.pinimg.com/736x/84/ed/24/84ed241219f9bd557cd3fffc24eac2d1.jpg",
 		favorite: false,
+		taggedFriends: [3, 4, 5],
 	},
 	{
 		id: 4,
@@ -26,6 +31,7 @@ export const albumMocks = [
 		desc: "Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development to fill empty spaces in a layout that do not yet",
 		cover: "https://i.pinimg.com/736x/75/52/4e/75524ed21bfb73508e4945d808cbc52e.jpg",
 		favorite: true,
+		taggedFriends: [],
 	},
 	{
 		id: 5,
@@ -33,6 +39,7 @@ export const albumMocks = [
 		desc: "Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development to fill empty spaces in a layout that do not yet",
 		cover: "https://i.pinimg.com/736x/d2/09/b6/d209b63cc2f90059e49b166b2f956a05.jpg",
 		favorite: false,
+		taggedFriends: [6],
 	},
 	{
 		id: 6,
@@ -40,5 +47,6 @@ export const albumMocks = [
 		desc: "Lorem ipsum is a dummy or placeholder text commonly used in graphic design, publishing, and web development to fill empty spaces in a layout that do not yet",
 		cover: "https://i.pinimg.com/736x/5c/08/1e/5c081ed7556a1fc85d7c55104a7aa49e.jpg",
 		favorite: true,
+		taggedFriends: [3, 4, 5, 6],
 	},
 ];

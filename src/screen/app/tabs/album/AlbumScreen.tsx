@@ -29,6 +29,7 @@ import Slider from "module/album/Slider";
 import { Button } from "components/button";
 import { albumMocks } from "mock/albumMocks";
 import { userMocks } from "mock/userMocks";
+import AlbumSearch from "./AlbumSearch";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
@@ -170,9 +171,7 @@ const AlbumScreen = () => {
 					presentationStyle="fullScreen"
 					animationType="fade"
 				>
-					<View style={{ flex: 1, paddingTop: 100 }}>
-						<Button onPress={toggleSearchModal}>Cancel</Button>
-					</View>
+					<AlbumSearch toggleSeachModal={toggleSearchModal}></AlbumSearch>
 				</Modal>
 			</BlurView>
 			<ScrollView

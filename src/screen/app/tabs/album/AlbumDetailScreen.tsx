@@ -4,6 +4,9 @@ import {
 	Image,
 	useWindowDimensions,
 	StatusBar,
+	StyleSheet,
+	Share,
+	Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { Button } from "components/button";
@@ -21,6 +24,8 @@ import { BlurView } from "expo-blur";
 import { useToggle } from "hook/useToggle";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import { albumMocks } from "mock/albumMocks";
+import { Album } from "types/Album";
+import { userMocks } from "mock/userMocks";
 
 const AlbumDetailScreen = () => {
 	const { width } = useWindowDimensions();
@@ -30,11 +35,36 @@ const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
 	const { colors } = useTheme();
 
-	const filteredAlbum = albumMocks.find(
+	const filteredAlbum: Album | undefined = albumMocks.find(
 		(item) => item.id === params?.albumId
 	);
 
+	const taggedFriends = userMocks.filter((u) =>
+		filteredAlbum?.taggedFriends.includes(u.id)
+	);
+
 	const [isFavorite, setIsFavorite] = useState(filteredAlbum?.favorite);
+
+	const onShare = async () => {
+		try {
+			const result = await Share.share({
+				message: "写真をシェアしましょう",
+				title: "写真シェア",
+			});
+
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					Alert.alert("シェアずみ");
+				} else {
+					Alert.alert("シェアずみ");
+				}
+			} else if (result.action === Share.dismissedAction) {
+				return null;
+			}
+		} catch (error: any) {
+			console.error(error.message);
+		}
+	};
 
 	return (
 		<>
@@ -137,64 +167,158 @@ const AlbumDetailScreen = () => {
 						></Header>
 					</View>
 
-					{/* heart icon  */}
+					{/* action bottom bar  */}
 					<View
 						style={{
 							position: "absolute",
 							bottom: 15,
-							right: 15,
+							width: "100%",
 							flexDirection: "row",
-							gap: 10,
+							justifyContent: "space-between",
+							paddingHorizontal: 15,
 						}}
 					>
-						<View
-							style={{
-								backgroundColor: "white",
-								width: 45,
-								height: 45,
-								borderRadius: 1000,
-							}}
+						{/* left container  */}
+						<CustomTouchableOpacity
+							style={{ flexDirection: "row" }}
+							onPress={() =>
+								navigate("GlobalStack", {
+									screen: "AlbumTaggedFriend",
+								})
+							}
 						>
-							<CustomTouchableOpacity
-								style={{
-									flex: 1,
-									alignItems: "center",
-									justifyContent: "center",
-								}}
-								onPress={() => setIsFavorite(!isFavorite)}
-							>
-								<AntDesign
-									name="heart"
-									size={25}
-									color={isFavorite ? "red" : "#d1d5db"}
-									style={{ marginTop: 2 }}
-								/>
-							</CustomTouchableOpacity>
-						</View>
+							{taggedFriends.length > 0 &&
+								taggedFriends.slice(0, 3).map((f, index) => (
+									<View
+										key={f.id}
+										style={{
+											width: 45,
+											aspectRatio: 1,
+											borderColor: "white",
+											backgroundColor: "white",
+											borderWidth: 2,
+											borderRadius: 1000,
+											overflow: "hidden",
+											marginLeft: index == 0 ? 0 : -20,
+										}}
+									>
+										<Image
+											source={{
+												uri: f?.avatar,
+											}}
+											style={{
+												flex: 1,
+												borderRadius: 1000,
+											}}
+										/>
+									</View>
+								))}
+							{taggedFriends.length > 3 && (
+								<View
+									style={{
+										width: 45,
+										aspectRatio: 1,
+										borderColor: "white",
+										backgroundColor: "white",
+										borderWidth: 2,
+										borderRadius: 1000,
+										overflow: "hidden",
+										marginLeft: -20,
+										position: "relative",
+										alignItems: "center",
+										justifyContent: "center",
+									}}
+								>
+									<Image
+										source={{
+											uri: taggedFriends[4].avatar,
+										}}
+										style={[
+											{
+												flex: 1,
+												borderRadius: 1000,
+											},
+											StyleSheet.absoluteFill,
+										]}
+									/>
+									<View
+										style={[
+											{
+												backgroundColor: "black",
+												opacity: 0.35,
+											},
+											StyleSheet.absoluteFill,
+										]}
+									/>
+									<AntDesign
+										name="plus"
+										size={24}
+										color={"white"}
+									/>
+								</View>
+							)}
+						</CustomTouchableOpacity>
 
+						{/* right container  */}
 						<View
 							style={{
-								backgroundColor: "white",
-								width: 45,
-								height: 45,
-								borderRadius: 1000,
+								flexDirection: "row",
+								alignItems: "center",
+								gap: 10,
 							}}
 						>
-							<CustomTouchableOpacity
+							{/* heart icon  */}
+							<View
 								style={{
+									backgroundColor: "white",
 									width: 45,
 									height: 45,
-									alignItems: "center",
-									justifyContent: "center",
+									borderRadius: 1000,
 								}}
 							>
-								<MaterialCommunityIcons
-									name="share"
-									size={35}
-									color={"#0ea5e9"}
-									style={{ marginTop: -4 }}
-								/>
-							</CustomTouchableOpacity>
+								<CustomTouchableOpacity
+									style={{
+										flex: 1,
+										alignItems: "center",
+										justifyContent: "center",
+									}}
+									onPress={() => setIsFavorite(!isFavorite)}
+								>
+									<AntDesign
+										name="heart"
+										size={25}
+										color={isFavorite ? "red" : "#d1d5db"}
+										style={{ marginTop: 2 }}
+									/>
+								</CustomTouchableOpacity>
+							</View>
+
+							{/* share icon  */}
+							<View
+								style={{
+									backgroundColor: "white",
+									width: 45,
+									height: 45,
+									borderRadius: 1000,
+								}}
+							>
+								<CustomTouchableOpacity
+									onPress={onShare}
+									style={{
+										width: 45,
+										height: 45,
+										alignItems: "center",
+										justifyContent: "center",
+									}}
+								>
+									<MaterialCommunityIcons
+										name="share"
+										size={35}
+										color={"#0ea5e9"}
+										style={{ marginTop: -4 }}
+									/>
+								</CustomTouchableOpacity>
+							</View>
 						</View>
 					</View>
 				</View>

@@ -5,6 +5,8 @@ import SavePhotoScreen from "screen/app/global/SavePhotoScreen";
 import AlbumDetailScreen from "screen/app/tabs/album/AlbumDetailScreen";
 import AlbumImageListScreen from "screen/app/tabs/album/AlbumImageListScreen";
 import AlbumListScreen from "screen/app/tabs/album/AlbumListScreen";
+import AlbumTaggedFriend from "screen/app/tabs/album/AlbumTaggedFriend";
+import AlbumSearch from "screen/app/tabs/album/AlbumSearch";
 
 const Stack = createNativeStackNavigator();
 
@@ -22,6 +24,10 @@ const GlobalStack = () => {
 				component={AlbumImageListScreen}
 			/>
 			<Stack.Screen name="AlbumListScreen" component={AlbumListScreen} />
+			<Stack.Screen
+				name="AlbumTaggedFriend"
+				component={AlbumTaggedFriend}
+			/>
 		</Stack.Navigator>
 	);
 };
