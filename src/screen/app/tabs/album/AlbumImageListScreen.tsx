@@ -7,6 +7,7 @@ import {
 	Image,
 	StyleSheet,
 	FlatList,
+	StatusBar,
 } from "react-native";
 import React from "react";
 import Header from "layout/Header";
@@ -85,7 +86,7 @@ const images = [
 		id: 17,
 		uri: "https://i.pinimg.com/736x/ad/6c/34/ad6c34d99197000f57891ef033cf3bbf.jpg",
 	},
-  {
+	{
 		id: 18,
 		uri: "https://i.pinimg.com/736x/85/c6/e0/85c6e08b42d8567b5065ec37e6c315f4.jpg",
 	},
@@ -109,57 +110,66 @@ const AlbumImageListScreen = () => {
 	const insets = useSafeAreaInsets();
 
 	return (
-		<View
-			style={{
-				flex: 1,
-			}}
-		>
-			<Header
-				canGoBack
-				intensity={100}
-				leftTitle="Main Album"
-				leftTitleStyle={{ color: "black" }}
-				backIconColor="black"
-			></Header>
-
-			<ScrollView
+		<>
+			<StatusBar barStyle={"dark-content"} />
+			<View
 				style={{
-					paddingTop: insets.top + DIMENTIONS.CANGOBACK_HEADER_HEIGHT + 10,
-					paddingHorizontal: PADDING - 0.001,
+					flex: 1,
 				}}
 			>
-				<View
-					style={{ flexDirection: "row", gap: GAP, flexWrap: "wrap" }}
+				<Header
+					canGoBack
+					intensity={100}
+					leftTitle="Main Album"
+					leftTitleStyle={{ color: "black" }}
+					backIconColor="black"
+				></Header>
+				<ScrollView
+					style={{
+						paddingTop:
+							insets.top +
+							DIMENTIONS.CANGOBACK_HEADER_HEIGHT +
+							10,
+						paddingHorizontal: PADDING - 0.001,
+					}}
 				>
-					{images.map((item, index) => (
-						<CustomTouchableOpacity
-							key={item.id}
-							style={{
-								width:
-									index % 4 == 0 && index !== 0
-										? index % 3 !== 0
-											? ITEM2_WIDTH
-											: ITEM1_WIDTH
-										: ITEM1_WIDTH,
-								height: ITEM1_WIDTH,
-								borderRadius: 10,
-								overflow: "hidden",
-							}}
-						>
-							<Image
-								source={{ uri: item.uri }}
+					<View
+						style={{
+							flexDirection: "row",
+							gap: GAP,
+							flexWrap: "wrap",
+						}}
+					>
+						{images.map((item, index) => (
+							<CustomTouchableOpacity
+								key={item.id}
 								style={{
-									flex: 1,
+									width:
+										index % 4 == 0 && index !== 0
+											? index % 3 !== 0
+												? ITEM2_WIDTH
+												: ITEM1_WIDTH
+											: ITEM1_WIDTH,
+									height: ITEM1_WIDTH,
+									borderRadius: 10,
+									overflow: "hidden",
 								}}
-							></Image>
-						</CustomTouchableOpacity>
-					))}
-				</View>
+							>
+								<Image
+									source={{ uri: item.uri }}
+									style={{
+										flex: 1,
+									}}
+								></Image>
+							</CustomTouchableOpacity>
+						))}
+					</View>
 
-        {/* spacing  */}
-        <View style={{height: 200}} />
-			</ScrollView>
-		</View>
+					{/* spacing  */}
+					<View style={{ height: 200 }} />
+				</ScrollView>
+			</View>
+		</>
 	);
 };
 

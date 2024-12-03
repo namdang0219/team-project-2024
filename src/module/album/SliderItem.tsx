@@ -7,13 +7,7 @@ const SliderItem = ({ item }: { item: any }) => {
 	const { navigate } = useNavigation<any>();
 
 	return (
-		<CustomTouchableOpacity
-			onPress={() =>
-				navigate("GlobalStack", {
-					screen: "AlbumDetailScreen",
-					params: { albumId: item.id },
-				})
-			}
+		<View
 			style={{
 				flex: 1,
 				borderRadius: 10,
@@ -52,7 +46,7 @@ const SliderItem = ({ item }: { item: any }) => {
 					<Text style={{ color: "white", fontSize: 16 }}>26枚</Text>
 				</View>
 			</ImageBackground>
-		</CustomTouchableOpacity>
+		</View>
 	);
 };
 

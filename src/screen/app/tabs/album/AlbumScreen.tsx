@@ -28,6 +28,7 @@ import Header from "layout/Header";
 import Slider from "module/album/Slider";
 import { Button } from "components/button";
 import { albumMocks } from "mock/albumMocks";
+import { userMocks } from "mock/userMocks";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
@@ -200,6 +201,11 @@ const AlbumScreen = () => {
 								最近のアルバム
 							</Text>
 							<CustomTouchableOpacity
+								onPress={() =>
+									navigate("GlobalStack", {
+										screen: "AlbumListScreen",
+									})
+								}
 								style={{
 									flexDirection: "row",
 									alignItems: "center",
@@ -217,7 +223,7 @@ const AlbumScreen = () => {
 							</CustomTouchableOpacity>
 						</View>
 						<FlatList
-							data={albumMocks}
+							data={albumMocks.slice(0, 5)}
 							style={{ marginTop: 12 }}
 							contentContainerStyle={{
 								paddingHorizontal: DIMENTIONS.APP_PADDING,
@@ -235,16 +241,39 @@ const AlbumScreen = () => {
 									}
 									key={index}
 								>
-									<Image
+									<ImageBackground
 										source={{
 											uri: item.cover,
 										}}
 										style={{
 											width: 150,
 											height: 180,
-											borderRadius: 10,
+											borderRadius: 12,
+											position: "relative",
+											overflow: "hidden",
 										}}
-									/>
+									>
+										{item.favorite && (
+											<View
+												style={{
+													width: 24,
+													aspectRatio: 1,
+													backgroundColor: "white",
+													borderRadius: 1000,
+													alignItems: "center",
+													justifyContent: "center",
+													position: "absolute",
+													bottom: 6,
+													right: 6,
+												}}
+											>
+												<AntDesign
+													name="heart"
+													color={"red"}
+												/>
+											</View>
+										)}
+									</ImageBackground>
 								</CustomTouchableOpacity>
 							)}
 						/>
@@ -288,11 +317,11 @@ const AlbumScreen = () => {
 								gap: 10,
 							}}
 						>
-							{new Array(4).fill(null).map((item, index) => (
+							{userMocks.slice(0, 4).map((item, index) => (
 								<CustomTouchableOpacity key={index}>
 									<Image
 										source={{
-											uri: "https://i.pinimg.com/736x/d3/e1/6a/d3e16a975b1cff37e5a30cea031f1c5f.jpg",
+											uri: item.avatar,
 										}}
 										style={{
 											width:
@@ -312,14 +341,14 @@ const AlbumScreen = () => {
 										}}
 										numberOfLines={1}
 									>
-										KimCheese
+										{item.name}
 									</Text>
 								</CustomTouchableOpacity>
 							))}
 						</View>
 					</View>
 
-					{/* recent album  */}
+					{/* favorite album  */}
 					<View>
 						<View
 							style={{
@@ -350,7 +379,9 @@ const AlbumScreen = () => {
 							</CustomTouchableOpacity>
 						</View>
 						<FlatList
-							data={new Array(5).fill(null)}
+							data={albumMocks
+								.filter((a) => a.favorite === true)
+								.slice(0, 5)}
 							style={{ marginTop: 12 }}
 							contentContainerStyle={{
 								paddingHorizontal: DIMENTIONS.APP_PADDING,
@@ -359,17 +390,27 @@ const AlbumScreen = () => {
 							horizontal
 							showsHorizontalScrollIndicator={false}
 							renderItem={({ item, index }) => (
-								<CustomTouchableOpacity key={index}>
-									<Image
+								<CustomTouchableOpacity
+									onPress={() =>
+										navigate("GlobalStack", {
+											screen: "AlbumDetailScreen",
+											params: { albumId: item.id },
+										})
+									}
+									key={index}
+								>
+									<ImageBackground
 										source={{
-											uri: "https://i.pinimg.com/736x/e2/9a/e6/e29ae6e909cf6dbdcda1a6fc42f142a4.jpg",
+											uri: item.cover,
 										}}
 										style={{
 											width: 150,
 											height: 180,
-											borderRadius: 10,
+											borderRadius: 12,
+											position: "relative",
+											overflow: "hidden",
 										}}
-									/>
+									></ImageBackground>
 								</CustomTouchableOpacity>
 							)}
 						/>
