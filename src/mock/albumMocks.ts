@@ -1,6 +1,6 @@
-import { Album } from "types/Album";
+import { IAlbum } from "types/IAlbum";
 
-export const albumMocks: Album[] = [
+export const albumMocks: IAlbum[] = [
 	{
 		id: 1,
 		title: "Album 1",

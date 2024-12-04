@@ -21,7 +21,7 @@ import handlePressBackground from "util/func/handlePressBackground";
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { albumMocks } from "mock/albumMocks";
 import { CustomTouchableOpacity } from "components/custom";
-import { Album } from "types/Album";
+import { IAlbum } from "types/IAlbum";
 
 const { width } = Dimensions.get("screen");
 const GAP = 8;
@@ -39,7 +39,7 @@ const AlbumSearch = ({
 	const inputRef = useRef<TextInput | null>(null);
 	const { navigate } = useNavigation<any>();
 	const [searchText, setSearchText] = useState<string>("");
-	const [results, setResults] = useState<Album[]>([]);
+	const [results, setResults] = useState<IAlbum[]>([]);
 
 	useEffect(() => {
 		if (searchText.trim() === "") {

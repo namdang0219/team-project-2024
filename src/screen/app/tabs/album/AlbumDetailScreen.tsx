@@ -24,7 +24,7 @@ import { BlurView } from "expo-blur";
 import { useToggle } from "hook/useToggle";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import { albumMocks } from "mock/albumMocks";
-import { Album } from "types/Album";
+import { IAlbum } from "types/IAlbum";
 import { userMocks } from "mock/userMocks";
 
 const AlbumDetailScreen = () => {
@@ -35,7 +35,7 @@ const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
 	const { colors } = useTheme();
 
-	const filteredAlbum: Album | undefined = albumMocks.find(
+	const filteredAlbum: IAlbum | undefined = albumMocks.find(
 		(item) => item.id === params?.albumId
 	);
 

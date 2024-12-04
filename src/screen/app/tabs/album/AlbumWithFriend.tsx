@@ -2,7 +2,7 @@ import { View } from "react-native";
 import React from "react";
 import { useRoute } from "@react-navigation/native";
 import { albumMocks } from "mock/albumMocks";
-import { Album } from "types/Album";
+import { IAlbum } from "types/IAlbum";
 import Header from "layout/Header";
 import { userMocks } from "mock/userMocks";
 import { AlbumList } from "components/list";
@@ -12,7 +12,7 @@ const AlbumWithFriend = () => {
 
 	const filteredUser = userMocks.find((u) => u.id === params.userId);
 
-	const filteredAlbums: Album[] = albumMocks.filter((a: Album) =>
+	const filteredAlbums: IAlbum[] = albumMocks.filter((a: IAlbum) =>
 		a.taggedFriends.includes(params?.userId)
 	);
 

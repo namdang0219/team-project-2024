@@ -9,10 +9,10 @@ import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
 import { AntDesign } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { Album } from "types/Album";
+import { IAlbum } from "types/IAlbum";
 import { useItemWidth } from "hook/useItemWidth";
 
-const AlbumItem = ({ item }: { item: Album }) => {
+const AlbumItem = ({ item }: { item: IAlbum }) => {
 	const { navigate } = useNavigation<any>();
 	const itemWidth = useItemWidth(DIMENTIONS.LIST_GAP, 2);
 

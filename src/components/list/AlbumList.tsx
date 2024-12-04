@@ -4,9 +4,9 @@ import { albumMocks } from "mock/albumMocks";
 import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AlbumItem } from "components/item";
-import { Album } from "types/Album";
+import { IAlbum } from "types/IAlbum";
 
-const AlbumList = ({ data }: { data: Album[] }) => {
+const AlbumList = ({ data }: { data: IAlbum[] }) => {
 	const insets = useSafeAreaInsets();
 
 	return (

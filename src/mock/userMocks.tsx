@@ -1,4 +1,6 @@
-export const userMocks = [
+import { IUser } from "types/IUser";
+
+export const userMocks: IUser[] = [
 	{
 		id: 1,
 		name: "Alice",

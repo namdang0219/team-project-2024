@@ -8,9 +8,6 @@ import {
 	ImageBackground,
 	StyleSheet,
 	Modal,
-	Alert,
-	TouchableWithoutFeedback,
-	TextInput,
 } from "react-native";
 import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,15 +17,12 @@ import { CustomTouchableOpacity } from "components/custom";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { useToggle } from "hook/useToggle";
-import { Input } from "components/input";
-import { Label } from "components/label";
-import handlePressBackground from "util/func/handlePressBackground";
-import * as ImagePicker from "expo-image-picker";
 import Header from "layout/Header";
 import Slider from "module/album/Slider";
 import { albumMocks } from "mock/albumMocks";
 import { userMocks } from "mock/userMocks";
 import AlbumSearch from "./AlbumSearch";
+import AlbumCreateModal from "./modal/AlbumCreateModal";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
@@ -38,27 +32,11 @@ const AlbumScreen = () => {
 
 	const [showOption, toggleShowOption, setShowOption] = useToggle(false);
 	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
-	const [addFriendModal, toggleAddFriendModal] = useToggle(false);
+	
 	const [image, setImage] = useState<string>(
 		"https://i.pinimg.com/564x/a6/e9/2f/a6e92f1fd4af9c28fbc23f031f7c7419.jpg"
 	);
 	const [searchModal, toggleSearchModal] = useToggle(false);
-
-	const pickImage = async () => {
-		// No permissions request is necessary for launching the image library
-		let result = await ImagePicker.launchImageLibraryAsync({
-			mediaTypes: ImagePicker.MediaTypeOptions.All,
-			allowsEditing: true,
-			aspect: [2, 1],
-			quality: 1,
-		});
-
-		// console.log(result);
-
-		if (!result.canceled) {
-			setImage(result.assets[0].uri);
-		}
-	};
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -510,291 +488,13 @@ const AlbumScreen = () => {
 				animationType="slide"
 				presentationStyle="fullScreen"
 			>
-				<View
-					style={{
-						paddingTop: insets.top,
-						flex: 1,
-					}}
-				>
-					{/* header  */}
-					<View
-						style={{
-							height: DIMENTIONS.HEADER_HEIGHT,
-							paddingHorizontal: DIMENTIONS.APP_PADDING,
-							alignItems: "center",
-							flexDirection: "row",
-							justifyContent: "space-between",
-						}}
-					>
-						<CustomTouchableOpacity
-							onPress={() => {
-								Alert.alert(
-									"破壊？",
-									"全ての内容が削除されます",
-									[
-										{
-											text: "キャンセル",
-											style: "cancel",
-										},
-										{
-											text: "破壊",
-											onPress: () =>
-												toggleCreateAlbumModal(),
-											style: "destructive",
-										},
-									]
-								);
-							}}
-						>
-							<Feather name="x" size={26} color={"red"} />
-						</CustomTouchableOpacity>
-						<Text
-							style={{
-								fontSize: 20,
-								fontWeight: "500",
-								width: width / 2,
-								textAlign: "center",
-							}}
-						>
-							アルバム作成
-						</Text>
-						<CustomTouchableOpacity
-							onPress={toggleCreateAlbumModal}
-						>
-							<Feather name="check" size={26} color={"#00C261"} />
-						</CustomTouchableOpacity>
-					</View>
+				<AlbumCreateModal
+					toggleCreateAlbumModal={toggleCreateAlbumModal}
+					image={image}
+					setImage={setImage}
+				/>
 
-					{/* content  */}
-					<TouchableWithoutFeedback onPress={handlePressBackground}>
-						<ScrollView style={{ flex: 1 }}>
-							<ImageBackground
-								source={{
-									uri: image,
-								}}
-								style={{
-									height: 250,
-									marginTop: 5,
-									position: "relative",
-								}}
-							>
-								<CustomTouchableOpacity
-									style={{
-										position: "absolute",
-										bottom: 20,
-										right: 20,
-									}}
-									onPress={pickImage}
-								>
-									<Feather
-										name="edit"
-										size={30}
-										color={"white"}
-									/>
-								</CustomTouchableOpacity>
-							</ImageBackground>
-							{/* input  */}
-							<View
-								style={{
-									paddingHorizontal: DIMENTIONS.APP_PADDING,
-									marginTop: 20,
-									flex: 1,
-									gap: 14,
-								}}
-							>
-								<View>
-									<Label>タイトル</Label>
-									<Input placeholder="アルバムのタイトル" />
-								</View>
-								<View>
-									<Label>説明</Label>
-									<Input placeholder="アルバムの説明" />
-								</View>
-								<View>
-									<Label>友達</Label>
-									<View
-										style={{
-											flexDirection: "row",
-											flexWrap: "wrap",
-											gap: 10,
-										}}
-									>
-										{Array(6)
-											.fill(null)
-											.map((item, index) => (
-												<View key={index}>
-													<Image
-														source={{
-															uri: "https://i.pinimg.com/564x/11/cd/ed/11cdedf63e1fd9aa0c84b94d210a4039.jpg",
-														}}
-														style={{
-															width:
-																(width -
-																	DIMENTIONS.APP_PADDING *
-																		2 -
-																	10 * 4) /
-																5,
-															aspectRatio: "1/1",
-															borderRadius: 1000,
-														}}
-													/>
-												</View>
-											))}
-										<CustomTouchableOpacity
-											style={{
-												width:
-													(width -
-														DIMENTIONS.APP_PADDING *
-															2 -
-														10 * 4) /
-													5,
-												aspectRatio: "1/1",
-												borderRadius: 1000,
-												backgroundColor: "#f3f4f6",
-												alignItems: "center",
-												justifyContent: "center",
-											}}
-											onPress={toggleAddFriendModal}
-										>
-											<AntDesign
-												name="plus"
-												color={"#9ca3af"}
-												size={30}
-											/>
-										</CustomTouchableOpacity>
-									</View>
-								</View>
-							</View>
-
-							<View style={{ height: 500 }}></View>
-						</ScrollView>
-					</TouchableWithoutFeedback>
-				</View>
-
-				<Modal
-					visible={addFriendModal}
-					animationType="slide"
-					presentationStyle="formSheet"
-				>
-					<TouchableWithoutFeedback onPress={handlePressBackground}>
-						{/* content  */}
-						<View style={{ flex: 1 }}>
-							<View
-								style={{
-									height: 40,
-									alignItems: "center",
-									paddingLeft: 14,
-									flexDirection: "row",
-									justifyContent: "space-between",
-								}}
-							>
-								<CustomTouchableOpacity
-									onPress={toggleAddFriendModal}
-								>
-									<Text
-										style={{ color: "black", fontSize: 16 }}
-									>
-										キャンセル
-									</Text>
-								</CustomTouchableOpacity>
-							</View>
-
-							<View
-								style={{
-									marginHorizontal: 14,
-									position: "relative",
-								}}
-							>
-								<TextInput
-									placeholder="友達を検索"
-									placeholderTextColor={"#9ca3af"}
-									style={{
-										backgroundColor: "rgba(0,0,0,0.05)",
-										height: 35,
-										paddingHorizontal: 14,
-										borderRadius: 6,
-										color: "white",
-									}}
-								/>
-								<Feather
-									name="search"
-									size={20}
-									style={{
-										position: "absolute",
-										right: 10,
-										top: 7,
-										color: "gray",
-									}}
-								/>
-							</View>
-
-							<FlatList
-								data={new Array(20).fill(null)}
-								style={{ marginTop: 6 }}
-								contentContainerStyle={{
-									paddingHorizontal: DIMENTIONS.APP_PADDING,
-									paddingVertical: 5,
-									flexGrow: 1,
-								}}
-								renderItem={({ item, index }) => (
-									<TouchableWithoutFeedback key={index}>
-										<View
-											style={{
-												paddingVertical: 5,
-												flexDirection: "row",
-												alignItems: "center",
-												justifyContent: "space-between",
-											}}
-										>
-											<View
-												style={{
-													flexDirection: "row",
-													alignItems: "center",
-													gap: 10,
-												}}
-											>
-												<Image
-													source={{
-														uri: "https://i.pinimg.com/564x/b8/6f/05/b86f052d99b84f5d77fa96771f6c75e1.jpg",
-													}}
-													style={{
-														width: 52,
-														aspectRatio: "1/1",
-														borderRadius: 1000,
-													}}
-												/>
-												<Text style={{ fontSize: 15 }}>
-													Andree Righthand
-												</Text>
-											</View>
-
-											<CustomTouchableOpacity
-												style={{
-													backgroundColor:
-														colors.primary,
-													width: 60,
-													paddingVertical: 5,
-													alignItems: "center",
-													justifyContent: "center",
-													borderRadius: 5,
-												}}
-											>
-												<Text
-													style={{
-														color: "white",
-														fontWeight: "500",
-													}}
-												>
-													タグ
-												</Text>
-											</CustomTouchableOpacity>
-										</View>
-									</TouchableWithoutFeedback>
-								)}
-							/>
-						</View>
-					</TouchableWithoutFeedback>
-				</Modal>
+				
 			</Modal>
 		</View>
 	);
