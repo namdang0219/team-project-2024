@@ -26,7 +26,6 @@ import handlePressBackground from "util/func/handlePressBackground";
 import * as ImagePicker from "expo-image-picker";
 import Header from "layout/Header";
 import Slider from "module/album/Slider";
-import { Button } from "components/button";
 import { albumMocks } from "mock/albumMocks";
 import { userMocks } from "mock/userMocks";
 import AlbumSearch from "./AlbumSearch";
@@ -171,7 +170,9 @@ const AlbumScreen = () => {
 					presentationStyle="fullScreen"
 					animationType="fade"
 				>
-					<AlbumSearch toggleSeachModal={toggleSearchModal}></AlbumSearch>
+					<AlbumSearch
+						toggleSeachModal={toggleSearchModal}
+					></AlbumSearch>
 				</Modal>
 			</BlurView>
 			<ScrollView
@@ -292,6 +293,11 @@ const AlbumScreen = () => {
 								友達と
 							</Text>
 							<CustomTouchableOpacity
+								onPress={() =>
+									navigate("GlobalStack", {
+										screen: "FriendListScreen",
+									})
+								}
 								style={{
 									flexDirection: "row",
 									alignItems: "center",
@@ -317,7 +323,15 @@ const AlbumScreen = () => {
 							}}
 						>
 							{userMocks.slice(0, 4).map((item, index) => (
-								<CustomTouchableOpacity key={index}>
+								<CustomTouchableOpacity
+									key={index}
+									onPress={() =>
+										navigate("GlobalStack", {
+											screen: "AlbumWithFriend",
+											params: { userId: item.id },
+										})
+									}
+								>
 									<Image
 										source={{
 											uri: item.avatar,

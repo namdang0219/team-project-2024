@@ -56,7 +56,9 @@ const Header = ({
 			<View
 				style={[
 					{
-						height: canGoBack ? DIMENTIONS.CANGOBACK_HEADER_HEIGHT : DIMENTIONS.HEADER_HEIGHT,
+						height: canGoBack
+							? DIMENTIONS.CANGOBACK_HEADER_HEIGHT
+							: DIMENTIONS.HEADER_HEIGHT,
 						flexDirection: "row",
 						alignItems: "center",
 						paddingHorizontal: DIMENTIONS.APP_PADDING + 6,
