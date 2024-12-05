@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 export type IUser = {
+	uid: string;
 	displayName: string;
 	email: string;
 	photoURL: string;
@@ -9,6 +10,7 @@ export type IUser = {
 };
 
 const initialState: IUser = {
+	uid: "1",
 	displayName: "MeowCopter",
 	email: "meowcopter99@gmail.com",
 	photoURL:
@@ -22,6 +24,7 @@ const userSlice = createSlice({
 	initialState,
 	reducers: {
 		setUser: (state, action) => ({
+			uid: action.payload.uid,
 			displayName: action.payload.displayName,
 			email: action.payload.email,
 			photoURL: action.payload.photoURL,

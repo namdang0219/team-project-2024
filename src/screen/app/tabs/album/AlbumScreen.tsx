@@ -19,23 +19,22 @@ import { BlurView } from "expo-blur";
 import { useToggle } from "hook/useToggle";
 import Header from "layout/Header";
 import Slider from "module/album/Slider";
-import { albumMocks } from "mock/albumMocks";
 import { userMocks } from "mock/userMocks";
 import AlbumSearch from "./AlbumSearch";
 import AlbumCreateModal from "./modal/AlbumCreateModal";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
 	const { colors } = useTheme();
 	const { navigate } = useNavigation<any>();
+	const albums = useSelector((state: RootState) => state.album);
 
 	const [showOption, toggleShowOption, setShowOption] = useToggle(false);
 	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
-	
-	const [image, setImage] = useState<string>(
-		"https://i.pinimg.com/564x/a6/e9/2f/a6e92f1fd4af9c28fbc23f031f7c7419.jpg"
-	);
+
 	const [searchModal, toggleSearchModal] = useToggle(false);
 
 	return (
@@ -121,22 +120,6 @@ const AlbumScreen = () => {
 												size={20}
 											/>
 										</CustomTouchableOpacity>
-
-										<CustomTouchableOpacity
-											style={{
-												height: 48,
-												flexDirection: "row",
-												alignItems: "center",
-												justifyContent: "space-between",
-											}}
-										>
-											<Text>アルバム作成</Text>
-											<MaterialIcons
-												name="create"
-												color={"black"}
-												size={20}
-											/>
-										</CustomTouchableOpacity>
 									</BlurView>
 								)}
 							</View>
@@ -201,7 +184,7 @@ const AlbumScreen = () => {
 							</CustomTouchableOpacity>
 						</View>
 						<FlatList
-							data={albumMocks.slice(0, 5)}
+							data={albums.slice(0, 5)}
 							style={{ marginTop: 12 }}
 							contentContainerStyle={{
 								paddingHorizontal: DIMENTIONS.APP_PADDING,
@@ -370,7 +353,7 @@ const AlbumScreen = () => {
 							</CustomTouchableOpacity>
 						</View>
 						<FlatList
-							data={albumMocks
+							data={albums
 								.filter((a) => a.favorite === true)
 								.slice(0, 5)}
 							style={{ marginTop: 12 }}
@@ -490,11 +473,7 @@ const AlbumScreen = () => {
 			>
 				<AlbumCreateModal
 					toggleCreateAlbumModal={toggleCreateAlbumModal}
-					image={image}
-					setImage={setImage}
 				/>
-
-				
 			</Modal>
 		</View>
 	);

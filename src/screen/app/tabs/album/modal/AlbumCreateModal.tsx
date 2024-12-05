@@ -11,6 +11,8 @@ import {
 	Modal,
 	TextInput,
 	FlatList,
+	KeyboardAvoidingView,
+	Platform,
 } from "react-native";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import { DIMENTIONS } from "constant/dimention";
@@ -26,22 +28,49 @@ import { userMocks } from "mock/userMocks";
 import { useItemWidth } from "hook/useItemWidth";
 import { useToggle } from "hook/useToggle";
 import AlbumTagFriendModal from "./AlbumTagFriendModal";
+import { Controller, useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("screen");
 
+interface ICreateAlbum {
+	title: string;
+	description: string;
+}
+
+const createAlbumScheme = Yup.object().shape({
+	title: Yup.string().required("タイトルを入力してください"),
+	description: Yup.string().required("説明を入力してください"),
+});
+
 const AlbumCreateModal = ({
 	toggleCreateAlbumModal,
-	image,
-	setImage,
 }: {
 	toggleCreateAlbumModal: () => void;
-	image: string;
-	setImage: Dispatch<SetStateAction<string>>;
 }) => {
 	const insets = useSafeAreaInsets();
-	const [taggedFriendId, setTaggedFriendId] = useState<number[]>([1]);
+	const { navigate } = useNavigation<any>();
+	const [taggedFriendId, setTaggedFriendId] = useState<number[]>([]);
 	const itemWidth = useItemWidth(10, 5);
 	const [tagFriendModal, toggleTagFriendModal] = useToggle(false);
+	const {
+		handleSubmit,
+		control,
+		formState: { isValid, errors },
+	} = useForm<ICreateAlbum>({
+		defaultValues: {
+			title: "",
+			description: "",
+		},
+		resolver: yupResolver(createAlbumScheme),
+	});
+
+	// data field
+	const [image, setImage] = useState<string>(
+		"https://i.pinimg.com/564x/a6/e9/2f/a6e92f1fd4af9c28fbc23f031f7c7419.jpg"
+	);
 
 	const taggedFriend: IUser[] = userMocks.filter((u: IUser) =>
 		taggedFriendId.includes(u.id)
@@ -70,6 +99,28 @@ const AlbumCreateModal = ({
 				text: "破壊",
 				onPress: () => toggleCreateAlbumModal(),
 				style: "destructive",
+			},
+		]);
+	};
+
+	const handleCreateAlbum = (value: ICreateAlbum) => {
+		if (!isValid) {
+			return;
+		}
+		Alert.alert("アルバムを作成しますか？", "", [
+			{
+				text: "キャンセル",
+				style: "cancel",
+			},
+			{
+				text: "はい",
+				onPress: () => {
+					toggleCreateAlbumModal();
+					navigate('GlobalStack', {
+						screen: "AlbumDetailScreen",
+						
+					})
+				},
 			},
 		]);
 	};
@@ -168,7 +219,10 @@ const AlbumCreateModal = ({
 	};
 
 	return (
-		<View style={styles.container}>
+		<KeyboardAvoidingView
+			style={styles.container}
+			behavior={Platform.OS === "ios" ? "padding" : "height"}
+		>
 			{/* header  */}
 			<View style={styles.headerContainer}>
 				<CustomTouchableOpacity onPress={onCancle}>
@@ -177,7 +231,9 @@ const AlbumCreateModal = ({
 
 				<Text style={styles.headerTitle}>アルバム作成</Text>
 
-				<CustomTouchableOpacity onPress={toggleCreateAlbumModal}>
+				<CustomTouchableOpacity
+					onPress={handleSubmit(handleCreateAlbum)}
+				>
 					<Feather name="check" size={26} color={"#00C261"} />
 				</CustomTouchableOpacity>
 			</View>
@@ -207,11 +263,41 @@ const AlbumCreateModal = ({
 					<View style={styles.contentContainer}>
 						<View>
 							<Label>タイトル</Label>
-							<Input placeholder="アルバムのタイトル" />
+							<Controller
+								control={control}
+								render={({
+									field: { onChange, onBlur, value },
+								}) => (
+									<Input
+										placeholder="アルバムのタイトル"
+										onBlur={onBlur}
+										onChangeText={onChange}
+										value={value}
+										errorMessage={errors.title?.message}
+									/>
+								)}
+								name="title"
+							/>
 						</View>
 						<View>
 							<Label>説明</Label>
-							<Input placeholder="アルバムの説明" />
+							<Controller
+								control={control}
+								render={({
+									field: { onChange, onBlur, value },
+								}) => (
+									<Input
+										placeholder="アルバムの説明"
+										onBlur={onBlur}
+										onChangeText={onChange}
+										value={value}
+										errorMessage={
+											errors.description?.message
+										}
+									/>
+								)}
+								name="title"
+							/>
 						</View>
 						<View>
 							<Label>友達</Label>
@@ -254,7 +340,7 @@ const AlbumCreateModal = ({
 					setTaggedFriendId={setTaggedFriendId}
 				/>
 			</Modal>
-		</View>
+		</KeyboardAvoidingView>
 	);
 };
 
