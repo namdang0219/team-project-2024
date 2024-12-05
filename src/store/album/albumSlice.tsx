@@ -15,11 +15,48 @@ const albumSlice = createSlice({
 			state.push(action.payload);
 		},
 		removeAlbum: (state, action) => {
-			state = state.filter((a) => a.id !== action.payload);
+			state = state.filter((a) => a.aid !== action.payload);
+		},
+		addImagesToAlbum: (state, action) => {
+			const albumIndex = state.findIndex(
+				(a) => a.aid === action.payload.aid
+			);
+			// payload: {aid: albumId, images: images}
+			if (albumIndex > -1) {
+				state[albumIndex].images = [
+					...state[albumIndex].images,
+					...action.payload.images,
+				];
+			}
+		},
+		addAlbumToFavorites: (state, action) => {
+			const albumIndex = state.findIndex(
+				(a) => a.aid === action.payload.aid
+			);
+			// payload: {aid: albumId, images: images}
+			if (albumIndex > -1) {
+				state[albumIndex].favorite = true;
+			}
+		},
+		removeAlbumFromFavorites: (state, action) => {
+			const albumIndex = state.findIndex(
+				(a) => a.aid === action.payload.aid
+			);
+			// payload: aid
+			if (albumIndex > -1) {
+				state[albumIndex].favorite = false;
+			}
 		},
 	},
 });
 
-export const { setAlbums, addAlbum, removeAlbum } = albumSlice.actions;
+export const {
+	setAlbums,
+	addAlbum,
+	removeAlbum,
+	addImagesToAlbum,
+	addAlbumToFavorites,
+	removeAlbumFromFavorites,
+} = albumSlice.actions;
 
 export default albumSlice.reducer;

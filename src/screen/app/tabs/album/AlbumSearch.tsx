@@ -146,7 +146,7 @@ const AlbumSearch = ({
 											paddingBottom: 100,
 										}}
 										keyExtractor={(item: IAlbum) =>
-											String(item.id)
+											String(item.aid)
 										}
 										renderItem={({ item }) => (
 											<AlbumItem item={item} />

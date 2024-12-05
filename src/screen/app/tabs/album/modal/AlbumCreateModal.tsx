@@ -126,21 +126,22 @@ const AlbumCreateModal = ({
 	const createAlbum = async (value: ICreateAlbum) => {
 		try {
 			setLoading(true);
-			const albumId = Date.now();
+			const aid = Date.now();
 			const newAlbum: IAlbum = {
-				id: albumId,
+				aid: aid,
 				title: value.title,
 				desc: value.description,
 				cover: image,
 				favorite: false,
 				taggedFriends: taggedFriendId,
+				images: [],
 			};
 			dispatch(addAlbum(newAlbum));
 			setLoading(false);
 			toggleCreateAlbumModal();
 			navigate("GlobalStack", {
 				screen: "AlbumDetailScreen",
-				params: { albumId },
+				params: { aid },
 			});
 		} catch (error) {
 			console.log(error);

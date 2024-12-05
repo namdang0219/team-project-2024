@@ -29,6 +29,9 @@ const RecentAlbum = () => {
 					onPress={() =>
 						navigate("GlobalStack", {
 							screen: "AlbumListScreen",
+							params: {
+								type: "recent",
+							},
 						})
 					}
 					style={{
@@ -59,7 +62,7 @@ const RecentAlbum = () => {
 						onPress={() =>
 							navigate("GlobalStack", {
 								screen: "AlbumDetailScreen",
-								params: { albumId: item.id },
+								params: { aid: item.aid },
 							})
 						}
 						key={index}

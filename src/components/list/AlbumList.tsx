@@ -19,7 +19,7 @@ const AlbumList = ({ data }: { data: IAlbum[] }) => {
 				paddingTop: DIMENTIONS.HEADER_HEIGHT + insets.top,
 				paddingBottom: 100,
 			}}
-			renderItem={({ item }) => <AlbumItem key={item.id} item={item} />}
+			renderItem={({ item }) => <AlbumItem key={item.aid} item={item} />}
 		/>
 	);
 };

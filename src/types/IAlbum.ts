@@ -1,8 +1,11 @@
+import { IImage } from "./IImage";
+
 export interface IAlbum {
-	id: number;
+	aid: number;
 	title: string;
 	desc: string;
 	cover: string;
 	favorite: boolean;
-	taggedFriends: number[]; // array of friends id
+	taggedFriends: number[];
+	images: IImage[];
 }

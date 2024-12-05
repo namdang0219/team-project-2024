@@ -8,7 +8,7 @@ import {
 	Share,
 	Alert,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "components/button";
 import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -25,15 +25,21 @@ import { useToggle } from "hook/useToggle";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 import { userMocks } from "mock/userMocks";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
+import {
+	addAlbumToFavorites,
+	removeAlbumFromFavorites,
+} from "store/album/albumSlice";
+import { Toast } from "toastify-react-native";
 
 const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
 	const albums = useSelector((state: RootState) => state.album);
+	const dispatch = useDispatch();
 
 	const filteredAlbum: IAlbum | undefined = albums.find(
-		(item) => item.id === params?.albumId
+		(item) => item.aid === params?.aid
 	);
 	const { width } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
@@ -47,6 +53,14 @@ const AlbumDetailScreen = () => {
 	);
 
 	const [isFavorite, setIsFavorite] = useState(filteredAlbum?.favorite);
+
+	useEffect(() => {
+		if (isFavorite) {
+			dispatch(addAlbumToFavorites({ aid: filteredAlbum?.aid }));
+		} else {
+			dispatch(removeAlbumFromFavorites({ aid: filteredAlbum?.aid }));
+		}
+	}, [isFavorite]);
 
 	const onShare = async () => {
 		try {
@@ -235,7 +249,7 @@ const AlbumDetailScreen = () => {
 								>
 									<Image
 										source={{
-											uri: taggedFriends[4].avatar,
+											uri: taggedFriends[3].avatar,
 										}}
 										style={[
 											{
@@ -360,6 +374,7 @@ const AlbumDetailScreen = () => {
 						onPress={() =>
 							navigate("GlobalStack", {
 								screen: "AlbumImageListScreen",
+								params: { aid: filteredAlbum?.aid },
 							})
 						}
 					>

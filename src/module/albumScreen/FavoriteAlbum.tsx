@@ -2,15 +2,15 @@ import { View, Text, FlatList, ImageBackground } from "react-native";
 import React from "react";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
-import colors from "react-native-ui-lib/src/style/colors";
 import { Entypo } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 
 const FavoriteAlbum = () => {
 	const albums = useSelector((state: RootState) => state.album);
 	const { navigate } = useNavigation<any>();
+	const { colors } = useTheme();
 
 	return (
 		<View>
@@ -26,6 +26,14 @@ const FavoriteAlbum = () => {
 					お気に入り
 				</Text>
 				<CustomTouchableOpacity
+					onPress={() =>
+						navigate("GlobalStack", {
+							screen: "AlbumListScreen",
+							params: {
+								type: "favorites",
+							},
+						})
+					}
 					style={{
 						flexDirection: "row",
 						alignItems: "center",
@@ -54,7 +62,7 @@ const FavoriteAlbum = () => {
 						onPress={() =>
 							navigate("GlobalStack", {
 								screen: "AlbumDetailScreen",
-								params: { albumId: item.id },
+								params: { aid: item.aid },
 							})
 						}
 						key={index}

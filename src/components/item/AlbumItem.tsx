@@ -45,12 +45,12 @@ const AlbumItem = ({ item }: { item: IAlbum }) => {
 
 	return (
 		<CustomTouchableOpacity
-			key={item.id}
+			key={item.aid}
 			style={{ marginBottom: 10 }}
 			onPress={() =>
 				navigate("GlobalStack", {
 					screen: "AlbumDetailScreen",
-					params: { albumId: item.id },
+					params: { aid: item.aid },
 				})
 			}
 		>
