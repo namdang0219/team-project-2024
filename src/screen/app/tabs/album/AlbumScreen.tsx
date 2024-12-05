@@ -1,40 +1,34 @@
 import {
 	View,
 	Text,
-	Image,
 	useWindowDimensions,
 	ScrollView,
-	FlatList,
-	ImageBackground,
-	StyleSheet,
 	Modal,
 } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DIMENTIONS } from "constant/dimention";
-import { Feather, Entypo, MaterialIcons, AntDesign } from "@expo/vector-icons";
+import { Feather, Entypo, MaterialIcons } from "@expo/vector-icons";
 import { CustomTouchableOpacity } from "components/custom";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { useToggle } from "hook/useToggle";
 import Header from "layout/Header";
-import Slider from "module/album/Slider";
-import { userMocks } from "mock/userMocks";
 import AlbumSearch from "./AlbumSearch";
 import AlbumCreateModal from "./modal/AlbumCreateModal";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
+import Slider from "module/albumScreen/Slider";
+import RecentAlbum from "module/albumScreen/RecentAlbum";
+import WithFriend from "module/albumScreen/WithFriend";
+import FavoriteAlbum from "module/albumScreen/FavoriteAlbum";
+import Category from "module/albumScreen/Category";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
-	const { colors } = useTheme();
-	const { navigate } = useNavigation<any>();
-	const albums = useSelector((state: RootState) => state.album);
-
 	const [showOption, toggleShowOption, setShowOption] = useToggle(false);
 	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
-
 	const [searchModal, toggleSearchModal] = useToggle(false);
 
 	return (
@@ -126,6 +120,8 @@ const AlbumScreen = () => {
 						</View>
 					}
 				/>
+
+				{/* search modal  */}
 				<Modal
 					visible={searchModal}
 					presentationStyle="fullScreen"
@@ -149,315 +145,16 @@ const AlbumScreen = () => {
 					<Slider />
 
 					{/* recent album  */}
-					<View>
-						<View
-							style={{
-								flexDirection: "row",
-								justifyContent: "space-between",
-								alignItems: "center",
-								paddingHorizontal: DIMENTIONS.APP_PADDING,
-							}}
-						>
-							<Text style={{ fontSize: 18, fontWeight: "600" }}>
-								最近のアルバム
-							</Text>
-							<CustomTouchableOpacity
-								onPress={() =>
-									navigate("GlobalStack", {
-										screen: "AlbumListScreen",
-									})
-								}
-								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									gap: 4,
-								}}
-							>
-								<Text style={{ color: colors.primary }}>
-									すべて
-								</Text>
-								<Entypo
-									name="chevron-thin-right"
-									size={14}
-									color={colors.primary}
-								/>
-							</CustomTouchableOpacity>
-						</View>
-						<FlatList
-							data={albums.slice(0, 5)}
-							style={{ marginTop: 12 }}
-							contentContainerStyle={{
-								paddingHorizontal: DIMENTIONS.APP_PADDING,
-								gap: 10,
-							}}
-							horizontal
-							showsHorizontalScrollIndicator={false}
-							renderItem={({ item, index }) => (
-								<CustomTouchableOpacity
-									onPress={() =>
-										navigate("GlobalStack", {
-											screen: "AlbumDetailScreen",
-											params: { albumId: item.id },
-										})
-									}
-									key={index}
-								>
-									<ImageBackground
-										source={{
-											uri: item.cover,
-										}}
-										style={{
-											width: 150,
-											height: 180,
-											borderRadius: 12,
-											position: "relative",
-											overflow: "hidden",
-										}}
-									>
-										{item.favorite && (
-											<View
-												style={{
-													width: 24,
-													aspectRatio: 1,
-													backgroundColor: "white",
-													borderRadius: 1000,
-													alignItems: "center",
-													justifyContent: "center",
-													position: "absolute",
-													bottom: 6,
-													right: 6,
-												}}
-											>
-												<AntDesign
-													name="heart"
-													color={"red"}
-												/>
-											</View>
-										)}
-									</ImageBackground>
-								</CustomTouchableOpacity>
-							)}
-						/>
-					</View>
+					<RecentAlbum />
 
 					{/* with friend  */}
-					<View>
-						<View
-							style={{
-								flexDirection: "row",
-								justifyContent: "space-between",
-								alignItems: "center",
-								paddingHorizontal: DIMENTIONS.APP_PADDING,
-							}}
-						>
-							<Text style={{ fontSize: 18, fontWeight: "600" }}>
-								友達と
-							</Text>
-							<CustomTouchableOpacity
-								onPress={() =>
-									navigate("GlobalStack", {
-										screen: "FriendListScreen",
-									})
-								}
-								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									gap: 4,
-								}}
-							>
-								<Text style={{ color: colors.primary }}>
-									すべて
-								</Text>
-								<Entypo
-									name="chevron-thin-right"
-									size={14}
-									color={colors.primary}
-								/>
-							</CustomTouchableOpacity>
-						</View>
-						<View
-							style={{
-								flexDirection: "row",
-								marginTop: 12,
-								paddingHorizontal: DIMENTIONS.APP_PADDING,
-								gap: 10,
-							}}
-						>
-							{userMocks.slice(0, 4).map((item, index) => (
-								<CustomTouchableOpacity
-									key={index}
-									onPress={() =>
-										navigate("GlobalStack", {
-											screen: "AlbumWithFriend",
-											params: { userId: item.id },
-										})
-									}
-								>
-									<Image
-										source={{
-											uri: item.avatar,
-										}}
-										style={{
-											width:
-												(width -
-													DIMENTIONS.APP_PADDING * 2 -
-													10 * 3) /
-												4,
-											aspectRatio: "1/1",
-											borderRadius: 1000,
-										}}
-									/>
-									<Text
-										style={{
-											textAlign: "center",
-											fontSize: 12,
-											marginTop: 8,
-										}}
-										numberOfLines={1}
-									>
-										{item.name}
-									</Text>
-								</CustomTouchableOpacity>
-							))}
-						</View>
-					</View>
+					<WithFriend />
 
 					{/* favorite album  */}
-					<View>
-						<View
-							style={{
-								flexDirection: "row",
-								justifyContent: "space-between",
-								alignItems: "center",
-								paddingHorizontal: DIMENTIONS.APP_PADDING,
-							}}
-						>
-							<Text style={{ fontSize: 18, fontWeight: "600" }}>
-								お気に入り
-							</Text>
-							<CustomTouchableOpacity
-								style={{
-									flexDirection: "row",
-									alignItems: "center",
-									gap: 4,
-								}}
-							>
-								<Text style={{ color: colors.primary }}>
-									すべて
-								</Text>
-								<Entypo
-									name="chevron-thin-right"
-									size={14}
-									color={colors.primary}
-								/>
-							</CustomTouchableOpacity>
-						</View>
-						<FlatList
-							data={albums
-								.filter((a) => a.favorite === true)
-								.slice(0, 5)}
-							style={{ marginTop: 12 }}
-							contentContainerStyle={{
-								paddingHorizontal: DIMENTIONS.APP_PADDING,
-								gap: 10,
-							}}
-							horizontal
-							showsHorizontalScrollIndicator={false}
-							renderItem={({ item, index }) => (
-								<CustomTouchableOpacity
-									onPress={() =>
-										navigate("GlobalStack", {
-											screen: "AlbumDetailScreen",
-											params: { albumId: item.id },
-										})
-									}
-									key={index}
-								>
-									<ImageBackground
-										source={{
-											uri: item.cover,
-										}}
-										style={{
-											width: 150,
-											height: 180,
-											borderRadius: 12,
-											position: "relative",
-											overflow: "hidden",
-										}}
-									></ImageBackground>
-								</CustomTouchableOpacity>
-							)}
-						/>
-					</View>
+					<FavoriteAlbum />
 
 					{/* category  */}
-					<View style={{ paddingHorizontal: DIMENTIONS.APP_PADDING }}>
-						<Text
-							style={{
-								fontSize: 18,
-								fontWeight: "600",
-								textAlign: "center",
-							}}
-						>
-							カテゴリー
-						</Text>
-						<View
-							style={{
-								flexDirection: "row",
-								flexWrap: "wrap",
-								gap: 12,
-								marginTop: 12,
-							}}
-						>
-							{Array(4)
-								.fill(null)
-								.map((item, index) => (
-									<CustomTouchableOpacity key={index}>
-										<ImageBackground
-											source={{
-												uri: "https://i.pinimg.com/736x/3b/12/87/3b12878320d3ee5120d8a405afa4b5b8.jpg",
-											}}
-											style={{
-												width:
-													(width -
-														DIMENTIONS.APP_PADDING *
-															2 -
-														12) /
-													2,
-												aspectRatio: "2/0.85",
-												borderRadius: 10,
-												overflow: "hidden",
-												position: "relative",
-											}}
-										>
-											<View
-												style={[
-													StyleSheet.absoluteFill,
-													,
-													{
-														backgroundColor:
-															"rgba(0,0,0,0.35)",
-														alignItems: "center",
-														justifyContent:
-															"center",
-													},
-												]}
-											>
-												<Text
-													style={{
-														color: "white",
-														fontSize: 20,
-														fontWeight: "600",
-													}}
-												>
-													#芸術
-												</Text>
-											</View>
-										</ImageBackground>
-									</CustomTouchableOpacity>
-								))}
-						</View>
-					</View>
+					<Category/>
 
 					{/* storage  */}
 					<Text style={{ color: "gray", textAlign: "center" }}>

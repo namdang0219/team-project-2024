@@ -23,21 +23,24 @@ import {
 import { BlurView } from "expo-blur";
 import { useToggle } from "hook/useToggle";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
-import { albumMocks } from "mock/albumMocks";
 import { IAlbum } from "types/IAlbum";
 import { userMocks } from "mock/userMocks";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
 
 const AlbumDetailScreen = () => {
+	const { params } = useRoute<any>();
+	const albums = useSelector((state: RootState) => state.album);
+
+	const filteredAlbum: IAlbum | undefined = albums.find(
+		(item) => item.id === params?.albumId
+	);
 	const { width } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
 	const [showOption, toggleShowOption] = useToggle(false);
 	const { navigate } = useNavigation<any>();
-	const { params } = useRoute<any>();
-	const { colors } = useTheme();
 
-	const filteredAlbum: IAlbum | undefined = albumMocks.find(
-		(item) => item.id === params?.albumId
-	);
+	const { colors } = useTheme();
 
 	const taggedFriends = userMocks.filter((u) =>
 		filteredAlbum?.taggedFriends.includes(u.id)
@@ -91,7 +94,8 @@ const AlbumDetailScreen = () => {
 							canGoBack
 							intensity={0}
 							leftTitleStyle={{
-								shadowOpacity: 0.5,
+								shadowOpacity: 0.25,
+								shadowOffset: { height: 0, width: 0 },
 							}}
 							rightContainer={
 								<View>

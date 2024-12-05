@@ -11,9 +11,15 @@ const albumSlice = createSlice({
 		setAlbums: (state, action) => {
 			state = action.payload;
 		},
+		addAlbum: (state, action) => {
+			state.push(action.payload);
+		},
+		removeAlbum: (state, action) => {
+			state = state.filter((a) => a.id !== action.payload);
+		},
 	},
 });
 
-export const { setAlbums } = albumSlice.actions;
+export const { setAlbums, addAlbum, removeAlbum } = albumSlice.actions;
 
 export default albumSlice.reducer;

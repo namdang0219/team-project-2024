@@ -19,9 +19,11 @@ import { DIMENTIONS } from "constant/dimention";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import handlePressBackground from "util/func/handlePressBackground";
 import { AntDesign, Feather } from "@expo/vector-icons";
-import { albumMocks } from "mock/albumMocks";
 import { CustomTouchableOpacity } from "components/custom";
 import { IAlbum } from "types/IAlbum";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
+import { AlbumItem } from "components/item";
 
 const { width } = Dimensions.get("screen");
 const GAP = 8;
@@ -40,13 +42,14 @@ const AlbumSearch = ({
 	const { navigate } = useNavigation<any>();
 	const [searchText, setSearchText] = useState<string>("");
 	const [results, setResults] = useState<IAlbum[]>([]);
+	const albums = useSelector((state: RootState) => state.album);
 
 	useEffect(() => {
 		if (searchText.trim() === "") {
 			setResults([]);
 			return;
 		}
-		const filteredResults = albumMocks.filter((album) =>
+		const filteredResults = albums.filter((album) =>
 			album.title.toLowerCase().includes(searchText.toLowerCase())
 		);
 		setResults(filteredResults);
@@ -98,7 +101,7 @@ const AlbumSearch = ({
 						<CustomTouchableOpacity
 							onPress={() => toggleSeachModal(false)}
 						>
-							<Text style={{color: 'blue'}}>キャンセル</Text>
+							<Text style={{ color: "blue" }}>キャンセル</Text>
 						</CustomTouchableOpacity>
 					</View>
 
@@ -142,58 +145,11 @@ const AlbumSearch = ({
 											gap: GAP,
 											paddingBottom: 100,
 										}}
-										renderItem={({ item, index }) => (
-											<CustomTouchableOpacity
-												key={item.id}
-												style={{ marginBottom: 10 }}
-												onPress={() =>
-													navigate("GlobalStack", {
-														screen: "AlbumDetailScreen",
-														params: {
-															albumId: item.id,
-														},
-													})
-												}
-											>
-												<ImageBackground
-													source={{ uri: item.cover }}
-													style={{
-														flex: 1,
-														borderRadius: 15,
-														width: ITEM_WIDTH,
-														height:
-															(ITEM_WIDTH / 5) *
-															6,
-														position: "relative",
-														overflow: "hidden",
-													}}
-												>
-													{item.favorite && (
-														<View
-															style={{
-																width: 25,
-																aspectRatio: 1,
-																backgroundColor:
-																	"white",
-																borderRadius: 1000,
-																alignItems:
-																	"center",
-																justifyContent:
-																	"center",
-																position:
-																	"absolute",
-																bottom: 6,
-																right: 6,
-															}}
-														>
-															<AntDesign
-																name="heart"
-																color={"red"}
-															/>
-														</View>
-													)}
-												</ImageBackground>
-											</CustomTouchableOpacity>
+										keyExtractor={(item: IAlbum) =>
+											String(item.id)
+										}
+										renderItem={({ item }) => (
+											<AlbumItem item={item} />
 										)}
 									/>
 								</View>

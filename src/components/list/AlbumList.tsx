@@ -1,6 +1,5 @@
 import { FlatList } from "react-native";
 import React from "react";
-import { albumMocks } from "mock/albumMocks";
 import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AlbumItem } from "components/item";

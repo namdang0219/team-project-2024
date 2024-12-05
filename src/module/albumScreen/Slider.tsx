@@ -1,33 +1,18 @@
 import React, { useRef } from "react";
 import {
 	Dimensions,
-	Image,
-	ImageBackground,
-	ScaledSize,
-	StyleSheet,
-	Text,
 	View,
 } from "react-native";
 import {
-	Extrapolation,
-	interpolate,
-	SharedValue,
 	useSharedValue,
 } from "react-native-reanimated";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
 import SliderItem from "./SliderItem";
-import { albumMocks } from "mock/albumMocks";
-
-const defaultDataWith6Colors = [
-	"#B0604D",
-	"#899F9C",
-	"#B3C680",
-	"#5C6265",
-	"#F5D399",
-	"#F1F1F1",
-];
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
 
 const Slider = () => {
+	const albums = useSelector((state: RootState) => state.album)
 	const ref = useRef<any>();
 	const progress = useSharedValue<number>(0);
 
@@ -53,7 +38,7 @@ const Slider = () => {
 					autoPlay
 					ref={ref}
 					autoPlayInterval={3000}
-					data={albumMocks}
+					data={albums}
 					height={HEIGHT}
 					loop={true}
 					pagingEnabled={true}
@@ -79,7 +64,7 @@ const Slider = () => {
 			{/* pagination  */}
 			<Pagination.Basic
 				progress={progress}
-				data={albumMocks}
+				data={albums}
 				size={7.5}
 				dotStyle={{
 					backgroundColor: "#ddd6fe",

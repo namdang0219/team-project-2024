@@ -9,12 +9,11 @@ import {
 	Dimensions,
 	StyleSheet,
 	Modal,
-	TextInput,
-	FlatList,
 	KeyboardAvoidingView,
 	Platform,
+	ActivityIndicator,
 } from "react-native";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { useState } from "react";
 import { DIMENTIONS } from "constant/dimention";
 import { Feather, AntDesign } from "@expo/vector-icons";
 import { CustomTouchableOpacity } from "components/custom";
@@ -32,6 +31,9 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { addAlbum } from "store/album/albumSlice";
+import { IAlbum } from "types/IAlbum";
 
 const { width } = Dimensions.get("screen");
 
@@ -52,9 +54,11 @@ const AlbumCreateModal = ({
 }) => {
 	const insets = useSafeAreaInsets();
 	const { navigate } = useNavigation<any>();
+	const [loading, setLoading] = useState<boolean>(false);
 	const [taggedFriendId, setTaggedFriendId] = useState<number[]>([]);
 	const itemWidth = useItemWidth(10, 5);
 	const [tagFriendModal, toggleTagFriendModal] = useToggle(false);
+	const dispatch = useDispatch();
 	const {
 		handleSubmit,
 		control,
@@ -114,15 +118,33 @@ const AlbumCreateModal = ({
 			},
 			{
 				text: "はい",
-				onPress: () => {
-					toggleCreateAlbumModal();
-					navigate('GlobalStack', {
-						screen: "AlbumDetailScreen",
-						
-					})
-				},
+				onPress: () => createAlbum(value),
 			},
 		]);
+	};
+
+	const createAlbum = async (value: ICreateAlbum) => {
+		try {
+			setLoading(true);
+			const albumId = Date.now();
+			const newAlbum: IAlbum = {
+				id: albumId,
+				title: value.title,
+				desc: value.description,
+				cover: image,
+				favorite: false,
+				taggedFriends: taggedFriendId,
+			};
+			dispatch(addAlbum(newAlbum));
+			setLoading(false);
+			toggleCreateAlbumModal();
+			navigate("GlobalStack", {
+				screen: "AlbumDetailScreen",
+				params: { albumId },
+			});
+		} catch (error) {
+			console.log(error);
+		}
 	};
 
 	const styles = StyleSheet.create({
@@ -162,7 +184,7 @@ const AlbumCreateModal = ({
 			paddingHorizontal: DIMENTIONS.APP_PADDING,
 			marginTop: 20,
 			flex: 1,
-			gap: 14,
+			gap: 22,
 		},
 		addFriendItemContainer: {
 			width: itemWidth,
@@ -225,7 +247,10 @@ const AlbumCreateModal = ({
 		>
 			{/* header  */}
 			<View style={styles.headerContainer}>
-				<CustomTouchableOpacity onPress={onCancle}>
+				<CustomTouchableOpacity
+					onPress={onCancle}
+					style={{ width: 30 }}
+				>
 					<Feather name="x" size={26} color={"red"} />
 				</CustomTouchableOpacity>
 
@@ -233,8 +258,13 @@ const AlbumCreateModal = ({
 
 				<CustomTouchableOpacity
 					onPress={handleSubmit(handleCreateAlbum)}
+					style={{ width: 30 }}
 				>
-					<Feather name="check" size={26} color={"#00C261"} />
+					{loading ? (
+						<ActivityIndicator size={"small"} />
+					) : (
+						<Feather name="check" size={26} color={"#00C261"} />
+					)}
 				</CustomTouchableOpacity>
 			</View>
 
@@ -296,7 +326,7 @@ const AlbumCreateModal = ({
 										}
 									/>
 								)}
-								name="title"
+								name="description"
 							/>
 						</View>
 						<View>

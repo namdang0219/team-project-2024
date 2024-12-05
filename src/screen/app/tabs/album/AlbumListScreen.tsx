@@ -1,10 +1,13 @@
 import { View } from "react-native";
 import React from "react";
 import Header from "layout/Header";
-import { albumMocks } from "mock/albumMocks";
 import { AlbumList } from "components/list";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
 
 const AlbumListScreen = () => {
+	const albums = useSelector((state: RootState) => state.album)
+
 	return (
 		<View style={{ flex: 1 }}>
 			<Header
@@ -14,7 +17,7 @@ const AlbumListScreen = () => {
 				backIconColor="black"
 			/>
 
-			<AlbumList data={albumMocks}></AlbumList>
+			<AlbumList data={albums}></AlbumList>
 		</View>
 	);
 };
