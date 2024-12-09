@@ -2,8 +2,9 @@ import { View, Text, StyleSheet, ImageBackground } from "react-native";
 import React from "react";
 import { CustomTouchableOpacity } from "components/custom";
 import { useNavigation } from "@react-navigation/native";
+import { IAlbum } from "types/IAlbum";
 
-const SliderItem = ({ item }: { item: any }) => {
+const SliderItem = ({ item }: { item: IAlbum }) => {
 	const { navigate } = useNavigation<any>();
 
 	return (
@@ -43,7 +44,9 @@ const SliderItem = ({ item }: { item: any }) => {
 					>
 						{item.title}
 					</Text>
-					<Text style={{ color: "white", fontSize: 16 }}>26枚</Text>
+					<Text
+						style={{ color: "white", fontSize: 16 }}
+					>{`${item.images.length}枚`}</Text>
 				</View>
 			</ImageBackground>
 		</View>

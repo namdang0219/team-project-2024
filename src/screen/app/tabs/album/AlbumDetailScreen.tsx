@@ -17,6 +17,7 @@ import { CustomTouchableOpacity } from "components/custom";
 import {
 	AntDesign,
 	Entypo,
+	Feather,
 	MaterialCommunityIcons,
 	MaterialIcons,
 } from "@expo/vector-icons";
@@ -32,6 +33,8 @@ import {
 	removeAlbumFromFavorites,
 } from "store/album/albumSlice";
 import { Toast } from "toastify-react-native";
+import { OptionModal } from "components/modal";
+import { IOption } from "components/modal/OptionModal";
 
 const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
@@ -61,6 +64,25 @@ const AlbumDetailScreen = () => {
 			dispatch(removeAlbumFromFavorites({ aid: filteredAlbum?.aid }));
 		}
 	}, [isFavorite]);
+
+	const options: IOption[] = [
+		{
+			label: "カバー写真を編集",
+			icon: (
+				<MaterialCommunityIcons
+					name="pencil"
+					color={"black"}
+					size={20}
+				/>
+			),
+			action: () => null,
+		},
+		{
+			label: "アルバムを削除",
+			icon: <Feather name="trash-2" color={"black"} size={20} />,
+			action: () => null,
+		},
+	];
 
 	const onShare = async () => {
 		try {
@@ -112,75 +134,10 @@ const AlbumDetailScreen = () => {
 								shadowOffset: { height: 0, width: 0 },
 							}}
 							rightContainer={
-								<View>
-									<CustomTouchableOpacity
-										style={{ position: "relative" }}
-										onPress={toggleShowOption}
-									>
-										<Entypo
-											name="dots-three-horizontal"
-											size={20}
-											color="white"
-										/>
-									</CustomTouchableOpacity>
-									{/* option modal  */}
-									{showOption && (
-										<BlurView
-											style={{
-												width: (width / 3) * 1.6,
-												borderRadius: 10,
-												position: "absolute",
-												right: -10,
-												top: 30,
-												paddingHorizontal: 15,
-												overflow: "hidden",
-											}}
-											tint="extraLight"
-											intensity={95}
-										>
-											<CustomTouchableOpacity
-												style={[
-													{
-														height: 48,
-														flexDirection: "row",
-														alignItems: "center",
-														justifyContent:
-															"space-between",
-														borderBottomColor:
-															"white",
-														borderBottomWidth: 0.5,
-													},
-												]}
-												onPress={() =>
-													toggleShowOption()
-												}
-											>
-												<Text>アルバム作成</Text>
-												<MaterialIcons
-													name="create"
-													color={"black"}
-													size={20}
-												/>
-											</CustomTouchableOpacity>
-											<CustomTouchableOpacity
-												style={{
-													height: 48,
-													flexDirection: "row",
-													alignItems: "center",
-													justifyContent:
-														"space-between",
-												}}
-											>
-												<Text>アルバム作成</Text>
-												<MaterialIcons
-													name="create"
-													color={"black"}
-													size={20}
-												/>
-											</CustomTouchableOpacity>
-										</BlurView>
-									)}
-								</View>
+								<OptionModal
+									options={options}
+									iconStyle={{ color: "white" }}
+								></OptionModal>
 							}
 						></Header>
 					</View>

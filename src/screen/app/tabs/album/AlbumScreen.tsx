@@ -4,32 +4,40 @@ import {
 	useWindowDimensions,
 	ScrollView,
 	Modal,
+	TouchableWithoutFeedback,
+	TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DIMENTIONS } from "constant/dimention";
 import { Feather, Entypo, MaterialIcons } from "@expo/vector-icons";
 import { CustomTouchableOpacity } from "components/custom";
-import { useNavigation, useTheme } from "@react-navigation/native";
 import { BlurView } from "expo-blur";
 import { useToggle } from "hook/useToggle";
 import Header from "layout/Header";
 import AlbumSearch from "./AlbumSearch";
 import AlbumCreateModal from "./modal/AlbumCreateModal";
-import { useSelector } from "react-redux";
-import { RootState } from "store/configureStore";
 import Slider from "module/albumScreen/Slider";
 import RecentAlbum from "module/albumScreen/RecentAlbum";
 import WithFriend from "module/albumScreen/WithFriend";
 import FavoriteAlbum from "module/albumScreen/FavoriteAlbum";
 import Category from "module/albumScreen/Category";
+import { OptionModal } from "components/modal";
+import { IOption } from "components/modal/OptionModal";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
-	const [showOption, toggleShowOption, setShowOption] = useToggle(false);
 	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
 	const [searchModal, toggleSearchModal] = useToggle(false);
+
+	const options: IOption[] = [
+		{
+			label: "アルバム作成",
+			icon: <MaterialIcons name="create" color={"black"} size={20} />,
+			action: toggleCreateAlbumModal,
+		},
+	];
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -65,58 +73,19 @@ const AlbumScreen = () => {
 							</CustomTouchableOpacity>
 
 							{/* option  */}
-							<View>
-								<CustomTouchableOpacity
-									style={{ position: "relative" }}
-									onPress={toggleShowOption}
+							<OptionModal options={options}>
+								<Modal
+									visible={createAlbumModal}
+									animationType="slide"
+									presentationStyle="fullScreen"
 								>
-									<Entypo
-										name="dots-three-horizontal"
-										size={20}
+									<AlbumCreateModal
+										toggleCreateAlbumModal={
+											toggleCreateAlbumModal
+										}
 									/>
-								</CustomTouchableOpacity>
-
-								{/* option modal  */}
-								{showOption && (
-									<BlurView
-										style={{
-											width: (width / 3) * 1.6,
-											borderRadius: 10,
-											position: "absolute",
-											right: -10,
-											top: 30,
-											paddingHorizontal: 15,
-											overflow: "hidden",
-										}}
-										tint="extraLight"
-										intensity={95}
-									>
-										<CustomTouchableOpacity
-											style={[
-												{
-													height: 48,
-													flexDirection: "row",
-													alignItems: "center",
-													justifyContent:
-														"space-between",
-													borderBottomColor: "white",
-													borderBottomWidth: 0.5,
-												},
-											]}
-											onPress={() =>
-												toggleCreateAlbumModal()
-											}
-										>
-											<Text>アルバム作成</Text>
-											<MaterialIcons
-												name="create"
-												color={"black"}
-												size={20}
-											/>
-										</CustomTouchableOpacity>
-									</BlurView>
-								)}
-							</View>
+								</Modal>
+							</OptionModal>
 						</View>
 					}
 				/>
@@ -137,9 +106,6 @@ const AlbumScreen = () => {
 					flex: 1,
 					paddingTop: insets.top + DIMENTIONS.HEADER_HEIGHT,
 				}}
-				onScroll={() => {
-					showOption && setShowOption(false);
-				}}
 			>
 				<View style={{ flex: 1, gap: 35, paddingBottom: 250 }}>
 					<Slider />
@@ -154,7 +120,7 @@ const AlbumScreen = () => {
 					<FavoriteAlbum />
 
 					{/* category  */}
-					<Category/>
+					<Category />
 
 					{/* storage  */}
 					<Text style={{ color: "gray", textAlign: "center" }}>
@@ -162,16 +128,6 @@ const AlbumScreen = () => {
 					</Text>
 				</View>
 			</ScrollView>
-
-			<Modal
-				visible={createAlbumModal}
-				animationType="slide"
-				presentationStyle="fullScreen"
-			>
-				<AlbumCreateModal
-					toggleCreateAlbumModal={toggleCreateAlbumModal}
-				/>
-			</Modal>
 		</View>
 	);
 };
