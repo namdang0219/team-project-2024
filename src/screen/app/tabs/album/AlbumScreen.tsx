@@ -4,13 +4,11 @@ import {
 	useWindowDimensions,
 	ScrollView,
 	Modal,
-	TouchableWithoutFeedback,
-	TouchableOpacity,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, {  } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DIMENTIONS } from "constant/dimention";
-import { Feather, Entypo, MaterialIcons } from "@expo/vector-icons";
+import { Feather, MaterialIcons } from "@expo/vector-icons";
 import { CustomTouchableOpacity } from "components/custom";
 import { BlurView } from "expo-blur";
 import { useToggle } from "hook/useToggle";

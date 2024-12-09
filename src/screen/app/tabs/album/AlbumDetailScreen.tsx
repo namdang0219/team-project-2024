@@ -2,11 +2,11 @@ import {
 	View,
 	Text,
 	Image,
-	useWindowDimensions,
 	StatusBar,
 	StyleSheet,
 	Share,
 	Alert,
+	Dimensions,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Button } from "components/button";
@@ -14,15 +14,7 @@ import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Header from "layout/Header";
 import { CustomTouchableOpacity } from "components/custom";
-import {
-	AntDesign,
-	Entypo,
-	Feather,
-	MaterialCommunityIcons,
-	MaterialIcons,
-} from "@expo/vector-icons";
-import { BlurView } from "expo-blur";
-import { useToggle } from "hook/useToggle";
+import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 import { userMocks } from "mock/userMocks";
@@ -30,11 +22,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import {
 	addAlbumToFavorites,
+	removeAlbum,
 	removeAlbumFromFavorites,
 } from "store/album/albumSlice";
-import { Toast } from "toastify-react-native";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
+
+const { width } = Dimensions.get("screen");
 
 const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
@@ -44,10 +38,8 @@ const AlbumDetailScreen = () => {
 	const filteredAlbum: IAlbum | undefined = albums.find(
 		(item) => item.aid === params?.aid
 	);
-	const { width } = useWindowDimensions();
 	const insets = useSafeAreaInsets();
-	const [showOption, toggleShowOption] = useToggle(false);
-	const { navigate } = useNavigation<any>();
+	const { navigate, goBack } = useNavigation<any>();
 
 	const { colors } = useTheme();
 
@@ -65,6 +57,23 @@ const AlbumDetailScreen = () => {
 		}
 	}, [isFavorite]);
 
+	const removeCurrentAlbum = () => {
+		Alert.alert("アルバムを削除しますか？", "", [
+			{
+				text: "キャンセル",
+				style: "cancel",
+			},
+			{
+				text: "削除する",
+				style: "destructive",
+				onPress: () => {
+					dispatch(removeAlbum(filteredAlbum?.aid));
+					goBack();
+				},
+			},
+		]);
+	};
+
 	const options: IOption[] = [
 		{
 			label: "カバー写真を編集",
@@ -80,7 +89,7 @@ const AlbumDetailScreen = () => {
 		{
 			label: "アルバムを削除",
 			icon: <Feather name="trash-2" color={"black"} size={20} />,
-			action: () => null,
+			action: removeCurrentAlbum,
 		},
 	];
 
@@ -114,12 +123,7 @@ const AlbumDetailScreen = () => {
 						source={{
 							uri: filteredAlbum?.cover,
 						}}
-						style={{
-							width: width,
-							flex: 1,
-							borderBottomLeftRadius: 25,
-							borderBottomRightRadius: 25,
-						}}
+						style={styles.image}
 					/>
 					{/* header  */}
 					<View
@@ -143,16 +147,7 @@ const AlbumDetailScreen = () => {
 					</View>
 
 					{/* action bottom bar  */}
-					<View
-						style={{
-							position: "absolute",
-							bottom: 15,
-							width: "100%",
-							flexDirection: "row",
-							justifyContent: "space-between",
-							paddingHorizontal: 15,
-						}}
-					>
+					<View style={styles.actionBottomContainer}>
 						{/* left container  */}
 						<CustomTouchableOpacity
 							style={{ flexDirection: "row" }}
@@ -166,16 +161,13 @@ const AlbumDetailScreen = () => {
 								taggedFriends.slice(0, 3).map((f, index) => (
 									<View
 										key={f.id}
-										style={{
-											width: 45,
-											aspectRatio: 1,
-											borderColor: "white",
-											backgroundColor: "white",
-											borderWidth: 2,
-											borderRadius: 1000,
-											overflow: "hidden",
-											marginLeft: index == 0 ? 0 : -20,
-										}}
+										style={[
+											styles.taggedFriendContainer,
+											{
+												marginLeft:
+													index == 0 ? 0 : -20,
+											},
+										]}
 									>
 										<Image
 											source={{
@@ -189,21 +181,7 @@ const AlbumDetailScreen = () => {
 									</View>
 								))}
 							{taggedFriends.length > 3 && (
-								<View
-									style={{
-										width: 45,
-										aspectRatio: 1,
-										borderColor: "white",
-										backgroundColor: "white",
-										borderWidth: 2,
-										borderRadius: 1000,
-										overflow: "hidden",
-										marginLeft: -20,
-										position: "relative",
-										alignItems: "center",
-										justifyContent: "center",
-									}}
-								>
+								<View style={styles.taggedFriendNum4}>
 									<Image
 										source={{
 											uri: taggedFriends[3].avatar,
@@ -243,14 +221,7 @@ const AlbumDetailScreen = () => {
 							}}
 						>
 							{/* heart icon  */}
-							<View
-								style={{
-									backgroundColor: "white",
-									width: 45,
-									height: 45,
-									borderRadius: 1000,
-								}}
-							>
+							<View style={styles.reactionIcon}>
 								<CustomTouchableOpacity
 									style={{
 										flex: 1,
@@ -269,14 +240,7 @@ const AlbumDetailScreen = () => {
 							</View>
 
 							{/* share icon  */}
-							<View
-								style={{
-									backgroundColor: "white",
-									width: 45,
-									height: 45,
-									borderRadius: 1000,
-								}}
-							>
+							<View style={styles.reactionIcon}>
 								<CustomTouchableOpacity
 									onPress={onShare}
 									style={{
@@ -342,5 +306,50 @@ const AlbumDetailScreen = () => {
 		</>
 	);
 };
+
+const styles = StyleSheet.create({
+	image: {
+		width: width,
+		flex: 1,
+		borderBottomLeftRadius: 25,
+		borderBottomRightRadius: 25,
+	},
+	actionBottomContainer: {
+		position: "absolute",
+		bottom: 15,
+		width: "100%",
+		flexDirection: "row",
+		justifyContent: "space-between",
+		paddingHorizontal: 15,
+	},
+	taggedFriendContainer: {
+		width: 45,
+		aspectRatio: 1,
+		borderColor: "white",
+		backgroundColor: "white",
+		borderWidth: 2,
+		borderRadius: 1000,
+		overflow: "hidden",
+	},
+	taggedFriendNum4: {
+		width: 45,
+		aspectRatio: 1,
+		borderColor: "white",
+		backgroundColor: "white",
+		borderWidth: 2,
+		borderRadius: 1000,
+		overflow: "hidden",
+		marginLeft: -20,
+		position: "relative",
+		alignItems: "center",
+		justifyContent: "center",
+	},
+	reactionIcon: {
+		backgroundColor: "white",
+		width: 45,
+		height: 45,
+		borderRadius: 1000,
+	},
+});
 
 export default AlbumDetailScreen;

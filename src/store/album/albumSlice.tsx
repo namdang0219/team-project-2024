@@ -15,7 +15,10 @@ const albumSlice = createSlice({
 			state.push(action.payload);
 		},
 		removeAlbum: (state, action) => {
-			state = state.filter((a) => a.aid !== action.payload);
+			const index = state.findIndex((a) => a.aid === action.payload);
+			if (index > -1) {
+				state.splice(index, 1);
+			}
 		},
 		addImagesToAlbum: (state, action) => {
 			const albumIndex = state.findIndex(

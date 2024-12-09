@@ -26,6 +26,7 @@ const BottomTab = () => {
 			<Tab.Screen
 				name="NotificationStack"
 				component={NotificationStack}
+				options={{headerShown: false}}
 			/>
 			<Tab.Screen
 				name="ProfileStack"
