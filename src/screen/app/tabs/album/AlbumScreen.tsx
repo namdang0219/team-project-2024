@@ -4,8 +4,9 @@ import {
 	useWindowDimensions,
 	ScrollView,
 	Modal,
+	RefreshControl,
 } from "react-native";
-import React, {  } from "react";
+import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DIMENTIONS } from "constant/dimention";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
@@ -28,6 +29,7 @@ const AlbumScreen = () => {
 	const { width } = useWindowDimensions();
 	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
 	const [searchModal, toggleSearchModal] = useToggle(false);
+	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 
 	const options: IOption[] = [
 		{
@@ -36,6 +38,13 @@ const AlbumScreen = () => {
 			action: toggleCreateAlbumModal,
 		},
 	];
+
+	const onRefresh = () => {
+		setIsRefreshing(true);
+		setTimeout(() => {
+			setIsRefreshing(false);
+		}, 2000);
+	};
 
 	return (
 		<View style={{ flex: 1 }}>
@@ -104,6 +113,15 @@ const AlbumScreen = () => {
 					flex: 1,
 					paddingTop: insets.top + DIMENTIONS.HEADER_HEIGHT,
 				}}
+				refreshControl={
+					<RefreshControl
+						refreshing={isRefreshing}
+						onRefresh={onRefresh}
+						progressViewOffset={
+							insets.top + DIMENTIONS.HEADER_HEIGHT
+						}
+					/>
+				}
 			>
 				<View style={{ flex: 1, gap: 35, paddingBottom: 250 }}>
 					<Slider />

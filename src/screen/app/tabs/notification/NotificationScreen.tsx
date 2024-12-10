@@ -1,4 +1,11 @@
-import { View, Text, FlatList, Image, RefreshControl } from "react-native";
+import {
+	View,
+	Text,
+	FlatList,
+	Image,
+	RefreshControl,
+	Alert,
+} from "react-native";
 import React, { useState } from "react";
 import Header from "layout/Header";
 import { DIMENTIONS } from "constant/dimention";
@@ -9,11 +16,29 @@ import { userMocks } from "mock/userMocks";
 import { IUser } from "types/IUser";
 import { INotification } from "types/INotification";
 import { notificationMocks } from "mock/notificationMocks";
+import { OptionModal } from "components/modal";
+import { IOption } from "components/modal/OptionModal";
+import { Feather } from "@expo/vector-icons";
 
 const NotificationScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+
+	const handleMarkAllAsReaded = () => {
+		Alert.alert("全て既読にしますか？", "", [
+			{ text: "いいえ", onPress: () => {}, style: "cancel" },
+			{ text: "はい", onPress: () => null },
+		]);
+	};
+
+	const options: IOption[] = [
+		{
+			label: "全て拝見したとマーク",
+			icon: <Feather name="check-square" size={20} />,
+			action: handleMarkAllAsReaded,
+		},
+	];
 
 	const onRefresh = () => {
 		setIsRefreshing(true);
@@ -44,7 +69,10 @@ const NotificationScreen = () => {
 
 	return (
 		<View style={{ flex: 1 }}>
-			<Header title="通知" rightContainer={<Text>RightContainer</Text>} />
+			<Header
+				title="通知"
+				rightContainer={<OptionModal options={options}></OptionModal>}
+			/>
 			<FlatList
 				data={notificationMocks.concat(notificationMocks)}
 				keyExtractor={(_, index) => String(index)}

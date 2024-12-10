@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
+import { Text, TouchableOpacity, Modal, StyleSheet, View } from "react-native";
 import React, { ReactNode, useRef, useState } from "react";
 import { Entypo } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
@@ -69,39 +69,49 @@ const OptionModal = ({
 					}}
 					onPressIn={() => setShowOption(false)}
 				>
-					<BlurView
-						tint="extraLight"
-						intensity={95}
-						style={[
-							styles.contentContainer,
-							{
-								position: "absolute",
-								top: showOptionPosition.y,
-							},
-						]}
+					<View
+						// style={{
+						// 	shadowOpacity: 0.1,
+						// 	shadowRadius: 20,
+						// 	elevation: 5,
+						// 	zIndex: 1000,
+						// 	shadowColor: "black",
+						// }}
 					>
-						{options.map((item: IOption, index) => (
-							<CustomTouchableOpacity
-								key={index}
-								style={[
-									styles.optionItem,
-									{
-										borderBottomWidth:
-											index === options.length - 1
-												? 0
-												: 1,
-									},
-								]}
-								onPress={() => {
-									setShowOption(false);
-									item.action();
-								}}
-							>
-								<Text>{item.label}</Text>
-								{item.icon}
-							</CustomTouchableOpacity>
-						))}
-					</BlurView>
+						<BlurView
+							tint="extraLight"
+							intensity={95}
+							style={[
+								styles.contentContainer,
+								{
+									position: "absolute",
+									top: showOptionPosition.y,
+								},
+							]}
+						>
+							{options.map((item: IOption, index) => (
+								<CustomTouchableOpacity
+									key={index}
+									style={[
+										styles.optionItem,
+										{
+											borderBottomWidth:
+												index === options.length - 1
+													? 0
+													: 1,
+										},
+									]}
+									onPress={() => {
+										setShowOption(false);
+										item.action();
+									}}
+								>
+									<Text>{item.label}</Text>
+									{item.icon}
+								</CustomTouchableOpacity>
+							))}
+						</BlurView>
+					</View>
 				</TouchableOpacity>
 			</Modal>
 
@@ -117,9 +127,9 @@ const styles = StyleSheet.create({
 		paddingVertical: 8,
 		paddingHorizontal: 15,
 		borderRadius: 12,
-		overflow: "hidden",
 		position: "absolute",
 		right: DIMENTIONS.APP_PADDING,
+		overflow: "hidden",
 	},
 	optionItem: {
 		flexDirection: "row",
