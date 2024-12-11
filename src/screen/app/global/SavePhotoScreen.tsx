@@ -7,13 +7,14 @@ import {
 	StyleSheet,
 	Alert,
 	Share,
+	FlatList,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { darkTheme } from "util/theme/themeColors";
 import { IconBack } from "icon/global";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { Button } from "components/button";
 import { Feather } from "@expo/vector-icons";
 import Svg, {
@@ -26,12 +27,25 @@ import Svg, {
 } from "react-native-svg";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { Toast } from "toastify-react-native";
+import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
+import { IAlbum } from "types/IAlbum";
+import { addImagesToAlbum } from "store/album/albumSlice";
 
 const SavePhotoScreen = ({ route }: { route: any }) => {
 	const { capturedUri } = route.params;
 	const { width: screenWidth } = useWindowDimensions();
 	const { goBack, navigate } = useNavigation<any>();
 	const [loading, setLoading] = useState<boolean>(false);
+	const insets = useSafeAreaInsets();
+	const albums = useSelector((state: RootState) => state.album);
+	const { colors } = useTheme();
+	const [selectedAlbumIds, setSelectedAlbumIds] = useState<number[]>([]);
+	const dispatch = useDispatch();
+
+	const actionSheetRef = useRef<ActionSheetRef>(null);
 
 	const savePhotoToCameraRoll = async (photoUri: string) => {
 		try {
@@ -39,12 +53,52 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 			const result = await CameraRoll.save(photoUri, { type: "photo" });
 			if (result) {
 				setLoading(false);
-				Toast.success("保存済み！🎉");
+				actionSheetRef.current?.show();
 			}
-
-			navigate("AlbumStack", { screen: "AlbumScreen" });
 		} catch (error) {
 			console.error("Error saving photo to Camera Roll:", error);
+		}
+	};
+
+	const handleDoneButton = () => {
+		const handleAddToAlbum = () => {
+			selectedAlbumIds.forEach((aid) => {
+				dispatch(
+					addImagesToAlbum({
+						aid: aid,
+						images: [
+							{
+								iid: Math.random(),
+								uri: capturedUri,
+							},
+						],
+					})
+				);
+			});
+			navigate("AlbumStack", {
+				screen: "AlbumScreen",
+			});
+			Toast.success("写真をアルバムに追加しました");
+		};
+
+		if (selectedAlbumIds.length == 0) {
+			navigate("AlbumStack", {
+				screen: "AlbumScreen",
+			});
+			return;
+		} else if (selectedAlbumIds.length > 0) {
+			Alert.alert("選択したアルバムに追加してもよろしいですか？", "", [
+				{
+					text: "キャンセル",
+					style: "cancel",
+				},
+				{
+					text: "はい",
+					onPress: handleAddToAlbum,
+				},
+			]);
+		} else {
+			console.log("Bugging");
 		}
 	};
 
@@ -196,39 +250,152 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 					</View>
 				</View>
 
+				{/* download button  */}
+				<Button
+					style={{ marginTop: 16 }}
+					loading={loading}
+					onPress={() => {
+						Alert.alert(
+							"写真をカメラロールに保存してもよろしいですか？",
+							"",
+							[
+								{
+									text: "キャンセル",
+									style: "cancel",
+								},
+								{
+									text: "はい",
+									onPress: () =>
+										savePhotoToCameraRoll(capturedUri),
+								},
+							]
+						);
+					}}
+				>
+					<View style={styles.buttonContent}>
+						<Feather
+							name="download"
+							color="white"
+							size={20}
+							style={{ position: "absolute", left: -90 }}
+						/>
+						<Text style={styles.buttonText}>デバイスに保存</Text>
+					</View>
+				</Button>
+			</View>
+			<ActionSheet
+				ref={actionSheetRef}
+				snapPoints={[100]}
+				safeAreaInsets={insets}
+				closeOnPressBack={false}
+				closeOnTouchBackdrop={false}
+			>
 				<View>
-					{/* add to album button   */}
-					<CustomTouchableOpacity
-						style={{ marginHorizontal: "auto" }}
-						onPress={() =>
-							navigate("AlbumStack", { screen: "AlbumScreen" })
-						}
+					<Text
+						style={{
+							fontSize: 24,
+							fontWeight: "500",
+							textAlign: "center",
+							marginVertical: 30,
+						}}
 					>
-						<Text style={{ color: "white", fontSize: 16 }}>
-							アルバムに追加
-						</Text>
-					</CustomTouchableOpacity>
+						写真保存済み！🎉
+					</Text>
 
-					{/* download button  */}
+					<View>
+						<Text style={{ textAlign: "center", marginBottom: 15 }}>
+							アルバムにも追加しますか？
+						</Text>
+						<FlatList
+							data={albums}
+							keyExtractor={(item: IAlbum) => item.aid.toString()}
+							columnWrapperStyle={{ gap: 10 }}
+							numColumns={2}
+							style={{ height: 220 }}
+							contentContainerStyle={{
+								gap: 10,
+								paddingHorizontal: DIMENTIONS.APP_PADDING,
+							}}
+							renderItem={({ item }) => (
+								<CustomTouchableOpacity
+									onPress={() =>
+										setSelectedAlbumIds((prev) => {
+											if (prev.includes(item.aid)) {
+												return prev.filter(
+													(id) => id !== item.aid
+												);
+											} else {
+												return [...prev, item.aid];
+											}
+										})
+									}
+									style={{
+										backgroundColor:
+											selectedAlbumIds.includes(item.aid)
+												? colors.primary
+												: colors.input,
+										padding: 10,
+										flex: 1,
+										borderRadius: 10,
+										flexDirection: "row",
+										gap: 10,
+										alignItems: "center",
+									}}
+								>
+									<Image
+										source={{ uri: item.cover }}
+										style={{
+											width: 45,
+											aspectRatio: 1,
+											borderRadius: 1000,
+										}}
+									/>
+									<View style={{ flex: 1 }}>
+										<Text
+											numberOfLines={1}
+											style={{
+												fontWeight: "500",
+												color: selectedAlbumIds.includes(
+													item.aid
+												)
+													? "white"
+													: "black",
+											}}
+										>
+											{item.title}
+										</Text>
+										<Text
+											numberOfLines={1}
+											style={{
+												marginTop: 5,
+												color: selectedAlbumIds.includes(
+													item.aid
+												)
+													? "white"
+													: colors.subGray,
+												fontSize: 12,
+											}}
+										>{`${item.images.length}枚`}</Text>
+									</View>
+								</CustomTouchableOpacity>
+							)}
+						/>
+					</View>
+
 					<Button
-						style={{ marginTop: 16 }}
+						style={{
+							marginTop: 30,
+							marginHorizontal: DIMENTIONS.APP_PADDING,
+						}}
 						loading={loading}
-						onPress={() => savePhotoToCameraRoll(capturedUri)}
+						onPress={handleDoneButton}
 					>
-						<View style={styles.buttonContent}>
-							<Feather
-								name="download"
-								color="white"
-								size={20}
-								style={{ position: "absolute", left: -90 }}
-							/>
-							<Text style={styles.buttonText}>
-								デバイスに保存
-							</Text>
-						</View>
+						{selectedAlbumIds.length > 0
+							? "追加してアルバムへ"
+							: "アルバムに戻る"}
 					</Button>
 				</View>
-			</View>
+			</ActionSheet>
 		</SafeAreaView>
 	);
 };

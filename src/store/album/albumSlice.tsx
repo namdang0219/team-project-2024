@@ -36,7 +36,7 @@ const albumSlice = createSlice({
 			const albumIndex = state.findIndex(
 				(a) => a.aid === action.payload.aid
 			);
-			// payload: {aid: albumId, images: images}
+			// payload: {aid: albumId, images: {iid: number, uri: string}[]}
 			if (albumIndex > -1) {
 				state[albumIndex].favorite = true;
 			}

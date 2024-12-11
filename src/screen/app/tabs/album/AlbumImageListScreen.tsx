@@ -175,7 +175,7 @@ const AlbumImageListScreen = () => {
 						{images.length > 0 &&
 							images.map((item: IImage, index) => (
 								<CustomTouchableOpacity
-									key={item.iid}
+									key={index}
 									style={{
 										width:
 											index % 4 == 0 && index !== 0
