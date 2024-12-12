@@ -27,6 +27,7 @@ import {
 } from "store/album/albumSlice";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
+import { IUser } from "types/IUser";
 
 const { width } = Dimensions.get("screen");
 
@@ -36,7 +37,7 @@ const AlbumDetailScreen = () => {
 	const dispatch = useDispatch();
 
 	const filteredAlbum: IAlbum | undefined = albums.find(
-		(item) => item.aid === params?.aid
+		(item: IAlbum) => item.aid === params?.aid
 	);
 	const insets = useSafeAreaInsets();
 	const { navigate, goBack } = useNavigation<any>();
@@ -44,7 +45,7 @@ const AlbumDetailScreen = () => {
 	const { colors } = useTheme();
 
 	const taggedFriends = userMocks.filter((u) =>
-		filteredAlbum?.taggedFriends.includes(u.id)
+		filteredAlbum?.taggedFriends.includes(u.uid)
 	);
 
 	const [isFavorite, setIsFavorite] = useState(filteredAlbum?.favorite);
@@ -158,33 +159,35 @@ const AlbumDetailScreen = () => {
 							}
 						>
 							{taggedFriends.length > 0 &&
-								taggedFriends.slice(0, 3).map((f, index) => (
-									<View
-										key={f.id}
-										style={[
-											styles.taggedFriendContainer,
-											{
-												marginLeft:
-													index == 0 ? 0 : -20,
-											},
-										]}
-									>
-										<Image
-											source={{
-												uri: f?.avatar,
-											}}
-											style={{
-												flex: 1,
-												borderRadius: 1000,
-											}}
-										/>
-									</View>
-								))}
+								taggedFriends
+									.slice(0, 3)
+									.map((f: IUser, index) => (
+										<View
+											key={f.uid}
+											style={[
+												styles.taggedFriendContainer,
+												{
+													marginLeft:
+														index == 0 ? 0 : -20,
+												},
+											]}
+										>
+											<Image
+												source={{
+													uri: f?.photoURL,
+												}}
+												style={{
+													flex: 1,
+													borderRadius: 1000,
+												}}
+											/>
+										</View>
+									))}
 							{taggedFriends.length > 3 && (
 								<View style={styles.taggedFriendNum4}>
 									<Image
 										source={{
-											uri: taggedFriends[3].avatar,
+											uri: taggedFriends[3].photoURL,
 										}}
 										style={[
 											{

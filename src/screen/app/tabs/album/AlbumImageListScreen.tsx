@@ -110,6 +110,7 @@ const AlbumImageListScreen = () => {
 	const { params } = useRoute<any>();
 	const albums = useSelector((state: RootState) => state.album);
 	const dispatch = useDispatch();
+	const user = useSelector((state: RootState) => state.user);
 
 	const aid = params?.aid;
 	const filteredAlbum = albums.find((a: IAlbum) => aid == a.aid);
@@ -127,6 +128,17 @@ const AlbumImageListScreen = () => {
 			const newImages: IImage[] = result.assets.map((a) => ({
 				iid: a?.fileName as string,
 				uri: a?.uri,
+				album: [
+					filteredAlbum?.aid as string,
+					filteredAlbum?.aid as string,
+				],
+				author: user.uid,
+				location: {
+					lat: 0,
+					long: 0,
+				},
+				create_at: Number(new Date()),
+				update_at: Number(new Date()),
 			}));
 			dispatch(addImagesToAlbum({ aid: aid, images: newImages }));
 			Toast.success("写真追加済み");

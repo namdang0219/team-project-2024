@@ -8,11 +8,11 @@ import { AlbumList } from "components/list";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 
-const AlbumWithFriend = () => {
+const AlbumWithFriendScreen = () => {
 	const { params } = useRoute<any>();
-	const albums = useSelector((state: RootState) => state.album)
+	const albums = useSelector((state: RootState) => state.album);
 
-	const filteredUser = userMocks.find((u) => u.id === params.userId);
+	const filteredUser = userMocks.find((u) => u.uid === params.userId);
 
 	const filteredAlbums: IAlbum[] = albums.filter((a: IAlbum) =>
 		a.taggedFriends.includes(params?.userId)
@@ -22,7 +22,7 @@ const AlbumWithFriend = () => {
 		<View style={{ flex: 1 }}>
 			<Header
 				canGoBack
-				leftTitle={filteredUser?.name}
+				leftTitle={filteredUser?.displayName}
 				leftTitleStyle={{ color: "black" }}
 				backIconColor="black"
 			/>
@@ -32,4 +32,4 @@ const AlbumWithFriend = () => {
 	);
 };
 
-export default AlbumWithFriend;
+export default AlbumWithFriendScreen;

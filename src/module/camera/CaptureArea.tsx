@@ -1,9 +1,7 @@
 import {
 	View,
-	useWindowDimensions,
 	StyleSheet,
 	Dimensions,
-	ImageBackground,
 } from "react-native";
 import React, { RefObject } from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -12,44 +10,10 @@ import Animated, {
 	useAnimatedStyle,
 } from "react-native-reanimated";
 
-type CaptureAreaProps = {
-	viewRef: RefObject<View>;
-	previewPhotoUri: string;
-	stickers: ISticker[];
-};
-
 export interface ISticker {
 	source: string;
 	id: number;
 }
-
-// const CaptureArea = ({
-// 	viewRef,
-// 	previewPhotoUri,
-// 	stickers,
-// }: CaptureAreaProps) => {
-// 	const { width } = useWindowDimensions();
-// 	return (
-// 		<View ref={viewRef} style={{ position: "relative", zIndex: 1 }}>
-// 			<ImageBackground
-// 				source={{
-// 					uri: previewPhotoUri,
-// 				}}
-// 				style={[
-// 					{
-// 						aspectRatio: "9/16",
-// 						width: width,
-// 					},
-// 				]}
-// 			>
-// 				{stickers &&
-// 					stickers.map((sticker) => (
-// 						<Sticker key={sticker.id} source={sticker.source} />
-// 					))}
-// 			</ImageBackground>
-// 		</View>
-// 	);
-// };
 
 export const Sticker = ({ source }: { source: string }) => {
 	const prevScale = useSharedValue(1);
@@ -123,5 +87,3 @@ export const Sticker = ({ source }: { source: string }) => {
 		</GestureDetector>
 	);
 };
-
-// export default CaptureArea;

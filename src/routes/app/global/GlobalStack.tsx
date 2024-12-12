@@ -5,8 +5,8 @@ import SavePhotoScreen from "screen/app/global/SavePhotoScreen";
 import AlbumDetailScreen from "screen/app/tabs/album/AlbumDetailScreen";
 import AlbumImageListScreen from "screen/app/tabs/album/AlbumImageListScreen";
 import AlbumListScreen from "screen/app/tabs/album/AlbumListScreen";
-import AlbumTaggedFriend from "screen/app/tabs/album/AlbumTaggedFriend";
-import AlbumWithFriend from "screen/app/tabs/album/AlbumWithFriend";
+import AlbumTaggedFriendScreen from "screen/app/tabs/album/AlbumTaggedFriend";
+import AlbumWithFriendScreen from "screen/app/tabs/album/AlbumWithFriend";
 import FriendListScreen from "screen/app/tabs/album/FriendListScreen";
 
 const Stack = createNativeStackNavigator();
@@ -27,13 +27,13 @@ const GlobalStack = () => {
 			<Stack.Screen name="AlbumListScreen" component={AlbumListScreen} />
 			{/* friend list who was tagged in album  */}
 			<Stack.Screen
-				name="AlbumTaggedFriend"
-				component={AlbumTaggedFriend}
+				name="AlbumTaggedFriendScreen"
+				component={AlbumTaggedFriendScreen}
 			/> 
 		    {/* album with friend  */}
 			<Stack.Screen
-				name="AlbumWithFriend"
-				component={AlbumWithFriend}
+				name="AlbumWithFriendScreen"
+				component={AlbumWithFriendScreen}
 			/>
 		    {/* friend list  */}
 			<Stack.Screen

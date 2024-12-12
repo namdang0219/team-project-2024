@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 
-const AlbumTaggedFriend = () => {
+const AlbumTaggedFriendScreen = () => {
 	return (
 		<View
 			style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
@@ -11,4 +11,4 @@ const AlbumTaggedFriend = () => {
 	);
 };
 
-export default AlbumTaggedFriend;
+export default AlbumTaggedFriendScreen;

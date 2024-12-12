@@ -31,9 +31,10 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addAlbum } from "store/album/albumSlice";
 import { IAlbum } from "types/IAlbum";
+import { RootState } from "store/configureStore";
 
 const { width } = Dimensions.get("screen");
 
@@ -54,8 +55,9 @@ const AlbumCreateModal = ({
 }) => {
 	const insets = useSafeAreaInsets();
 	const { navigate } = useNavigation<any>();
+	const currentUser = useSelector((state: RootState) => state.user);
 	const [loading, setLoading] = useState<boolean>(false);
-	const [taggedFriendId, setTaggedFriendId] = useState<number[]>([]);
+	const [taggedFriendId, setTaggedFriendId] = useState<IUser["uid"][]>([]);
 	const itemWidth = useItemWidth(10, 5);
 	const [tagFriendModal, toggleTagFriendModal] = useToggle(false);
 	const dispatch = useDispatch();
@@ -77,7 +79,7 @@ const AlbumCreateModal = ({
 	);
 
 	const taggedFriend: IUser[] = userMocks.filter((u: IUser) =>
-		taggedFriendId.includes(u.id)
+		taggedFriendId.includes(u.uid)
 	);
 
 	const pickImage = async () => {
@@ -128,13 +130,16 @@ const AlbumCreateModal = ({
 			setLoading(true);
 			const aid = Date.now();
 			const newAlbum: IAlbum = {
-				aid: aid,
+				aid: aid.toString(),
+				author: currentUser.uid,
 				title: value.title,
 				desc: value.description,
 				cover: image,
 				favorite: false,
 				taggedFriends: taggedFriendId,
 				images: [],
+				create_at: Date.now(),
+				update_at: Date.now(),
 			};
 			dispatch(addAlbum(newAlbum));
 			setLoading(false);
@@ -199,10 +204,10 @@ const AlbumCreateModal = ({
 
 	const FriendItem = ({ user }: { user: IUser }) => {
 		const handleUntagFriend = () => {
-			const index = taggedFriendId.indexOf(user.id);
+			const index = taggedFriendId.indexOf(user.uid);
 			if (index >= 0) {
 				setTaggedFriendId(
-					taggedFriendId.filter((id) => id !== user.id)
+					taggedFriendId.filter((id) => id !== user.uid)
 				);
 			}
 		};
@@ -211,7 +216,7 @@ const AlbumCreateModal = ({
 			<View style={{ position: "relative" }}>
 				<Image
 					source={{
-						uri: user.avatar,
+						uri: user.photoURL,
 					}}
 					style={{
 						width: itemWidth,
@@ -340,7 +345,7 @@ const AlbumCreateModal = ({
 								}}
 							>
 								{taggedFriend.map((item: IUser) => (
-									<FriendItem key={item.id} user={item} />
+									<FriendItem key={item.uid} user={item} />
 								))}
 								<CustomTouchableOpacity
 									style={styles.addFriendItemContainer}

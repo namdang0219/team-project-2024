@@ -46,29 +46,29 @@ const FriendListScreen = () => {
 
 			<FlatList
 				data={userMocks}
-				keyExtractor={(item) => String(item.id)}
+				keyExtractor={(item) => String(item.uid)}
 				numColumns={3}
 				contentContainerStyle={styles.container}
 				columnWrapperStyle={{
 					gap: GAP,
 				}}
 				renderItem={({ item }) => (
-					<View key={item.id}>
+					<View key={item.uid}>
 						<CustomTouchableOpacity
 							onPress={() =>
 								navigate("GlobalStack", {
 									screen: "AlbumWithFriend",
-									params: { userId: item.id },
+									params: { userId: item.uid },
 								})
 							}
 						>
 							<Image
-								source={{ uri: item.avatar }}
+								source={{ uri: item.photoURL }}
 								style={styles.image}
 							/>
 						</CustomTouchableOpacity>
 						<Text numberOfLines={1} style={styles.title}>
-							{item.name}
+							{item.displayName}
 						</Text>
 					</View>
 				)}

@@ -2,7 +2,7 @@ import { View, Image, StyleSheet, ViewProps } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemedView } from "components/themed";
-import { IUser } from "store/user/userSlice";
+import { IUser } from "types/IUser";
 
 const ProfileAvatar = ({
 	photoURL = "",

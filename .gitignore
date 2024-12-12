@@ -23,7 +23,6 @@ web-build/
 npm-debug.*
 yarn-debug.*
 yarn-error.*
-
 # macOS
 .DS_Store
 *.pem
@@ -35,6 +34,9 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-#prebuld folder
+# prebuld folder
 ios
 android
+
+# draft
+draft.md

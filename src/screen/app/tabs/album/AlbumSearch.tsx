@@ -6,7 +6,6 @@ import {
 	TouchableWithoutFeedback,
 	FlatList,
 	Dimensions,
-	ImageBackground,
 } from "react-native";
 import React, {
 	Dispatch,
@@ -25,12 +24,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { AlbumItem } from "components/item";
 
-const { width } = Dimensions.get("screen");
 const GAP = 8;
-const ITEM_PER_ROW = 2;
-const ITEM_WIDTH =
-	(width - DIMENTIONS.APP_PADDING * 2 - GAP * (ITEM_PER_ROW - 1)) /
-	ITEM_PER_ROW;
 
 const AlbumSearch = ({
 	toggleSeachModal,

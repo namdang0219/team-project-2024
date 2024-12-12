@@ -1,13 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-
-export type IUser = {
-	uid: string;
-	displayName: string;
-	email: string;
-	photoURL: string;
-	posts: number;
-	friends: number;
-};
+import { IUser } from "types/IUser";
 
 const initialState: IUser = {
 	uid: "1",

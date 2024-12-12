@@ -42,7 +42,9 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 	const insets = useSafeAreaInsets();
 	const albums = useSelector((state: RootState) => state.album);
 	const { colors } = useTheme();
-	const [selectedAlbumIds, setSelectedAlbumIds] = useState<number[]>([]);
+	const [selectedAlbumIds, setSelectedAlbumIds] = useState<IAlbum["aid"][]>(
+		[]
+	);
 	const dispatch = useDispatch();
 
 	const actionSheetRef = useRef<ActionSheetRef>(null);

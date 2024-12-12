@@ -24,8 +24,8 @@ const AlbumTagFriendModal = ({
 	setTaggedFriendId,
 }: {
 	toggleTagFriendModal: () => void;
-	taggedFriendId: number[];
-	setTaggedFriendId: Dispatch<SetStateAction<number[]>>;
+	taggedFriendId: IUser["uid"][];
+	setTaggedFriendId: Dispatch<SetStateAction<IUser["uid"][]>>;
 }) => {
 	const insets = useSafeAreaInsets();
 
@@ -49,7 +49,7 @@ const AlbumTagFriendModal = ({
 				<FlatList
 					data={userMocks}
 					style={{ marginTop: 6 }}
-					keyExtractor={(item) => String(item.id)}
+					keyExtractor={(item) => String(item.uid)}
 					contentContainerStyle={styles.contentContainer}
 					renderItem={({ item }: { item: IUser }) => (
 						<UserItem
@@ -77,18 +77,18 @@ const UserItem = ({
 	setTaggedFriendId,
 }: {
 	item: IUser;
-	taggedFriendId: number[];
-	setTaggedFriendId: Dispatch<SetStateAction<number[]>>;
+	taggedFriendId: IUser["uid"][];
+	setTaggedFriendId: Dispatch<SetStateAction<IUser["uid"][]>>;
 }) => {
 	const { colors } = useTheme();
 
-	const isTagged = taggedFriendId.includes(item.id);
+	const isTagged = taggedFriendId.includes(item.uid);
 
 	const handleTagFriend = () => {
 		if (isTagged) {
 			return;
 		}
-		setTaggedFriendId((prev) => [...prev, item.id]);
+		setTaggedFriendId((prev) => [...prev, item.uid]);
 	};
 
 	return (
@@ -110,7 +110,7 @@ const UserItem = ({
 				>
 					<Image
 						source={{
-							uri: item.avatar,
+							uri: item.photoURL,
 						}}
 						style={{
 							width: 52,
@@ -118,7 +118,7 @@ const UserItem = ({
 							borderRadius: 1000,
 						}}
 					/>
-					<Text style={{ fontSize: 15 }}>{item.name}</Text>
+					<Text style={{ fontSize: 15 }}>{item.displayName}</Text>
 				</View>
 
 				<CustomTouchableOpacity

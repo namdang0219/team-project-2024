@@ -56,14 +56,14 @@ const WithFriend = () => {
 						key={index}
 						onPress={() =>
 							navigate("GlobalStack", {
-								screen: "AlbumWithFriend",
-								params: { userId: item.id },
+								screen: "AlbumWithFriendScreen",
+								params: { userId: item.uid },
 							})
 						}
 					>
 						<Image
 							source={{
-								uri: item.avatar,
+								uri: item.photoURL,
 							}}
 							style={{
 								width:
@@ -83,7 +83,7 @@ const WithFriend = () => {
 							}}
 							numberOfLines={1}
 						>
-							{item.name}
+							{item.displayName}
 						</Text>
 					</CustomTouchableOpacity>
 				))}

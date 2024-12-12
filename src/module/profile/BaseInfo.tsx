@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { ThemedText } from "components/themed";
-import { IUser } from "store/user/userSlice";
+import { IUser } from "types/IUser";
 
 const BaseInfo = ({
 	displayName,
