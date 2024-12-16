@@ -257,8 +257,8 @@ const MapSection = ({
 						/>
 						<View
 							style={{
-								width: 26,
-								aspectRatio: 1,
+								height: 24,
+								paddingHorizontal: 4,
 								borderRadius: 100,
 								position: "absolute",
 								top: -28,
@@ -350,12 +350,11 @@ const MapSection = ({
 							name="location-dot"
 							color="red"
 							size={45}
-							styles={{}}
 						/>
 						<View
 							style={{
-								width: 26,
-								aspectRatio: 1,
+								height: 24,
+								paddingHorizontal: 4,
 								borderRadius: 100,
 								position: "absolute",
 								top: -28,
@@ -424,7 +423,7 @@ const MapSection = ({
 				</Marker>
 
 				{/* <MapViewDirections
-					origin={currentLocation}
+					origin={testLocation}
 					destination={destination}
 					apikey={
 						process.env.EXPO_PUBLIC_GOOGLE_DIRECTIONS_API as string

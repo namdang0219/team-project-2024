@@ -47,8 +47,8 @@ const NotificationScreen = () => {
 		}, 2000);
 	};
 
-	const findNoticeUser = (userId: number) => {
-		const user: IUser | undefined = userMocks.find((u) => u.id === userId);
+	const findNoticeUser = (userId: IUser["uid"]) => {
+		const user: IUser | undefined = userMocks.find((u) => u.uid === userId);
 		return user;
 	};
 
@@ -56,11 +56,11 @@ const NotificationScreen = () => {
 		switch (item.type) {
 			case "NEW_POST":
 				return `${
-					findNoticeUser(item.userId)?.name
+					findNoticeUser(item.noticeUser)?.displayName
 				} さんが新しく投稿しました。すぐチェックして一緒に楽しみましょう！`;
 			case "MENTION":
 				return `${
-					findNoticeUser(item.userId)?.name
+					findNoticeUser(item.noticeUser)?.displayName
 				} さんからメンションされました。さっそく確認に行きましょう！`;
 			default:
 				return null;
@@ -100,7 +100,7 @@ const NotificationScreen = () => {
 					>
 						<Image
 							source={{
-								uri: findNoticeUser(item.userId)?.avatar,
+								uri: findNoticeUser(item.noticeUser)?.photoURL,
 							}}
 							style={{
 								width: 64,
@@ -122,7 +122,10 @@ const NotificationScreen = () => {
 										fontWeight: "600",
 									}}
 								>
-									{findNoticeUser(item.userId)?.name}
+									{
+										findNoticeUser(item.noticeUser)
+											?.displayName
+									}
 								</Text>
 								{!item.isChecked && (
 									<View
