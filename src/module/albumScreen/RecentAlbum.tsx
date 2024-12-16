@@ -6,6 +6,7 @@ import { AntDesign, Entypo } from "@expo/vector-icons";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
+import { ThemedText } from "components/themed";
 
 const RecentAlbum = () => {
 	const { navigate } = useNavigation<any>();
@@ -22,9 +23,9 @@ const RecentAlbum = () => {
 					paddingHorizontal: DIMENTIONS.APP_PADDING,
 				}}
 			>
-				<Text style={{ fontSize: 18, fontWeight: "600" }}>
+				<ThemedText style={{ fontSize: 18, fontWeight: "600" }}>
 					最近のアルバム
-				</Text>
+				</ThemedText>
 				<CustomTouchableOpacity
 					onPress={() =>
 						navigate("GlobalStack", {

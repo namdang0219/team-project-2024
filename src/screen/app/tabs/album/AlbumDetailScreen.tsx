@@ -28,6 +28,7 @@ import {
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { IUser } from "types/IUser";
+import { ThemedText } from "components/themed";
 
 const { width } = Dimensions.get("screen");
 
@@ -271,7 +272,7 @@ const AlbumDetailScreen = () => {
 						paddingHorizontal: DIMENTIONS.APP_PADDING,
 					}}
 				>
-					<Text
+					<ThemedText
 						style={{
 							color: colors.subGray,
 							opacity: 0.8,
@@ -279,8 +280,8 @@ const AlbumDetailScreen = () => {
 						}}
 					>
 						2024/12/02
-					</Text>
-					<Text
+					</ThemedText>
+					<ThemedText
 						style={{
 							fontSize: 24,
 							fontWeight: "600",
@@ -289,10 +290,10 @@ const AlbumDetailScreen = () => {
 						numberOfLines={1}
 					>
 						{filteredAlbum?.title}
-					</Text>
-					<Text style={{ marginTop: 10 }} numberOfLines={2}>
+					</ThemedText>
+					<ThemedText style={{ marginTop: 10 }} numberOfLines={2}>
 						{filteredAlbum?.desc}
-					</Text>
+					</ThemedText>
 					<Button
 						style={{ marginTop: 20, marginBottom: 5 }}
 						onPress={() =>

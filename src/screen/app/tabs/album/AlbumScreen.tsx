@@ -23,6 +23,9 @@ import FavoriteAlbum from "module/albumScreen/FavoriteAlbum";
 import Category from "module/albumScreen/Category";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
+import { useTheme } from "@react-navigation/native";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
@@ -30,6 +33,9 @@ const AlbumScreen = () => {
 	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
 	const [searchModal, toggleSearchModal] = useToggle(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+	const { colors } = useTheme();
+	const albums = useSelector((state: RootState) => state.album);
+	const images = useSelector((state: RootState) => state.image);
 
 	const options: IOption[] = [
 		{
@@ -76,7 +82,11 @@ const AlbumScreen = () => {
 						>
 							{/* search  */}
 							<CustomTouchableOpacity onPress={toggleSearchModal}>
-								<Feather name="search" size={24} />
+								<Feather
+									name="search"
+									size={24}
+									color={colors.text}
+								/>
 							</CustomTouchableOpacity>
 
 							{/* option  */}
@@ -140,7 +150,7 @@ const AlbumScreen = () => {
 
 					{/* storage  */}
 					<Text style={{ color: "gray", textAlign: "center" }}>
-						11アルバム、400記念
+						{`${albums.length}アルバム、${images.length}記念`}
 					</Text>
 				</View>
 			</ScrollView>

@@ -6,6 +6,7 @@ import { Entypo } from "@expo/vector-icons";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { useNavigation, useTheme } from "@react-navigation/native";
+import { ThemedText } from "components/themed";
 
 const FavoriteAlbum = () => {
 	const albums = useSelector((state: RootState) => state.album);
@@ -22,9 +23,9 @@ const FavoriteAlbum = () => {
 					paddingHorizontal: DIMENTIONS.APP_PADDING,
 				}}
 			>
-				<Text style={{ fontSize: 18, fontWeight: "600" }}>
+				<ThemedText style={{ fontSize: 18, fontWeight: "600" }}>
 					お気に入り
-				</Text>
+				</ThemedText>
 				<CustomTouchableOpacity
 					onPress={() =>
 						navigate("GlobalStack", {

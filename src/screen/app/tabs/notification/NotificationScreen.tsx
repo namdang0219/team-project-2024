@@ -19,6 +19,7 @@ import { notificationMocks } from "mock/notificationMocks";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { Feather } from "@expo/vector-icons";
+import { ThemedText } from "components/themed";
 
 const NotificationScreen = () => {
 	const insets = useSafeAreaInsets();
@@ -116,7 +117,7 @@ const NotificationScreen = () => {
 									gap: 6,
 								}}
 							>
-								<Text
+								<ThemedText
 									style={{
 										fontSize: 16,
 										fontWeight: "600",
@@ -126,7 +127,7 @@ const NotificationScreen = () => {
 										findNoticeUser(item.noticeUser)
 											?.displayName
 									}
-								</Text>
+								</ThemedText>
 								{!item.isChecked && (
 									<View
 										style={{
@@ -138,7 +139,7 @@ const NotificationScreen = () => {
 									/>
 								)}
 							</View>
-							<Text
+							<ThemedText
 								style={{
 									fontWeight: "400",
 									lineHeight: 24,
@@ -147,9 +148,9 @@ const NotificationScreen = () => {
 								numberOfLines={2}
 							>
 								{renderNotificationContent(item)}
-							</Text>
+							</ThemedText>
 
-							<Text
+							<ThemedText
 								style={{
 									marginTop: 6,
 									fontSize: 12,
@@ -157,7 +158,7 @@ const NotificationScreen = () => {
 								}}
 							>
 								1時間前
-							</Text>
+							</ThemedText>
 						</View>
 					</CustomTouchableOpacity>
 				)}

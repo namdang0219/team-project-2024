@@ -5,6 +5,7 @@ import { CustomTouchableOpacity } from "components/custom";
 import { Entypo } from "@expo/vector-icons";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { userMocks } from "mock/userMocks";
+import { ThemedText } from "components/themed";
 
 const width = Dimensions.get("screen").width;
 
@@ -22,7 +23,7 @@ const WithFriend = () => {
 					paddingHorizontal: DIMENTIONS.APP_PADDING,
 				}}
 			>
-				<Text style={{ fontSize: 18, fontWeight: "600" }}>友達と</Text>
+				<ThemedText style={{ fontSize: 18, fontWeight: "600" }}>友達と</ThemedText>
 				<CustomTouchableOpacity
 					onPress={() =>
 						navigate("GlobalStack", {
@@ -75,7 +76,7 @@ const WithFriend = () => {
 								borderRadius: 1000,
 							}}
 						/>
-						<Text
+						<ThemedText
 							style={{
 								textAlign: "center",
 								fontSize: 12,
@@ -84,7 +85,7 @@ const WithFriend = () => {
 							numberOfLines={1}
 						>
 							{item.displayName}
-						</Text>
+						</ThemedText>
 					</CustomTouchableOpacity>
 				))}
 			</View>

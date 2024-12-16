@@ -8,13 +8,14 @@ import {
 import React from "react";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
+import { ThemedText } from "components/themed";
 
 const width = Dimensions.get("screen").width;
 
 const Category = () => {
 	return (
 		<View style={{ paddingHorizontal: DIMENTIONS.APP_PADDING }}>
-			<Text
+			<ThemedText
 				style={{
 					fontSize: 18,
 					fontWeight: "600",
@@ -22,7 +23,7 @@ const Category = () => {
 				}}
 			>
 				カテゴリー
-			</Text>
+			</ThemedText>
 			<View
 				style={{
 					flexDirection: "row",

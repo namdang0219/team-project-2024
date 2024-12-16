@@ -4,6 +4,7 @@ import { Entypo } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
+import { useTheme } from "@react-navigation/native";
 
 export interface IOption {
 	label: string;
@@ -29,6 +30,7 @@ const OptionModal = ({
 		y: 0,
 	});
 	const showOptionButtonRef = useRef<TouchableOpacity>(null);
+	const { colors } = useTheme();
 
 	const openMenu = () => {
 		showOptionButtonRef.current?.measure(
@@ -57,6 +59,7 @@ const OptionModal = ({
 					name="dots-three-horizontal"
 					size={20}
 					style={iconStyle}
+					color={colors.text}
 				/>
 			</TouchableOpacity>
 
@@ -70,13 +73,13 @@ const OptionModal = ({
 					onPressIn={() => setShowOption(false)}
 				>
 					<View
-						// style={{
-						// 	shadowOpacity: 0.1,
-						// 	shadowRadius: 20,
-						// 	elevation: 5,
-						// 	zIndex: 1000,
-						// 	shadowColor: "black",
-						// }}
+					// style={{
+					// 	shadowOpacity: 0.1,
+					// 	shadowRadius: 20,
+					// 	elevation: 5,
+					// 	zIndex: 1000,
+					// 	shadowColor: "black",
+					// }}
 					>
 						<BlurView
 							tint="extraLight"

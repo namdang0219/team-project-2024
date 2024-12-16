@@ -5,13 +5,14 @@ import {
 	ViewProps,
 	StyleProp,
 	TextStyle,
+	useColorScheme,
 } from "react-native";
-import React, { CSSProperties, ReactNode } from "react";
+import React, { ReactNode } from "react";
 import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
-import { Entypo, Feather, Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import HeaderTitle from "../components/title/HeaderTitle";
 import { useNavigation } from "@react-navigation/native";
 
@@ -39,6 +40,7 @@ const Header = ({
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
 	const { goBack } = useNavigation();
+	const scheme = useColorScheme();
 
 	return (
 		<BlurView
@@ -50,7 +52,7 @@ const Header = ({
 				width,
 			}}
 			intensity={intensity}
-			tint="light"
+			tint={scheme === "dark" ? "dark" : "light"}
 		>
 			{/* header container  */}
 			<View
