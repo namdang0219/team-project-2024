@@ -3,17 +3,12 @@ import {
 	StyleSheet,
 	Dimensions,
 } from "react-native";
-import React, { RefObject } from "react";
+import React from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
 	useSharedValue,
 	useAnimatedStyle,
 } from "react-native-reanimated";
-
-export interface ISticker {
-	source: string;
-	id: number;
-}
 
 export const Sticker = ({ source }: { source: string }) => {
 	const prevScale = useSharedValue(1);

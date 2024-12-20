@@ -1,5 +1,3 @@
-import { ISticker } from "module/camera/CaptureArea";
-
 export const recentStickers: ISticker["id"][] = [1, 2, 3, 5, 6];
 
 export const stickerList: ISticker[] = [
