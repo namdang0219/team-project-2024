@@ -72,15 +72,7 @@ const OptionModal = ({
 					}}
 					onPressIn={() => setShowOption(false)}
 				>
-					<View
-					// style={{
-					// 	shadowOpacity: 0.1,
-					// 	shadowRadius: 20,
-					// 	elevation: 5,
-					// 	zIndex: 1000,
-					// 	shadowColor: "black",
-					// }}
-					>
+					<View>
 						<BlurView
 							tint="extraLight"
 							intensity={95}
@@ -109,7 +101,9 @@ const OptionModal = ({
 										item.action();
 									}}
 								>
-									<Text>{item.label}</Text>
+									<Text style={{ fontSize: 15 }}>
+										{item.label}
+									</Text>
 									{item.icon}
 								</CustomTouchableOpacity>
 							))}
@@ -137,6 +131,7 @@ const styles = StyleSheet.create({
 	optionItem: {
 		flexDirection: "row",
 		justifyContent: "space-between",
+		alignItems: "center",
 		paddingVertical: 10,
 		borderBlockColor: "rgba(255, 255, 255, 0.5)",
 	},

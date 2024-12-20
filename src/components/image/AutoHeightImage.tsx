@@ -1,4 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, {
+	useEffect,
+	useState,
+	forwardRef,
+	useImperativeHandle,
+} from "react";
 import {
 	Dimensions,
 	Image,
@@ -10,34 +15,59 @@ import {
 
 const { width: screenWidth } = Dimensions.get("screen");
 
-const AutoHeightImage: React.VFC<{
-	source: ImageURISource | ImageRequireSource;
-	width?: number;
-	style?: StyleProp<ImageStyle>;
-}> = ({ source, style, width = screenWidth }) => {
-	const [height, setHeight] = useState<number>(0);
+const AutoHeightImage = forwardRef(
+	(
+		{
+			source,
+			style,
+			width = screenWidth,
+		}: {
+			source: ImageURISource | ImageRequireSource;
+			width?: number;
+			style?: StyleProp<ImageStyle>;
+		},
+		ref
+	) => {
+		const [height, setHeight] = useState<number>(0);
 
-	useEffect(() => {
-		if (typeof source === "number") {
-			const originalSize = Image.resolveAssetSource(source);
-			const newHeight =
-				(width * originalSize.height) / originalSize.width;
-			setHeight(newHeight);
-		} else if (source?.uri) {
-			Image.getSize(source.uri, (originalWidth, originalHeight) => {
-				const newHeight = (width * originalHeight) / originalWidth;
+		//   useImperativeHandle(ref, () => ({
+		//     getHeight: () => height,
+		//     setNewWidth: (newWidth: number) => {
+		//       if (typeof source === "number") {
+		//         const originalSize = Image.resolveAssetSource(source);
+		//         const newHeight = (newWidth * originalSize.height) / originalSize.width;
+		//         setHeight(newHeight);
+		//       } else if (source?.uri) {
+		//         Image.getSize(source.uri, (originalWidth, originalHeight) => {
+		//           const newHeight = (newWidth * originalHeight) / originalWidth;
+		//           setHeight(newHeight);
+		//         });
+		//       }
+		//     },
+		//   }));
+
+		useEffect(() => {
+			if (typeof source === "number") {
+				const originalSize = Image.resolveAssetSource(source);
+				const newHeight =
+					(width * originalSize.height) / originalSize.width;
 				setHeight(newHeight);
-			});
-		}
-	}, [source, width]);
+			} else if (source?.uri) {
+				Image.getSize(source.uri, (originalWidth, originalHeight) => {
+					const newHeight = (width * originalHeight) / originalWidth;
+					setHeight(newHeight);
+				});
+			}
+		}, [source, width]);
 
-	return (
-		<Image
-			source={source}
-			resizeMode="contain"
-			style={[{ height, width }, style]}
-		/>
-	);
-};
+		return (
+			<Image
+				source={source}
+				resizeMode="contain"
+				style={[{ height, width }, style]}
+			/>
+		);
+	}
+);
 
 export default AutoHeightImage;
