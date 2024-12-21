@@ -57,26 +57,26 @@ const ImageViewScreen = ({
 
 	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
 
-	const imageColors = useImageColors(imageUrls[currentImageIndex]);
-	console.log("🚀 ~ imageColors:", imageColors);
+	// const imageColors = useImageColors(imageUrls[currentImageIndex]);
+	// console.log("🚀 ~ imageColors:", imageColors);
 
 	// Hàm kiểm tra độ sáng của màu (chuyển HEX -> RGB -> tính toán độ sáng)
-	const isColorBright = (hex: string) => {
-		const rgb = hexToRgb(hex);
-		if (!rgb) return false;
-		const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-		return brightness > 128; // Giá trị 128 là ngưỡng sáng/tối
-	};
+	// const isColorBright = (hex: string) => {
+	// 	const rgb = hexToRgb(hex);
+	// 	if (!rgb) return false;
+	// 	const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
+	// 	return brightness > 128; // Giá trị 128 là ngưỡng sáng/tối
+	// };
 
-	// Hàm chuyển HEX thành RGB
-	const hexToRgb = (hex: string) => {
-		const sanitizedHex = hex.replace("#", "");
-		const bigint = parseInt(sanitizedHex, 16);
-		const r = (bigint >> 16) & 255;
-		const g = (bigint >> 8) & 255;
-		const b = bigint & 255;
-		return { r, g, b };
-	};
+	// // Hàm chuyển HEX thành RGB
+	// const hexToRgb = (hex: string) => {
+	// 	const sanitizedHex = hex.replace("#", "");
+	// 	const bigint = parseInt(sanitizedHex, 16);
+	// 	const r = (bigint >> 16) & 255;
+	// 	const g = (bigint >> 8) & 255;
+	// 	const b = bigint & 255;
+	// 	return { r, g, b };
+	// };
 
 	const galleryRef = useRef<GalleryRef>(null);
 

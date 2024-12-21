@@ -19,16 +19,14 @@ import { CustomTouchableOpacity } from "components/custom";
 import { useTheme } from "@react-navigation/native";
 import {
 	AntDesign,
+	Feather,
 	FontAwesome6,
 	MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { GLOBAL_GRADIENT } from "util/theme/themeColors";
-import Animated, {
-	useSharedValue,
-	withTiming,
-} from "react-native-reanimated";
+import Animated, { useSharedValue, withTiming } from "react-native-reanimated";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
 import { NativeViewGestureHandler } from "react-native-gesture-handler";
 import { DIMENTIONS } from "constant/dimention";
@@ -83,6 +81,8 @@ const MapSection = ({
 
 	const [currentLocation, setCurrentLocation] = useState<Region>();
 
+	const [destination, setDestination] = useState<Region>();
+
 	const [heading, setHeading] = useState(0);
 
 	const setMapRegion = (newRegion: Region) => {
@@ -98,11 +98,6 @@ const MapSection = ({
 	const testLocation = {
 		latitude: 37.787094190061325,
 		longitude: -122.40435593090945,
-	};
-
-	const destination = {
-		latitude: 37.78514356762952,
-		longitude: -122.41106500691487,
 	};
 
 	const getCurrentPosition = async () => {
@@ -325,7 +320,7 @@ const MapSection = ({
 						</View>
 					</CustomTouchableOpacity>
 				</Marker>
-				<Marker
+				{/* <Marker
 					coordinate={destination}
 					style={{
 						// backgroundColor: "cyan",
@@ -420,19 +415,53 @@ const MapSection = ({
 								))}
 						</View>
 					</CustomTouchableOpacity>
-				</Marker>
+				</Marker> */}
 
-				{/* <MapViewDirections
-					origin={testLocation}
-					destination={destination}
-					apikey={
-						process.env.EXPO_PUBLIC_GOOGLE_DIRECTIONS_API as string
+				{/* cancel button   */}
+				<CustomTouchableOpacity
+					onPress={() =>
+						setDestination({
+							latitude: 0,
+							longitude: 0,
+							latitudeDelta: LATITUDE_DELTA,
+							longitudeDelta: LONGITUDE_DELTA,
+						})
 					}
-					strokeWidth={4}
-					strokeColor="blue"
-					tappable
-					mode="WALKING"
-				/> */}
+					style={{
+						position: "absolute",
+						top: 100,
+						right: 50,
+						width: 50,
+						aspectRatio: 1,
+						borderRadius: 1000,
+						backgroundColor: "white",
+						alignItems: "center",
+						justifyContent: "center",
+						elevation: 1,
+						shadowRadius: 5,
+						shadowOpacity: 0.15,
+						shadowOffset: { width: 0, height: 0 },
+						zIndex: 10,
+					}}
+				>
+					<Feather name="x" size={20} color={"red"} />
+				</CustomTouchableOpacity>
+
+				{/* {destination?.latitude !== 0 &&
+					destination?.longitudeDelta !== 0 && (
+						<MapViewDirections
+							origin={currentLocation}
+							destination={destination}
+							apikey={
+								process.env
+									.EXPO_PUBLIC_GOOGLE_DIRECTIONS_API as string
+							}
+							strokeWidth={4}
+							strokeColor="blue"
+							tappable
+							mode="WALKING"
+						/>
+					)} */}
 			</MapView>
 
 			{/* current location button  */}
@@ -870,10 +899,36 @@ const MapSection = ({
 									marginLeft: 22,
 								}}
 							>
-								Lat: 30,23, Long: 60, 50
+								Lat: 30,23 Long: 60,50
 							</Text>
 						</View>
-						<View>
+						<View
+							style={{
+								flexDirection: "row",
+								alignItems: "center",
+								gap: 20,
+							}}
+						>
+							{/* direction button  */}
+							<CustomTouchableOpacity
+								onPress={() => {
+									setDestination({
+										latitude: testLocation.latitude,
+										longitude: testLocation.longitude,
+										latitudeDelta: LATITUDE_DELTA,
+										longitudeDelta: LONGITUDE_DELTA,
+									});
+									actionSheetRef.current?.hide();
+								}}
+							>
+								<Ionicons
+									name="navigate"
+									size={20}
+									color={"#007AFF"}
+								/>
+							</CustomTouchableOpacity>
+
+							{/* option Modal */}
 							<OptionModal
 								options={[
 									{
@@ -931,7 +986,7 @@ const MapSection = ({
 								)}
 							/>
 						) : (
-							// post view 
+							// post view
 							<FlatList
 								key={viewType}
 								data={DATA}
