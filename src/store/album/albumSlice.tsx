@@ -26,10 +26,9 @@ const albumSlice = createSlice({
 			);
 			// payload: {aid: albumId, images: images}
 			if (albumIndex > -1) {
-				state[albumIndex].images = [
-					...state[albumIndex].images,
-					...action.payload.images,
-				];
+				state[albumIndex].images = state[albumIndex].images.concat(
+					action.payload.imageIds
+				);
 			}
 		},
 		addAlbumToFavorites: (state, action) => {

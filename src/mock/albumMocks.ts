@@ -9,7 +9,7 @@ export const albumMocks: IAlbum[] = [
 		cover: "https://i.pinimg.com/736x/ad/6c/34/ad6c34d99197000f57891ef033cf3bbf.jpg",
 		favorite: true,
 		taggedFriends: ["1", "2", "3", "4", "5"],
-		images: ["1", "2", "5", "8", "10"],
+		images: ["1", "2", "5", "8", "10", "11", "12", "13", "14", "15"],
 		create_at: Number(Date.now()),
 		update_at: Number(Date.now()),
 	},

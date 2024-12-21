@@ -1,6 +1,5 @@
 import {
 	View,
-	Text,
 	Image,
 	StatusBar,
 	StyleSheet,
@@ -29,8 +28,11 @@ import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { IUser } from "types/IUser";
 import { ThemedText } from "components/themed";
+import Animated, { FadeInDown } from "react-native-reanimated";
 
 const { width } = Dimensions.get("screen");
+
+const AnimatedThemedText = Animated.createAnimatedComponent(ThemedText);
 
 const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
@@ -272,28 +274,32 @@ const AlbumDetailScreen = () => {
 						paddingHorizontal: DIMENTIONS.APP_PADDING,
 					}}
 				>
-					<ThemedText
+					<AnimatedThemedText
 						style={{
 							color: colors.subGray,
-							opacity: 0.8,
-							marginLeft: 4,
 						}}
+						entering={FadeInDown.duration(400)}
 					>
 						2024/12/02
-					</ThemedText>
-					<ThemedText
+					</AnimatedThemedText>
+					<AnimatedThemedText
 						style={{
 							fontSize: 24,
 							fontWeight: "600",
 							marginTop: 4,
 						}}
 						numberOfLines={1}
+						entering={FadeInDown.duration(600)}
 					>
 						{filteredAlbum?.title}
-					</ThemedText>
-					<ThemedText style={{ marginTop: 10 }} numberOfLines={2}>
+					</AnimatedThemedText>
+					<AnimatedThemedText
+						style={{ marginTop: 10 }}
+						numberOfLines={2}
+						entering={FadeInDown.duration(800)}
+					>
 						{filteredAlbum?.desc}
-					</ThemedText>
+					</AnimatedThemedText>
 					<Button
 						style={{ marginTop: 20, marginBottom: 5 }}
 						onPress={() =>

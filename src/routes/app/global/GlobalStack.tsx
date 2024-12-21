@@ -41,15 +41,6 @@ const GlobalStack = () => {
 				name="FriendListScreen"
 				component={FriendListScreen}
 			/>
-			{/* image view  */}
-			<Stack.Screen
-				name="ImageViewScreen"
-				component={ImageViewScreen}
-				options={{
-					presentation: "transparentModal",
-					animation: "fade",
-				}}
-			/>
 		</Stack.Navigator>
 	);
 };

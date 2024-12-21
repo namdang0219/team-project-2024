@@ -9,7 +9,7 @@ const imageSlice = createSlice({
 	name: "image",
 	reducers: {
 		addImage: (state, action) => {
-			state.push(action.payload);
+			state.concat(action.payload);
 		},
 		removeImage: (state, action) => {
 			const index = state.findIndex((i) => i.iid === action.payload);

@@ -1,5 +1,5 @@
-import { View, StatusBar, FlatList } from "react-native";
-import React from "react";
+import { View, StatusBar, FlatList, Modal } from "react-native";
+import React, { useRef, useState } from "react";
 import Header from "layout/Header";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CustomTouchableOpacity } from "components/custom";
@@ -15,7 +15,16 @@ import { Toast } from "toastify-react-native";
 import { imageMocks } from "mock/imageMocks";
 import { useItemWidth } from "hook/useItemWidth";
 import { DIMENTIONS } from "constant/dimention";
-import Animated from "react-native-reanimated";
+import Animated, {
+	FadeIn,
+	LinearTransition,
+	ZoomIn,
+	ZoomInDown,
+	ZoomOutRotate,
+} from "react-native-reanimated";
+import { addImage } from "store/image/imageSlice";
+import { GalleryRef } from "react-native-awesome-gallery";
+import ImageViewScreen from "./ImageViewScreen";
 
 const GAP = 4;
 
@@ -26,15 +35,15 @@ const AlbumImageListScreen = () => {
 	const dispatch = useDispatch();
 	const user = useSelector((state: RootState) => state.user);
 	const itemWidth = useItemWidth(GAP, 3, 0);
-	const { navigate } = useNavigation<any>();
+	const images = useSelector((state: RootState) => state.image);
+	const [showImageModal, setShowImageModal] = useState<boolean>(false);
+	const [imageModalImageId, setImageModalImageId] = useState<number>(0);
 
 	const aid = params?.aid;
 	const filteredAlbum = albums.find((a: IAlbum) => aid == a.aid);
 	const imageIds = filteredAlbum?.images || [];
 
-	const imageData = imageMocks.filter((i: IImage) =>
-		imageIds.includes(i.iid)
-	);
+	const imageData = images.filter((i: IImage) => imageIds.includes(i.iid));
 
 	const pickImages = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -46,12 +55,9 @@ const AlbumImageListScreen = () => {
 
 		if (!result.canceled) {
 			const newImages: IImage[] = result.assets.map((a) => ({
-				iid: a?.fileName as string,
+				iid: a?.fileName + String(Date.now()),
 				uri: a?.uri,
-				album: [
-					filteredAlbum?.aid as string,
-					filteredAlbum?.aid as string,
-				],
+				album: [filteredAlbum?.aid as string],
 				author: user.uid,
 				location: {
 					lat: 0,
@@ -60,7 +66,14 @@ const AlbumImageListScreen = () => {
 				create_at: Number(new Date()),
 				update_at: Number(new Date()),
 			}));
-			dispatch(addImagesToAlbum({ aid: aid, images: newImages }));
+			dispatch(addImage(newImages));
+			dispatch(
+				addImagesToAlbum({
+					aid: aid,
+					imageIds: newImages.map((i) => String(i.iid)),
+				})
+			);
+
 			Toast.success("写真追加済み");
 		}
 	};
@@ -87,10 +100,11 @@ const AlbumImageListScreen = () => {
 						</View>
 					}
 				></Header>
-				<FlatList
+				<Animated.FlatList
 					data={imageData}
 					keyExtractor={(item) => item.iid}
 					numColumns={3}
+					itemLayoutAnimation={LinearTransition}
 					contentContainerStyle={{
 						paddingTop: insets.top + DIMENTIONS.HEADER_HEIGHT,
 						gap: GAP,
@@ -98,24 +112,30 @@ const AlbumImageListScreen = () => {
 					columnWrapperStyle={{
 						gap: GAP,
 					}}
-					renderItem={({ item }) => (
+					renderItem={({ item, index }) => (
 						<CustomTouchableOpacity
-							onPress={() =>
-								navigate("GlobalStack", {
-									screen: "ImageViewScreen",
-									params: { imageIds },
-								})
-							}
+							onPress={() => {
+								setShowImageModal(true);
+								setImageModalImageId(index);
+							}}
 						>
 							<Animated.Image
 								source={{ uri: item.uri }}
 								style={{ width: itemWidth, aspectRatio: 1 }}
-								sharedTransitionTag={item.iid}
+								entering={FadeIn.duration((index + 1) * 150)}
+								// sharedTransitionTag={item.iid}
 							/>
 						</CustomTouchableOpacity>
 					)}
 				/>
 			</View>
+			<Modal visible={showImageModal}>
+				<ImageViewScreen
+					imageIds={imageIds}
+					imageModalImageId={imageModalImageId}
+					setShowImageModal={setShowImageModal}
+				/>
+			</Modal>
 		</>
 	);
 };
