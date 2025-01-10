@@ -23,6 +23,7 @@ export default function Test() {
 		// Add your detection options here if needed
 		landmarkMode: "all",
 		autoScale: true,
+		trackingEnabled: true,
 	}).current;
 
 	const device = useCameraDevice("front");
@@ -114,7 +115,7 @@ export default function Test() {
 								style={{
 									position: "absolute",
 									resizeMode: "contain",
-									top: face.bounds.y * imageSize.height + 20,
+									top: face.bounds.y * imageSize.height + 45,
 									left: face.bounds.x * imageSize.width,
 									width: face.bounds.width * imageSize.width,
 									height:

@@ -418,34 +418,37 @@ const MapSection = ({
 				</Marker> */}
 
 				{/* cancel button   */}
-				<CustomTouchableOpacity
-					onPress={() =>
-						setDestination({
-							latitude: 0,
-							longitude: 0,
-							latitudeDelta: LATITUDE_DELTA,
-							longitudeDelta: LONGITUDE_DELTA,
-						})
-					}
-					style={{
-						position: "absolute",
-						top: 100,
-						right: 50,
-						width: 50,
-						aspectRatio: 1,
-						borderRadius: 1000,
-						backgroundColor: "white",
-						alignItems: "center",
-						justifyContent: "center",
-						elevation: 1,
-						shadowRadius: 5,
-						shadowOpacity: 0.15,
-						shadowOffset: { width: 0, height: 0 },
-						zIndex: 10,
-					}}
-				>
-					<Feather name="x" size={20} color={"red"} />
-				</CustomTouchableOpacity>
+				{/* {destination?.latitude !== 0 &&
+					destination?.longitudeDelta !== 0 && (
+						<CustomTouchableOpacity
+							onPress={() =>
+								setDestination({
+									latitude: 0,
+									longitude: 0,
+									latitudeDelta: LATITUDE_DELTA,
+									longitudeDelta: LONGITUDE_DELTA,
+								})
+							}
+							style={{
+								position: "absolute",
+								top: 120,
+								right: 120,
+								width: 100,
+								aspectRatio: 1,
+								borderRadius: 1000,
+								backgroundColor: "white",
+								alignItems: "center",
+								justifyContent: "center",
+								elevation: 1,
+								shadowRadius: 5,
+								shadowOpacity: 0.15,
+								shadowOffset: { width: 0, height: 0 },
+								zIndex: 10,
+							}}
+						>
+							<Feather name="x" size={20} color={"red"} />
+						</CustomTouchableOpacity>
+					)} */}
 
 				{/* {destination?.latitude !== 0 &&
 					destination?.longitudeDelta !== 0 && (
