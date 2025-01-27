@@ -9,7 +9,7 @@ const TitleAuth = ({ children, style }: TextProps) => {
 				{
 					fontSize: 32,
 					fontWeight: "600",
-					marginTop: 50,
+					marginTop: 30,
 					textAlign: "center",
 				},
 				style,

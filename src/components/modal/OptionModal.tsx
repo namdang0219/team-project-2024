@@ -5,7 +5,7 @@ import { BlurView } from "expo-blur";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
 import { useTheme } from "@react-navigation/native";
-import Animated, { ZoomInRight, ZoomInRotate } from "react-native-reanimated";
+import Animated, { FadeIn } from "react-native-reanimated";
 
 export interface IOption {
 	label: string;
@@ -73,7 +73,7 @@ const OptionModal = ({
 					}}
 					onPressIn={() => setShowOption(false)}
 				>
-					<Animated.View entering={ZoomInRight.duration(400)}>
+					<Animated.View entering={FadeIn.duration(150)}>
 						<BlurView
 							tint="extraLight"
 							intensity={95}

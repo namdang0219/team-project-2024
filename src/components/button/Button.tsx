@@ -6,6 +6,7 @@ import { CustomTouchableOpacity } from "components/custom";
 const Button = ({
 	children,
 	loading = false,
+	disabled = false,
 	style,
 	...props
 }: TouchableOpacityProps & { loading?: boolean }) => {
@@ -18,7 +19,7 @@ const Button = ({
 					alignItems: "center",
 					justifyContent: "center",
 					height: 50,
-					backgroundColor: colors.primary,
+					backgroundColor: disabled ? "#D1D5DB" : colors.primary,
 					borderRadius: 1000,
 					position: "relative",
 				},
@@ -32,7 +33,7 @@ const Button = ({
 						style={{
 							fontSize: 16,
 							fontWeight: "600",
-							color: "white",
+							color: disabled ? "#6B7280" : "white",
 						}}
 					>
 						{children}

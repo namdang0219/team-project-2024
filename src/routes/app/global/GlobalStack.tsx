@@ -9,12 +9,17 @@ import AlbumTaggedFriendScreen from "screen/app/tabs/album/AlbumTaggedFriend";
 import AlbumWithFriendScreen from "screen/app/tabs/album/AlbumWithFriend";
 import FriendListScreen from "screen/app/tabs/album/FriendListScreen";
 import ImageViewScreen from "screen/app/tabs/album/ImageViewScreen";
+import RequirePermisionsScreen from "screen/app/global/RequirePermisionsScreen";
 
 const Stack = createNativeStackNavigator();
 
 const GlobalStack = () => {
 	return (
 		<Stack.Navigator screenOptions={{ headerShown: false }}>
+			<Stack.Screen
+				name="RequirePermisionsScreen"
+				component={RequirePermisionsScreen}
+			/>
 			<Stack.Screen name="CameraScreen" component={CameraScreen} />
 			<Stack.Screen name="SavePhotoScreen" component={SavePhotoScreen} />
 			<Stack.Screen
