@@ -17,12 +17,13 @@ import React, {
 import { DIMENTIONS } from "constant/dimention";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import handlePressBackground from "util/func/handlePressBackground";
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { CustomTouchableOpacity } from "components/custom";
 import { IAlbum } from "types/IAlbum";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { AlbumItem } from "components/item";
+import { useAlbum } from "context/album-context";
 
 const GAP = 8;
 
@@ -36,7 +37,7 @@ const AlbumSearch = ({
 	const { navigate } = useNavigation<any>();
 	const [searchText, setSearchText] = useState<string>("");
 	const [results, setResults] = useState<IAlbum[]>([]);
-	const albums = useSelector((state: RootState) => state.album);
+	const { albums } = useAlbum();
 
 	useEffect(() => {
 		if (searchText.trim() === "") {
@@ -95,7 +96,9 @@ const AlbumSearch = ({
 						<CustomTouchableOpacity
 							onPress={() => toggleSeachModal(false)}
 						>
-							<Text style={{ color: "blue" }}>キャンセル</Text>
+							<Text style={{ color: colors.iosBlue }}>
+								キャンセル
+							</Text>
 						</CustomTouchableOpacity>
 					</View>
 

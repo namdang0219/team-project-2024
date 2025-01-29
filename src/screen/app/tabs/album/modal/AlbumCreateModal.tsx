@@ -152,15 +152,18 @@ const AlbumCreateModal = ({
 		try {
 			setLoading(true);
 			const timestamp = Date.now();
-
-			const imageRef = ref(storage, `0_images/${timestamp}.jpg`);
+			const fileName = `0_images/${timestamp}.jpg`;
+			const imageRef = ref(storage, fileName);
 			const imageBlob = await getBlobFroUri(image);
 			await uploadBytes(imageRef, imageBlob as Blob);
 			const downloadUrl = await getDownloadURL(imageRef);
 			const newAlbum: IAlbum = {
 				aid: String(timestamp),
 				author: currentUser?.uid as string,
-				cover: downloadUrl,
+				cover: {
+					name: fileName,
+					uri: downloadUrl,
+				},
 				title: value.title,
 				desc: value.description,
 				favorite: false,
@@ -173,11 +176,11 @@ const AlbumCreateModal = ({
 			await updateDoc(doc(db, "0_users", String(currentUser?.uid)), {
 				albums: arrayUnion(newAlbum.aid),
 			});
-			Toast.success('アルバム作成成功')
-			toggleCreateAlbumModal()
+			Toast.success("アルバム作成成功");
+			toggleCreateAlbumModal();
 		} catch (error) {
 			console.log(error);
-			Toast.error('作成失敗')
+			Toast.error("作成失敗");
 		} finally {
 			setLoading(false);
 		}

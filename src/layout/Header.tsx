@@ -23,6 +23,7 @@ export type HeaderProps = {
 	leftTitle?: string;
 	backIconColor?: string;
 	leftTitleStyle?: StyleProp<TextStyle>;
+	backIconStyle?: StyleProp<TextStyle>;
 	rightContainer?: ReactNode;
 };
 
@@ -31,6 +32,7 @@ const Header = ({
 	rightContainer,
 	leftTitle,
 	leftTitleStyle,
+	backIconStyle,
 	backIconColor = "white",
 	style,
 	intensity,
@@ -83,6 +85,7 @@ const Header = ({
 							name="chevron-back"
 							color={backIconColor}
 							size={20}
+							style={backIconStyle}
 						/>
 						<Text
 							style={[

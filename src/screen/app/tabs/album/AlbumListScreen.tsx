@@ -6,9 +6,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { useRoute } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
+import { useAlbum } from "context/album-context";
 
 const AlbumListScreen = () => {
-	const albums = useSelector((state: RootState) => state.album);
+	const { albums } = useAlbum();
 	const { params } = useRoute<any>();
 	const [displayAlbums, setDisplayAlbums] = useState<IAlbum[]>([]);
 
@@ -21,7 +22,7 @@ const AlbumListScreen = () => {
 			);
 			setDisplayAlbums(favoriteAlbums);
 		} else {
-			Alert.alert("読み込み失敗")
+			Alert.alert("読み込み失敗");
 		}
 	}, []);
 

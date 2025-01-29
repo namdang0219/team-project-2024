@@ -14,16 +14,18 @@ import { store } from "store/configureStore";
 import { AuthProvider } from "context/auth-context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NetInfo from "@react-native-community/netinfo";
-import { AlbumsProvider } from "context/album-context";
+import { AlbumsProvider, useAlbum } from "context/album-context";
 
 enableLegacyWebImplementation(true);
 
 const App = () => {
 	const scheme = useColorScheme();
 	const { colors } = useTheme();
+	const { refreshAlbums } = useAlbum();
+
 	LogBox.ignoreLogs([
 		"Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.",
-		"@firebase/auth: Auth (11.2.0):"
+		"@firebase/auth: Auth (11.2.0):",
 	]);
 	const [isConnected, setIsConnected] = useState<boolean>(false);
 
@@ -35,17 +37,9 @@ const App = () => {
 		return unsubscribe();
 	}, []);
 
-	useEffect(() => {
-		const getAllKeys = async () => {
-			try {
-				const keys = await AsyncStorage.getAllKeys();
-				console.log("🚀 ~ getAllKeys ~ keys:", keys);
-			} catch (e) {
-				console.log(e);
-			}
-		};
-		getAllKeys();
-	}, []);
+	// useEffect(() => {
+	// 	refreshAlbums();
+	// }, []);
 
 	if (!isConnected) {
 		return (

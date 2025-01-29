@@ -8,13 +8,14 @@ import React from "react";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
 import { AntDesign } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 import { useItemWidth } from "hook/useItemWidth";
 
 const AlbumItem = ({ item }: { item: IAlbum }) => {
 	const { navigate } = useNavigation<any>();
 	const itemWidth = useItemWidth(DIMENTIONS.LIST_GAP, 2);
+	const { colors } = useTheme();
 
 	const styles = StyleSheet.create({
 		background: {
@@ -24,6 +25,7 @@ const AlbumItem = ({ item }: { item: IAlbum }) => {
 			height: (itemWidth / 5) * 6,
 			position: "relative",
 			overflow: "hidden",
+			backgroundColor: colors.input
 		},
 		heartContainer: {
 			width: 25,
@@ -55,7 +57,7 @@ const AlbumItem = ({ item }: { item: IAlbum }) => {
 			}
 		>
 			<ImageBackground
-				source={{ uri: item.cover }}
+				source={{ uri: item.cover.uri }}
 				style={styles.background}
 			>
 				{item.favorite && (

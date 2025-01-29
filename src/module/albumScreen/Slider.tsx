@@ -1,18 +1,12 @@
 import React, { useRef } from "react";
-import {
-	Dimensions,
-	View,
-} from "react-native";
-import {
-	useSharedValue,
-} from "react-native-reanimated";
+import { Dimensions, View } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
 import SliderItem from "./SliderItem";
-import { useSelector } from "react-redux";
-import { RootState } from "store/configureStore";
+import { useAlbum } from "context/album-context";
 
 const Slider = () => {
-	const albums = useSelector((state: RootState) => state.album)
+	const { albums } = useAlbum();
 	const ref = useRef<any>();
 	const progress = useSharedValue<number>(0);
 
@@ -55,31 +49,33 @@ const Slider = () => {
 						parallaxAdjacentItemScale: 0.72,
 					}}
 					onProgressChange={progress}
-					renderItem={({item}) => (
+					renderItem={({ item }) => (
 						<SliderItem item={item}></SliderItem>
 					)}
 				/>
 			</View>
 
 			{/* pagination  */}
-			<Pagination.Basic
-				progress={progress}
-				data={albums}
-				size={7.5}
-				dotStyle={{
-					backgroundColor: "#ddd6fe",
-					borderRadius: 1000,
-				}}
-				activeDotStyle={{
-					overflow: "hidden",
-					backgroundColor: "#8b5cf6",
-				}}
-				containerStyle={{
-					gap: 8,
-				}}
-				horizontal
-				onPress={onPressPagination}
-			/>
+			{albums.length > 1 && (
+				<Pagination.Basic
+					progress={progress}
+					data={albums}
+					size={7.5}
+					dotStyle={{
+						backgroundColor: "#ddd6fe",
+						borderRadius: 1000,
+					}}
+					activeDotStyle={{
+						overflow: "hidden",
+						backgroundColor: "#8b5cf6",
+					}}
+					containerStyle={{
+						gap: 8,
+					}}
+					horizontal
+					onPress={onPressPagination}
+				/>
+			)}
 		</View>
 	);
 };

@@ -6,6 +6,8 @@ import {
 	Share,
 	Alert,
 	Dimensions,
+	Text,
+	ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Button } from "components/button";
@@ -15,20 +17,18 @@ import Header from "layout/Header";
 import { CustomTouchableOpacity } from "components/custom";
 import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
-import { IAlbum } from "types/IAlbum";
-import { userMocks } from "mock/userMocks";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "store/configureStore";
-import {
-	addAlbumToFavorites,
-	removeAlbum,
-	removeAlbumFromFavorites,
-} from "store/album/albumSlice";
+import { IAlbum, ITaggedFriend } from "types/IAlbum";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
-import { IUser } from "types/IUser";
 import { ThemedText } from "components/themed";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { deleteDoc, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { db, storage } from "../../../../../firebaseConfig";
+import { Toast } from "toastify-react-native";
+import { formatDate } from "util/func/formatDate";
+import { customStyle } from "style/customStyle";
+import { lightTheme } from "util/theme/themeColors";
+import { deleteObject, ref } from "firebase/storage";
 
 const { width } = Dimensions.get("screen");
 
@@ -36,30 +36,47 @@ const AnimatedThemedText = Animated.createAnimatedComponent(ThemedText);
 
 const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
-	const albums = useSelector((state: RootState) => state.album);
-	const dispatch = useDispatch();
-
-	const filteredAlbum: IAlbum | undefined = albums.find(
-		(item: IAlbum) => item.aid === params?.aid
-	);
 	const insets = useSafeAreaInsets();
 	const { navigate, goBack } = useNavigation<any>();
-
 	const { colors } = useTheme();
+	const [currentAlbum, setCurrentAlbum] = useState<IAlbum | null>(null);
+	const [loading, setLoading] = useState<boolean>(false);
+	const [changingFavorite, setChangingFavorite] = useState<boolean>(false);
+	const aid = params.aid;
 
-	const taggedFriends = userMocks.filter((u) =>
-		filteredAlbum?.taggedFriends.includes(u.uid)
-	);
-
-	const [isFavorite, setIsFavorite] = useState(filteredAlbum?.favorite);
-
+	// get album
 	useEffect(() => {
-		if (isFavorite) {
-			dispatch(addAlbumToFavorites({ aid: filteredAlbum?.aid }));
-		} else {
-			dispatch(removeAlbumFromFavorites({ aid: filteredAlbum?.aid }));
+		const getCurrentAlbum = async () => {
+			try {
+				setLoading(true);
+				const docRef = doc(db, "0_albums", aid);
+
+				const unsub = onSnapshot(docRef, (doc) => {
+					setCurrentAlbum(doc.data() as IAlbum);
+				});
+
+				return unsub;
+			} catch (error) {
+				console.log(error);
+			} finally {
+				setLoading(false);
+			}
+		};
+		getCurrentAlbum();
+	}, []);
+
+	async function handleRemoveAlbum(aid: string) {
+		try {
+			const docRef = doc(db, "0_albums", aid);
+			const coverRef = ref(storage, `0_images/${currentAlbum?.cover.fileName}`);
+			await deleteObject(coverRef);
+			await deleteDoc(docRef);
+			Toast.success("アルバムを削除しました");
+		} catch (error) {
+			console.log(error);
+			Toast.error("アルバム削除できませんでした");
 		}
-	}, [isFavorite]);
+	}
 
 	const removeCurrentAlbum = () => {
 		Alert.alert("アルバムを削除しますか？", "", [
@@ -71,7 +88,7 @@ const AlbumDetailScreen = () => {
 				text: "削除する",
 				style: "destructive",
 				onPress: () => {
-					dispatch(removeAlbum(filteredAlbum?.aid));
+					handleRemoveAlbum(aid);
 					goBack();
 				},
 			},
@@ -97,6 +114,23 @@ const AlbumDetailScreen = () => {
 		},
 	];
 
+	async function handleChangeFavorite() {
+		try {
+			setChangingFavorite(true);
+			const albumDoc = doc(db, "0_albums", aid);
+			await updateDoc(albumDoc, {
+				favorite: !currentAlbum?.favorite,
+				update_at: Date.now(),
+			});
+			Toast.success("更新済み");
+		} catch (error) {
+			console.log(error);
+			Toast.success("エラー");
+		} finally {
+			setChangingFavorite(false);
+		}
+	}
+
 	const onShare = async () => {
 		try {
 			const result = await Share.share({
@@ -118,17 +152,40 @@ const AlbumDetailScreen = () => {
 		}
 	};
 
+	if (!currentAlbum) {
+		return (
+			<View
+				style={{
+					flex: 1,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<Text>アルバムが見つかりませんでした 🥲</Text>
+			</View>
+		);
+	}
+
 	return (
 		<>
 			<StatusBar barStyle={"light-content"} />
 			<View style={{ flex: 1, paddingBottom: insets.bottom }}>
 				<View style={{ flex: 1, position: "relative" }}>
-					<Image
-						source={{
-							uri: filteredAlbum?.cover,
-						}}
-						style={styles.image}
-					/>
+					{loading ? (
+						<View
+							style={[
+								{ backgroundColor: colors.input },
+								styles.image,
+							]}
+						></View>
+					) : (
+						<Image
+							source={{
+								uri: currentAlbum?.cover.uri,
+							}}
+							style={styles.image}
+						/>
+					)}
 					{/* header  */}
 					<View
 						style={{ paddingTop: insets.top, position: "absolute" }}
@@ -137,6 +194,7 @@ const AlbumDetailScreen = () => {
 							leftTitle="Album"
 							canGoBack
 							intensity={0}
+							backIconStyle={customStyle.shadow}
 							leftTitleStyle={{
 								shadowOpacity: 0.25,
 								shadowOffset: { height: 0, width: 0 },
@@ -144,8 +202,11 @@ const AlbumDetailScreen = () => {
 							rightContainer={
 								<OptionModal
 									options={options}
-									iconStyle={{ color: "white" }}
-								></OptionModal>
+									iconStyle={[
+										{ color: "white" },
+										customStyle.shadow,
+									]}
+								/>
 							}
 						></Header>
 					</View>
@@ -161,12 +222,12 @@ const AlbumDetailScreen = () => {
 								})
 							}
 						>
-							{taggedFriends.length > 0 &&
-								taggedFriends
+							{currentAlbum?.taggedFriends.length > 0 &&
+								currentAlbum?.taggedFriends
 									.slice(0, 3)
-									.map((f: IUser, index) => (
+									.map((f: ITaggedFriend, index) => (
 										<View
-											key={f.uid}
+											key={f.userId}
 											style={[
 												styles.taggedFriendContainer,
 												{
@@ -175,31 +236,77 @@ const AlbumDetailScreen = () => {
 												},
 											]}
 										>
-											<Image
-												source={{
-													uri: f?.photoURL,
-												}}
-												style={{
-													flex: 1,
-													borderRadius: 1000,
-												}}
-											/>
+											{f?.photoURL ? (
+												<Image
+													source={{
+														uri: f?.photoURL,
+													}}
+													style={{
+														flex: 1,
+														borderRadius: 1000,
+													}}
+												/>
+											) : (
+												<View
+													style={{
+														backgroundColor:
+															colors.input,
+														flex: 1,
+														alignItems: "center",
+														justifyContent:
+															"center",
+													}}
+												>
+													<Text
+														style={{
+															color: colors.icon,
+														}}
+													>
+														{f.displayName?.slice(
+															0,
+															1
+														)}
+													</Text>
+												</View>
+											)}
 										</View>
 									))}
-							{taggedFriends.length > 3 && (
+							{currentAlbum?.taggedFriends.length > 3 && (
 								<View style={styles.taggedFriendNum4}>
-									<Image
-										source={{
-											uri: taggedFriends[3].photoURL,
-										}}
-										style={[
-											{
+									{currentAlbum?.taggedFriends[3]
+										?.photoURL ? (
+										<Image
+											source={{
+												uri: currentAlbum
+													?.taggedFriends[3]
+													?.photoURL,
+											}}
+											style={{
 												flex: 1,
 												borderRadius: 1000,
-											},
-											StyleSheet.absoluteFill,
-										]}
-									/>
+											}}
+										/>
+									) : (
+										<View
+											style={{
+												backgroundColor: colors.input,
+												flex: 1,
+												alignItems: "center",
+												justifyContent: "center",
+											}}
+										>
+											<Text
+												style={{
+													color: colors.icon,
+												}}
+											>
+												{currentAlbum?.taggedFriends[3].displayName?.slice(
+													0,
+													1
+												)}
+											</Text>
+										</View>
+									)}
 									<View
 										style={[
 											{
@@ -227,26 +334,44 @@ const AlbumDetailScreen = () => {
 							}}
 						>
 							{/* heart icon  */}
-							<View style={styles.reactionIcon}>
+							<View
+								style={[
+									styles.reactionIcon,
+									customStyle.shadow,
+								]}
+							>
 								<CustomTouchableOpacity
 									style={{
 										flex: 1,
 										alignItems: "center",
 										justifyContent: "center",
 									}}
-									onPress={() => setIsFavorite(!isFavorite)}
+									onPress={handleChangeFavorite}
 								>
-									<AntDesign
-										name="heart"
-										size={25}
-										color={isFavorite ? "red" : "#d1d5db"}
-										style={{ marginTop: 2 }}
-									/>
+									{!changingFavorite ? (
+										<AntDesign
+											name="heart"
+											size={25}
+											color={
+												currentAlbum?.favorite
+													? "red"
+													: "#d1d5db"
+											}
+											style={{ marginTop: 2 }}
+										/>
+									) : (
+										<ActivityIndicator size="small" />
+									)}
 								</CustomTouchableOpacity>
 							</View>
 
 							{/* share icon  */}
-							<View style={styles.reactionIcon}>
+							<View
+								style={[
+									styles.reactionIcon,
+									customStyle.shadow,
+								]}
+							>
 								<CustomTouchableOpacity
 									onPress={onShare}
 									style={{
@@ -280,7 +405,7 @@ const AlbumDetailScreen = () => {
 						}}
 						entering={FadeInDown.duration(400)}
 					>
-						2024/12/02
+						{formatDate(currentAlbum.create_at)}
 					</AnimatedThemedText>
 					<AnimatedThemedText
 						style={{
@@ -291,21 +416,21 @@ const AlbumDetailScreen = () => {
 						numberOfLines={1}
 						entering={FadeInDown.duration(600)}
 					>
-						{filteredAlbum?.title}
+						{currentAlbum?.title}
 					</AnimatedThemedText>
 					<AnimatedThemedText
 						style={{ marginTop: 10 }}
 						numberOfLines={2}
 						entering={FadeInDown.duration(800)}
 					>
-						{filteredAlbum?.desc}
+						{currentAlbum?.desc}
 					</AnimatedThemedText>
 					<Button
 						style={{ marginTop: 20, marginBottom: 5 }}
 						onPress={() =>
 							navigate("GlobalStack", {
 								screen: "AlbumImageListScreen",
-								params: { aid: filteredAlbum?.aid },
+								params: { aid: currentAlbum?.aid },
 							})
 						}
 					>
@@ -323,6 +448,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		borderBottomLeftRadius: 25,
 		borderBottomRightRadius: 25,
+		backgroundColor: lightTheme.colors.input,
 	},
 	actionBottomContainer: {
 		position: "absolute",

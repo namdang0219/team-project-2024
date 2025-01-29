@@ -3,6 +3,7 @@ import React from "react";
 import { CustomTouchableOpacity } from "components/custom";
 import { useNavigation } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
+import { customStyle } from "style/customStyle";
 
 const SliderItem = ({ item }: { item: IAlbum }) => {
 	const { navigate } = useNavigation<any>();
@@ -17,7 +18,7 @@ const SliderItem = ({ item }: { item: IAlbum }) => {
 		>
 			<ImageBackground
 				source={{
-					uri: item.cover,
+					uri: item.cover.uri,
 				}}
 				style={{
 					flex: 1,
@@ -36,16 +37,17 @@ const SliderItem = ({ item }: { item: IAlbum }) => {
 					]}
 				>
 					<Text
-						style={{
+						style={[{
 							fontSize: 28,
 							color: "white",
 							fontWeight: "600",
-						}}
+						}, customStyle.shadow]}
+						numberOfLines={1}
 					>
 						{item.title}
 					</Text>
 					<Text
-						style={{ color: "white", fontSize: 16 }}
+						style={[{ color: "white", fontSize: 16 }, customStyle.shadow]}
 					>{`${item.images.length}枚`}</Text>
 				</View>
 			</ImageBackground>

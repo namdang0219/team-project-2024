@@ -1,4 +1,10 @@
-import { View, Text, FlatList, ImageBackground } from "react-native";
+import {
+	View,
+	Text,
+	FlatList,
+	ImageBackground,
+	StyleSheet,
+} from "react-native";
 import React from "react";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
@@ -7,6 +13,8 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { ThemedText } from "components/themed";
 import { useAlbum } from "context/album-context";
 import { Skeleton } from "components/skeleton";
+import { customStyle } from "style/customStyle";
+import { lightTheme } from "util/theme/themeColors";
 
 const RecentAlbum = () => {
 	const { navigate } = useNavigation<any>();
@@ -71,30 +79,12 @@ const RecentAlbum = () => {
 						>
 							<ImageBackground
 								source={{
-									uri: item.cover,
+									uri: item.cover.uri,
 								}}
-								style={{
-									width: 150,
-									height: 180,
-									borderRadius: 12,
-									position: "relative",
-									overflow: "hidden",
-								}}
+								style={styles.cover}
 							>
 								{item.favorite && (
-									<View
-										style={{
-											width: 24,
-											aspectRatio: 1,
-											backgroundColor: "white",
-											borderRadius: 1000,
-											alignItems: "center",
-											justifyContent: "center",
-											position: "absolute",
-											bottom: 6,
-											right: 6,
-										}}
-									>
+									<View style={[styles.favoriteContainer, customStyle.shadow]}>
 										<AntDesign name="heart" color={"red"} />
 									</View>
 								)}
@@ -110,11 +100,33 @@ const RecentAlbum = () => {
 						marginTop: 12,
 					}}
 				>
-					<Skeleton />
+					<Skeleton width={150} height={180} />
 				</View>
 			)}
 		</View>
 	);
 };
+
+const styles = StyleSheet.create({
+	favoriteContainer: {
+		width: 24,
+		aspectRatio: 1,
+		backgroundColor: "white",
+		borderRadius: 1000,
+		alignItems: "center",
+		justifyContent: "center",
+		position: "absolute",
+		bottom: 6,
+		right: 6,
+	},
+	cover: {
+		width: 150,
+		height: 180,
+		borderRadius: 12,
+		position: "relative",
+		overflow: "hidden",
+		backgroundColor: lightTheme.colors.input
+	},
+});
 
 export default RecentAlbum;

@@ -30,9 +30,7 @@ import { useAlbum } from "context/album-context";
 import FirstAlbumScreen from "screen/app/global/FirstAlbumScreen";
 
 const AlbumScreen = () => {
-	const { albums, fetchingAlbums } = useAlbum();
-	console.log("🚀 ~ AlbumScreen ~ fetchingAlbums:", fetchingAlbums)
-	console.log("🚀 ~ AlbumScreen ~ albums:", albums);
+	const { albums, fetchingAlbums, refreshAlbums } = useAlbum();
 
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
@@ -55,9 +53,8 @@ const AlbumScreen = () => {
 
 	const onRefresh = () => {
 		setIsRefreshing(true);
-		setTimeout(() => {
-			setIsRefreshing(false);
-		}, 2000);
+		refreshAlbums();
+		setIsRefreshing(false);
 	};
 
 	useEffect(() => {

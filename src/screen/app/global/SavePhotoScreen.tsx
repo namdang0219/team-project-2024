@@ -345,7 +345,7 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 									}}
 								>
 									<Image
-										source={{ uri: item.cover }}
+										source={{ uri: item.cover.uri }}
 										style={{
 											width: 45,
 											aspectRatio: 1,
