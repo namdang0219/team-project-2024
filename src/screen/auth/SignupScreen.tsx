@@ -20,8 +20,10 @@ import * as Yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { DIMENTIONS } from "constant/dimention";
+import { useAuth } from "context/auth-context";
 
 export interface IAuth {
+	username: string;
 	email: string;
 	password: string;
 }
@@ -43,7 +45,9 @@ const signupSchema = Yup.object().shape({
 const SignupScreen = () => {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
+	const { signUp } = useAuth();
 	const [isChecked, setIsChecked] = useState<boolean>(false);
+	const [loading, setLoading] = useState<boolean>(false);
 	const {
 		handleSubmit,
 		control,
@@ -57,15 +61,23 @@ const SignupScreen = () => {
 		resolver: yupResolver(signupSchema),
 	});
 
-	const handleSignup = (values: IAuth) => {
+	const handleSignup = async (values: IAuth) => {
 		if (!isValid) {
 			return;
 		}
 		if (!isChecked) {
 			Alert.alert("利用規約に同意してください");
-            return;
+			return;
 		}
-		navigate("VerifyCodeScreen");
+
+		try {
+			setLoading(true);
+			await signUp(values.username, values.email, values.password);
+		} catch (error: any) {
+			console.log(error.code);
+		} finally {
+			setLoading(false);
+		}
 	};
 
 	return (
@@ -158,6 +170,7 @@ const SignupScreen = () => {
 						<Button
 							style={{ marginTop: 10 }}
 							onPress={handleSubmit(handleSignup)}
+							loading={loading}
 						>
 							登録
 						</Button>

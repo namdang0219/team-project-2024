@@ -4,14 +4,14 @@ import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 import { useNavigation, useTheme } from "@react-navigation/native";
-import { useSelector } from "react-redux";
-import { RootState } from "store/configureStore";
 import { ThemedText } from "components/themed";
+import { useAlbum } from "context/album-context";
+import { Skeleton } from "components/skeleton";
 
 const RecentAlbum = () => {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
-	const albums = useSelector((state: RootState) => state.album);
+	const { albums, fetchingAlbums } = useAlbum();
 
 	return (
 		<View>
@@ -49,58 +49,70 @@ const RecentAlbum = () => {
 					/>
 				</CustomTouchableOpacity>
 			</View>
-			<FlatList
-				data={albums.slice(0, 5)}
-				style={{ marginTop: 12 }}
-				contentContainerStyle={{
-					paddingHorizontal: DIMENTIONS.APP_PADDING,
-					gap: 10,
-				}}
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				renderItem={({ item, index }) => (
-					<CustomTouchableOpacity
-						onPress={() =>
-							navigate("GlobalStack", {
-								screen: "AlbumDetailScreen",
-								params: { aid: item.aid },
-							})
-						}
-						key={index}
-					>
-						<ImageBackground
-							source={{
-								uri: item.cover,
-							}}
-							style={{
-								width: 150,
-								height: 180,
-								borderRadius: 12,
-								position: "relative",
-								overflow: "hidden",
-							}}
+			{!fetchingAlbums ? (
+				<FlatList
+					data={albums.slice(0, 5)}
+					contentContainerStyle={{
+						paddingHorizontal: DIMENTIONS.APP_PADDING,
+						gap: 10,
+						marginTop: 12,
+					}}
+					horizontal
+					showsHorizontalScrollIndicator={false}
+					renderItem={({ item, index }) => (
+						<CustomTouchableOpacity
+							onPress={() =>
+								navigate("GlobalStack", {
+									screen: "AlbumDetailScreen",
+									params: { aid: item.aid },
+								})
+							}
+							key={index}
 						>
-							{item.favorite && (
-								<View
-									style={{
-										width: 24,
-										aspectRatio: 1,
-										backgroundColor: "white",
-										borderRadius: 1000,
-										alignItems: "center",
-										justifyContent: "center",
-										position: "absolute",
-										bottom: 6,
-										right: 6,
-									}}
-								>
-									<AntDesign name="heart" color={"red"} />
-								</View>
-							)}
-						</ImageBackground>
-					</CustomTouchableOpacity>
-				)}
-			/>
+							<ImageBackground
+								source={{
+									uri: item.cover,
+								}}
+								style={{
+									width: 150,
+									height: 180,
+									borderRadius: 12,
+									position: "relative",
+									overflow: "hidden",
+								}}
+							>
+								{item.favorite && (
+									<View
+										style={{
+											width: 24,
+											aspectRatio: 1,
+											backgroundColor: "white",
+											borderRadius: 1000,
+											alignItems: "center",
+											justifyContent: "center",
+											position: "absolute",
+											bottom: 6,
+											right: 6,
+										}}
+									>
+										<AntDesign name="heart" color={"red"} />
+									</View>
+								)}
+							</ImageBackground>
+						</CustomTouchableOpacity>
+					)}
+				/>
+			) : (
+				<View
+					style={{
+						paddingHorizontal: DIMENTIONS.APP_PADDING,
+						gap: 10,
+						marginTop: 12,
+					}}
+				>
+					<Skeleton />
+				</View>
+			)}
 		</View>
 	);
 };

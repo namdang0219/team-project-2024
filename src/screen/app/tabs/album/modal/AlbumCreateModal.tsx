@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { DIMENTIONS } from "constant/dimention";
-import { Feather, AntDesign } from "@expo/vector-icons";
+import { Feather, AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
 import { CustomTouchableOpacity } from "components/custom";
 import { Input } from "components/input";
 import { Label } from "components/label";
@@ -30,11 +30,14 @@ import AlbumTagFriendModal from "./AlbumTagFriendModal";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import { useNavigation } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
-import { addAlbum } from "store/album/albumSlice";
+import { useNavigation, useTheme } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
 import { IAlbum } from "types/IAlbum";
-import { RootState } from "store/configureStore";
+import { useAuth } from "context/auth-context";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { auth, db, storage } from "../../../../../../firebaseConfig";
+import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
+import { Toast } from "toastify-react-native";
 
 const { width } = Dimensions.get("screen");
 
@@ -50,17 +53,18 @@ const createAlbumScheme = Yup.object().shape({
 
 const AlbumCreateModal = ({
 	toggleCreateAlbumModal,
+	cancelale = true,
 }: {
 	toggleCreateAlbumModal: () => void;
+	cancelale?: boolean;
 }) => {
 	const insets = useSafeAreaInsets();
-	const { navigate } = useNavigation<any>();
-	const currentUser = useSelector((state: RootState) => state.user);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [taggedFriendId, setTaggedFriendId] = useState<IUser["uid"][]>([]);
 	const itemWidth = useItemWidth(10, 5);
 	const [tagFriendModal, toggleTagFriendModal] = useToggle(false);
-	const dispatch = useDispatch();
+	const { colors } = useTheme();
+	const { currentUser } = useAuth();
 	const {
 		handleSubmit,
 		control,
@@ -74,13 +78,28 @@ const AlbumCreateModal = ({
 	});
 
 	// data field
-	const [image, setImage] = useState<string>(
-		"https://i.pinimg.com/564x/a6/e9/2f/a6e92f1fd4af9c28fbc23f031f7c7419.jpg"
-	);
+	const [image, setImage] = useState<string | undefined>("");
 
 	const taggedFriend: IUser[] = userMocks.filter((u: IUser) =>
 		taggedFriendId.includes(u.uid)
 	);
+
+	const getBlobFroUri = async (uri: string) => {
+		const blob = await new Promise((resolve, reject) => {
+			const xhr = new XMLHttpRequest();
+			xhr.onload = function () {
+				resolve(xhr.response);
+			};
+			xhr.onerror = function (e) {
+				reject(new TypeError("Network request failed"));
+			};
+			xhr.responseType = "blob";
+			xhr.open("GET", uri, true);
+			xhr.send(null);
+		});
+
+		return blob;
+	};
 
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -126,30 +145,41 @@ const AlbumCreateModal = ({
 	};
 
 	const createAlbum = async (value: ICreateAlbum) => {
+		if (!image) {
+			Alert.alert("画像を選択してください");
+			return;
+		}
 		try {
 			setLoading(true);
-			const aid = Date.now();
+			const timestamp = Date.now();
+
+			const imageRef = ref(storage, `0_images/${timestamp}.jpg`);
+			const imageBlob = await getBlobFroUri(image);
+			await uploadBytes(imageRef, imageBlob as Blob);
+			const downloadUrl = await getDownloadURL(imageRef);
 			const newAlbum: IAlbum = {
-				aid: aid.toString(),
-				author: currentUser.uid,
+				aid: String(timestamp),
+				author: currentUser?.uid as string,
+				cover: downloadUrl,
 				title: value.title,
 				desc: value.description,
-				cover: image,
 				favorite: false,
-				taggedFriends: taggedFriendId,
+				taggedFriends: [],
 				images: [],
-				create_at: Date.now(),
-				update_at: Date.now(),
+				create_at: timestamp,
+				update_at: timestamp,
 			};
-			dispatch(addAlbum(newAlbum));
-			setLoading(false);
-			toggleCreateAlbumModal();
-			navigate("GlobalStack", {
-				screen: "AlbumDetailScreen",
-				params: { aid },
+			await setDoc(doc(db, "0_albums", String(timestamp)), newAlbum);
+			await updateDoc(doc(db, "0_users", String(currentUser?.uid)), {
+				albums: arrayUnion(newAlbum.aid),
 			});
+			Toast.success('アルバム作成成功')
+			toggleCreateAlbumModal()
 		} catch (error) {
 			console.log(error);
+			Toast.error('作成失敗')
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -170,6 +200,7 @@ const AlbumCreateModal = ({
 			fontWeight: "500",
 			width: width / 2,
 			textAlign: "center",
+			flex: 1,
 		},
 		image: {
 			height: 560,
@@ -253,12 +284,16 @@ const AlbumCreateModal = ({
 		>
 			{/* header  */}
 			<View style={styles.headerContainer}>
-				<CustomTouchableOpacity
-					onPress={onCancle}
-					style={{ width: 30 }}
-				>
-					<Feather name="x" size={26} color={"red"} />
-				</CustomTouchableOpacity>
+				<View style={{ width: 30 }}>
+					{cancelale && (
+						<CustomTouchableOpacity
+							onPress={onCancle}
+							style={{ width: 30 }}
+						>
+							<Feather name="x" size={26} color={"red"} />
+						</CustomTouchableOpacity>
+					)}
+				</View>
 
 				<Text style={styles.headerTitle}>アルバム作成</Text>
 
@@ -277,24 +312,52 @@ const AlbumCreateModal = ({
 			{/* content  */}
 			<TouchableWithoutFeedback onPress={handlePressBackground}>
 				<ScrollView style={{ flex: 1 }}>
-					<ImageBackground
-						source={{
-							uri: image,
-						}}
-						style={styles.image}
-					>
-						<CustomTouchableOpacity
-							style={styles.pickerIconContainer}
-							onPress={pickImage}
+					{image ? (
+						<ImageBackground
+							source={{
+								uri: image,
+							}}
+							style={styles.image}
 						>
-							<Feather
-								name="edit"
-								size={30}
-								color={"white"}
-								style={styles.pickerIcon}
+							<CustomTouchableOpacity
+								style={styles.pickerIconContainer}
+								onPress={pickImage}
+							>
+								<Feather
+									name="edit"
+									size={30}
+									color={"white"}
+									style={styles.pickerIcon}
+								/>
+							</CustomTouchableOpacity>
+						</ImageBackground>
+					) : (
+						<CustomTouchableOpacity
+							onPress={pickImage}
+							style={{
+								flex: 1,
+								alignItems: "center",
+								justifyContent: "center",
+								backgroundColor: colors.input,
+								height: 560,
+							}}
+						>
+							<MaterialCommunityIcons
+								name="file-image-plus-outline"
+								size={60}
+								color={colors.icon}
 							/>
+							<Text
+								style={{
+									color: colors.icon,
+									marginTop: 14,
+									fontWeight: "500",
+								}}
+							>
+								写真をアップロード
+							</Text>
 						</CustomTouchableOpacity>
-					</ImageBackground>
+					)}
 					{/* input  */}
 					<View style={styles.contentContainer}>
 						<View>

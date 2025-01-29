@@ -24,6 +24,7 @@ import { AvatarDefault, IconArrowDown } from "icon/auth";
 import * as ImagePicker from "expo-image-picker";
 import { GLOBAL_GRADIENT } from "util/theme/themeColors";
 import { AntDesign } from "@expo/vector-icons";
+import { useAuth } from "context/auth-context";
 
 const UserInfoScreen = () => {
 	const { navigate } = useNavigation<any>();
@@ -38,6 +39,7 @@ const UserInfoScreen = () => {
 	const { bottom } = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
 	const [image, setImage] = useState<string | null>(null);
+	
 
 	const pickImage = async () => {
 		// No permissions request is necessary for launching the image library
@@ -88,200 +90,95 @@ const UserInfoScreen = () => {
 		<SafeAreaView style={{ flex: 1 }}>
 			<TouchableWithoutFeedback onPress={handlePressBackground}>
 				<View style={{ flex: 1 }}>
-					<HeaderWithBack />
 					<View
 						style={{
 							marginHorizontal: DIMENTIONS.AUTH_PADDING,
+							flex: 1,
 						}}
 					>
-						{/* title  */}
-						<TitleAuth
-							style={{ textAlign: "center", marginTop: 0 }}
-						>
-							基本情報
-						</TitleAuth>
+						<View style={{ flex: 1 }}>
+							{/* title  */}
+							<TitleAuth style={{ textAlign: "center" }}>
+								基本情報
+							</TitleAuth>
 
-						{/* avatar  */}
-						<View
-							style={{
-								position: "relative",
-								marginHorizontal: "auto",
-							}}
-						>
-							<LinearGradient
-								colors={["#D823FF", "#9A33EF"]}
-								style={styles.avatarContainerGradient}
-								start={{ x: 0, y: 0 }}
-								end={{ x: 1, y: 1 }}
-							>
-								<ThemedView style={styles.avatarContainerWhite}>
-									{image ? (
-										<Image
-											source={{ uri: image }}
-											style={{ width: 146, height: 146, borderRadius: 1000 }}
-										/>
-									) : (
-										<AvatarDefault></AvatarDefault>
-									)}
-								</ThemedView>
-							</LinearGradient>
+							{/* avatar  */}
 							<View
 								style={{
-									width: 35,
-									height: 35,
-									position: "absolute",
-									bottom: 0,
-									right: 10,
-									backgroundColor: "white",
-									borderRadius: 1000,
-									zIndex: 50,
-									alignItems: "center",
-									justifyContent: "center",
+									position: "relative",
+									marginHorizontal: "auto",
 								}}
 							>
 								<LinearGradient
-									colors={[
-										GLOBAL_GRADIENT.STOP_1,
-										GLOBAL_GRADIENT.STOP_2,
-									]}
+									colors={["#D823FF", "#9A33EF"]}
+									style={styles.avatarContainerGradient}
+									start={{ x: 0, y: 0 }}
+									end={{ x: 1, y: 1 }}
+								>
+									<ThemedView
+										style={styles.avatarContainerWhite}
+									>
+										{image ? (
+											<Image
+												source={{ uri: image }}
+												style={{
+													width: 146,
+													height: 146,
+													borderRadius: 1000,
+												}}
+											/>
+										) : (
+											<AvatarDefault></AvatarDefault>
+										)}
+									</ThemedView>
+								</LinearGradient>
+								<View
 									style={{
+										width: 35,
+										height: 35,
+										position: "absolute",
+										bottom: 0,
+										right: 10,
+										backgroundColor: "white",
 										borderRadius: 1000,
-										width: 30,
-										height: 30,
+										zIndex: 50,
 										alignItems: "center",
 										justifyContent: "center",
 									}}
 								>
-									<CustomTouchableOpacity onPress={pickImage}>
-										<AntDesign
-											name="plus"
-											size={25}
-											color={"white"}
-										/>
-									</CustomTouchableOpacity>
-								</LinearGradient>
-							</View>
-						</View>
-
-						{/* input  */}
-						<View style={{ marginTop: 8, gap: 16 }}>
-							{/* sex  */}
-							<View>
-								<Label>性別</Label>
-								<CustomTouchableOpacity
-									onPress={() => setShowSexSheet(true)}
-									style={styles.inputContainer}
-								>
-									<Text style={{ color: colors.subGray }}>
-										{sex == "male" ? "男性" : "女性"}
-									</Text>
-									<IconArrowDown color={colors.subGray} />
-								</CustomTouchableOpacity>
-								<ActionSheet
-									title={"あなたの性別を選択してください"}
-									visible={showSexSheet}
-									onDismiss={() => setShowSexSheet(false)}
-									cancelButtonIndex={3}
-									destructiveButtonIndex={0}
-									options={[
-										{
-											label: "男性",
-											onPress: () => setSex("male"),
-										},
-										{
-											label: "女性",
-											onPress: () => setSex("female"),
-										},
-										{
-											label: "キャンセル",
-											onPress: () =>
-												setShowSexSheet(false),
-										},
-									]}
-									containerStyle={{ paddingBottom: bottom }}
-								/>
-							</View>
-
-							{/* birthday  */}
-							<View>
-								<Label>生年月日</Label>
-								<CustomTouchableOpacity
-									// onPress={() => setShowSexSheet(true)}
-									style={styles.inputContainer}
-								>
-									<DateTimePicker
-										editable={true}
-										placeholder={"YYYY/MM/DD"}
-										style={{ color: colors.subGray }}
-										containerStyle={{
-											width:
-												width -
-												2 * 16 -
-												2 * DIMENTIONS.AUTH_PADDING,
+									<LinearGradient
+										colors={[
+											GLOBAL_GRADIENT.STOP_1,
+											GLOBAL_GRADIENT.STOP_2,
+										]}
+										style={{
+											borderRadius: 1000,
+											width: 30,
+											height: 30,
+											alignItems: "center",
+											justifyContent: "center",
 										}}
-									/>
-								</CustomTouchableOpacity>
-							</View>
-
-							{/* nationality  */}
-							<View>
-								<Label>国籍</Label>
-								<CustomTouchableOpacity
-									onPress={() =>
-										setShowNationalitySheet(true)
-									}
-									style={styles.inputContainer}
-								>
-									<Text style={{ color: colors.subGray }}>
-										{nationality == "japan"
-											? "日本"
-											: nationality == "vietnam"
-											? "ベトナム"
-											: "タイ"}
-									</Text>
-									<IconArrowDown color={colors.subGray} />
-								</CustomTouchableOpacity>
-								<ActionSheet
-									title={"あなたの国籍を選択してください"}
-									visible={showNationalitySheet}
-									onDismiss={() =>
-										setShowNationalitySheet(false)
-									}
-									cancelButtonIndex={4}
-									destructiveButtonIndex={0}
-									options={[
-										{
-											label: "日本",
-											onPress: () =>
-												setNationality("japan"),
-										},
-										{
-											label: "ベトナム",
-											onPress: () =>
-												setNationality("vietnam"),
-										},
-										{
-											label: "タイ",
-											onPress: () =>
-												setNationality("thai"),
-										},
-										{
-											label: "キャンセル",
-											onPress: () =>
-												setShowSexSheet(false),
-										},
-									]}
-									containerStyle={{ paddingBottom: bottom }}
-								/>
+									>
+										<CustomTouchableOpacity
+											onPress={pickImage}
+										>
+											<AntDesign
+												name="plus"
+												size={25}
+												color={"white"}
+											/>
+										</CustomTouchableOpacity>
+									</LinearGradient>
+								</View>
 							</View>
 						</View>
 
 						{/* button  */}
 						<Button
-							style={{ marginTop: 32 }}
-							// onPress={handleSubmit(handleFindAccount)}
 							onPress={() =>
-								navigate("AppStack", { screen: "AlbumStack" })
+								navigate("GlobalStack", {
+									screen: "RequirePermisionsScreen",
+								})
 							}
 						>
 							次へ

@@ -41,7 +41,7 @@ const Button = ({
 				) : (
 					children
 				))}
-			{loading && <ActivityIndicator size={"small"} />}
+			{loading && <ActivityIndicator color={'white'} size={"small"} />}
 		</CustomTouchableOpacity>
 	);
 };

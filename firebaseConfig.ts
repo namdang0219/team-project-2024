@@ -1,7 +1,15 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+// @ts-ignore
+import {
+	initializeAuth,
+	getReactNativePersistence,
+	getAuth,
+} from "firebase/auth";
+import ReactNativeAsyncStorage from "@react-native-async-storage/async-storage";
+
+// Firebase Project: Morimori
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -17,6 +25,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication and get a reference to the service
+// export const auth = initializeAuth(app, {
+// 	persistence: getReactNativePersistence(ReactNativeAsyncStorage),
+// });
+
 export const auth = getAuth(app);
 
 // Initialize Cloud Firestore and get a reference to the service
@@ -24,5 +36,3 @@ export const db = getFirestore(app);
 
 // Initialize Cloud Storage and get a reference to the service
 export const storage = getStorage(app);
-
-

@@ -4,16 +4,14 @@ import ProfileAvatar from "./ProfileAvatar";
 import BaseInfo from "./BaseInfo";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { ThemedText } from "components/themed";
-import { useSelector } from "react-redux";
-import { RootState } from "store/configureStore";
 import { Feather } from "@expo/vector-icons";
+import { useAuth } from "context/auth-context";
 
 const ProfileHeader = () => {
 	const { colors } = useTheme();
-	const { photoURL, displayName, email, posts, friends } = useSelector(
-		(state: RootState) => state.user
-	);
 	const { navigate } = useNavigation<any>();
+	const { currentUser } = useAuth();
+	console.log("🚀 ~ ProfileHeader ~ currentUser:", currentUser);
 
 	const styles = StyleSheet.create({
 		analyticContainer: {
@@ -43,25 +41,30 @@ const ProfileHeader = () => {
 		},
 	});
 
+	// return <></>;
+
 	return (
 		<>
-			<ProfileAvatar photoURL={photoURL} />
+			<ProfileAvatar photoURL={currentUser?.photoURL} />
 
 			{/* base info  */}
-			<BaseInfo displayName={displayName} email={email} />
+			<BaseInfo
+				displayName={currentUser?.displayName}
+				email={currentUser?.email}
+			/>
 
 			{/* post and friends number  */}
 			<View style={styles.analyticContainer}>
 				<View style={{ alignItems: "center", gap: 2 }}>
 					<ThemedText style={{ opacity: 0.4 }}>投稿</ThemedText>
 					<ThemedText style={{ fontWeight: "600", fontSize: 20 }}>
-						{posts}
+						{/* {posts} */}
 					</ThemedText>
 				</View>
 				<View style={{ alignItems: "center", gap: 2 }}>
 					<ThemedText style={{ opacity: 0.4 }}>友達</ThemedText>
 					<ThemedText style={{ fontWeight: "600", fontSize: 20 }}>
-						{friends}
+						{/* {friends} */}
 					</ThemedText>
 				</View>
 			</View>
@@ -80,8 +83,8 @@ const ProfileHeader = () => {
 					onPress={() => {
 						Share.share({
 							message: "プロフィールをシェア",
-							title: displayName,
-							url: photoURL,
+							title: currentUser?.displayName as string,
+							url: currentUser?.photoURL as string,
 						});
 					}}
 				>

@@ -6,7 +6,7 @@ import {
 	Modal,
 	RefreshControl,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { DIMENTIONS } from "constant/dimention";
 import { Feather, MaterialIcons } from "@expo/vector-icons";
@@ -25,17 +25,25 @@ import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { useTheme } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
+import { useAlbum } from "context/album-context";
+import FirstAlbumScreen from "screen/app/global/FirstAlbumScreen";
 
 const AlbumScreen = () => {
+	const { albums, fetchingAlbums } = useAlbum();
+	console.log("🚀 ~ AlbumScreen ~ fetchingAlbums:", fetchingAlbums)
+	console.log("🚀 ~ AlbumScreen ~ albums:", albums);
+
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
 	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
 	const [searchModal, toggleSearchModal] = useToggle(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const { colors } = useTheme();
-	const albums = useSelector((state: RootState) => state.album);
 	const images = useSelector((state: RootState) => state.image);
+
+	const [firstAlbumModalOpen, setFirstAlbumModalOpen] =
+		useState<boolean>(false);
 
 	const options: IOption[] = [
 		{
@@ -50,6 +58,16 @@ const AlbumScreen = () => {
 		setTimeout(() => {
 			setIsRefreshing(false);
 		}, 2000);
+	};
+
+	useEffect(() => {
+		if (!fetchingAlbums && albums.length === 0) {
+			setFirstAlbumModalOpen(true);
+		}
+	}, []);
+
+	const toggleFirstAlbumModal = () => {
+		setFirstAlbumModalOpen(!firstAlbumModalOpen);
 	};
 
 	return (
@@ -154,6 +172,13 @@ const AlbumScreen = () => {
 					</Text>
 				</View>
 			</ScrollView>
+
+			{/* first album modal  */}
+			<Modal visible={firstAlbumModalOpen} animationType="slide">
+				<FirstAlbumScreen
+					toggleFirstAlbumModal={toggleFirstAlbumModal}
+				/>
+			</Modal>
 		</View>
 	);
 };

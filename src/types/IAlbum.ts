@@ -9,7 +9,7 @@ export interface IAlbum {
 	cover: string;
 	favorite: boolean;
 	taggedFriends: IUser["uid"][];
-	images: IImage["iid"][];
+	images: IImage[];
 	create_at: number;
 	update_at: number;
 }

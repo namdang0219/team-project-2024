@@ -5,7 +5,7 @@ import {
 	Image,
 	TouchableWithoutFeedback,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { TitleAuth } from "components/title";
 import { Button } from "components/button";
@@ -19,6 +19,11 @@ import { IAuth } from "./SignupScreen";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "components/input";
 import { DIMENTIONS } from "constant/dimention";
+import { Toast } from "toastify-react-native";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../../firebaseConfig";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "context/auth-context";
 
 const loginScheme = Yup.object().shape({
 	email: Yup.string()
@@ -33,6 +38,8 @@ const loginScheme = Yup.object().shape({
 export default function LoginScreen() {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
+	const { login } = useAuth();
+	const [loading, setLoading] = useState<boolean>(false);
 	const {
 		handleSubmit,
 		control,
@@ -45,11 +52,19 @@ export default function LoginScreen() {
 		resolver: yupResolver(loginScheme),
 	});
 
-	const handleLogin = (values: IAuth) => {
+	const handleLogin = async (values: IAuth) => {
 		if (!isValid) {
 			return;
 		}
-		navigate("AppStack", { screen: "AlbumStack" });
+		try {
+			setLoading(true);
+			await login(values.email, values.password);
+			setLoading(false);
+		} catch (error: any) {
+			console.log(error.code);
+			setLoading(false);
+			Toast.error("ログイン情報が存在していません");
+		}
 	};
 
 	return (
@@ -117,8 +132,8 @@ export default function LoginScreen() {
 						</CustomTouchableOpacity>
 						{/* button  */}
 						<Button
+							loading={loading}
 							style={{ marginTop: 10 }}
-							
 							onPress={handleSubmit(handleLogin)}
 						>
 							ログイン
