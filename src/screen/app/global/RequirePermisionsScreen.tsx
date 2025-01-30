@@ -46,7 +46,7 @@ const RequirePermisionsScreen = () => {
 		checkLocationPermission();
 	}, []);
 
-	// library permission
+	// library permissional
 	const [status, requestPermission] =
 		ImagePicker.useMediaLibraryPermissions();
 	useEffect(() => {

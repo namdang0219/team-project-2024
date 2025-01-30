@@ -25,13 +25,12 @@ import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { useNavigation, useTheme } from "@react-navigation/native";
+import { useTheme } from "@react-navigation/native";
 import { useAlbum } from "context/album-context";
 import FirstAlbumScreen from "screen/app/global/FirstAlbumScreen";
 
 const AlbumScreen = () => {
 	const { albums, fetchingAlbums, refreshAlbums } = useAlbum();
-
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
 	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
@@ -58,13 +57,13 @@ const AlbumScreen = () => {
 	};
 
 	useEffect(() => {
-		if (!fetchingAlbums && albums.length === 0) {
+		if (!fetchingAlbums && albums.length == 0) {
 			setFirstAlbumModalOpen(true);
 		}
-	}, []);
+	}, [albums, fetchingAlbums]);
 
 	const toggleFirstAlbumModal = () => {
-		setFirstAlbumModalOpen(!firstAlbumModalOpen);
+		setFirstAlbumModalOpen(false);
 	};
 
 	return (
@@ -171,11 +170,13 @@ const AlbumScreen = () => {
 			</ScrollView>
 
 			{/* first album modal  */}
-			<Modal visible={firstAlbumModalOpen} animationType="slide">
-				<FirstAlbumScreen
-					toggleFirstAlbumModal={toggleFirstAlbumModal}
-				/>
-			</Modal>
+			{!fetchingAlbums && albums.length == 0 && (
+				<Modal visible={firstAlbumModalOpen} animationType="slide">
+					<FirstAlbumScreen
+						toggleFirstAlbumModal={toggleFirstAlbumModal}
+					/>
+				</Modal>
+			)}
 		</View>
 	);
 };

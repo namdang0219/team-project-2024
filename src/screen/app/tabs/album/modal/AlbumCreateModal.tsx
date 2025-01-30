@@ -38,6 +38,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { auth, db, storage } from "../../../../../../firebaseConfig";
 import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
 import { Toast } from "toastify-react-native";
+import { getBlobFromUri } from "util/func/getBlobFromUri";
 
 const { width } = Dimensions.get("screen");
 
@@ -84,23 +85,6 @@ const AlbumCreateModal = ({
 		taggedFriendId.includes(u.uid)
 	);
 
-	const getBlobFroUri = async (uri: string) => {
-		const blob = await new Promise((resolve, reject) => {
-			const xhr = new XMLHttpRequest();
-			xhr.onload = function () {
-				resolve(xhr.response);
-			};
-			xhr.onerror = function (e) {
-				reject(new TypeError("Network request failed"));
-			};
-			xhr.responseType = "blob";
-			xhr.open("GET", uri, true);
-			xhr.send(null);
-		});
-
-		return blob;
-	};
-
 	const pickImage = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
 			mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -122,7 +106,7 @@ const AlbumCreateModal = ({
 			},
 			{
 				text: "破壊",
-				onPress: () => toggleCreateAlbumModal(),
+				onPress: toggleCreateAlbumModal,
 				style: "destructive",
 			},
 		]);
@@ -139,7 +123,10 @@ const AlbumCreateModal = ({
 			},
 			{
 				text: "はい",
-				onPress: () => createAlbum(value),
+				onPress: () => {
+					createAlbum(value);
+					toggleCreateAlbumModal();
+				},
 			},
 		]);
 	};
@@ -152,16 +139,16 @@ const AlbumCreateModal = ({
 		try {
 			setLoading(true);
 			const timestamp = Date.now();
-			const fileName = `0_images/${timestamp}.jpg`;
-			const imageRef = ref(storage, fileName);
-			const imageBlob = await getBlobFroUri(image);
+			const fileName = `${timestamp}.jpg`;
+			const imageRef = ref(storage, `0_images/${fileName}`);
+			const imageBlob = await getBlobFromUri(image);
 			await uploadBytes(imageRef, imageBlob as Blob);
 			const downloadUrl = await getDownloadURL(imageRef);
 			const newAlbum: IAlbum = {
 				aid: String(timestamp),
 				author: currentUser?.uid as string,
 				cover: {
-					name: fileName,
+					fileName: fileName,
 					uri: downloadUrl,
 				},
 				title: value.title,

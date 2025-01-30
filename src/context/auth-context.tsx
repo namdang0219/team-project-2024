@@ -10,13 +10,14 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { auth, db } from "../../firebaseConfig";
 import { Toast } from "toastify-react-native";
 import { useNavigation } from "@react-navigation/native";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot, setDoc } from "firebase/firestore";
 import { IUser } from "types/IUser";
 
 type AuthContextType = {
 	isSignedIn: boolean;
 	authLoading: boolean;
 	currentUser: User | null;
+	remoteUserData: IUser | null;
 	login: (email: string, password: string) => Promise<void>;
 	logout: () => Promise<void>;
 	signUp: (
@@ -35,6 +36,25 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 	const [authLoading, setAuthLoading] = useState<boolean>(true);
 	const { navigate } = useNavigation<any>();
 	const [currentUser, setCurrentUser] = useState<User | null>(null);
+	const [remoteUserData, setRemoteUserData] = useState<IUser | null>(null);
+
+	useEffect(() => {
+		async function getRemoteUserData() {
+			if (currentUser?.uid)
+				try {
+					const unsub = onSnapshot(
+						doc(db, "0_users", currentUser?.uid),
+						(doc) => {
+							setRemoteUserData(doc.data() as IUser);
+						}
+					);
+					return unsub;
+				} catch (error) {
+					console.log(error);
+				}
+		}
+		getRemoteUserData();
+	}, [currentUser]);
 
 	useEffect(() => {
 		const checkAuthStatus = async () => {
@@ -145,7 +165,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 				login,
 				logout,
 				signUp,
-				currentUser
+				currentUser,
+				remoteUserData,
 			}}
 		>
 			{children}

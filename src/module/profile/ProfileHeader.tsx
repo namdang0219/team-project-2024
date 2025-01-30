@@ -10,8 +10,7 @@ import { useAuth } from "context/auth-context";
 const ProfileHeader = () => {
 	const { colors } = useTheme();
 	const { navigate } = useNavigation<any>();
-	const { currentUser } = useAuth();
-	console.log("🚀 ~ ProfileHeader ~ currentUser:", currentUser);
+	const { remoteUserData } = useAuth();
 
 	const styles = StyleSheet.create({
 		analyticContainer: {
@@ -41,17 +40,12 @@ const ProfileHeader = () => {
 		},
 	});
 
-	// return <></>;
-
 	return (
 		<>
-			<ProfileAvatar photoURL={currentUser?.photoURL} />
+			<ProfileAvatar />
 
 			{/* base info  */}
-			<BaseInfo
-				displayName={currentUser?.displayName}
-				email={currentUser?.email}
-			/>
+			<BaseInfo />
 
 			{/* post and friends number  */}
 			<View style={styles.analyticContainer}>
@@ -83,8 +77,8 @@ const ProfileHeader = () => {
 					onPress={() => {
 						Share.share({
 							message: "プロフィールをシェア",
-							title: currentUser?.displayName as string,
-							url: currentUser?.photoURL as string,
+							title: remoteUserData?.displayName as string,
+							url: remoteUserData?.photoURL as string,
 						});
 					}}
 				>

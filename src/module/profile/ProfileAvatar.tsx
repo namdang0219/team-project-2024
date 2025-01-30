@@ -1,17 +1,15 @@
 import { View, Image, StyleSheet, ViewProps } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemedView } from "components/themed";
 import { IUser } from "types/IUser";
 import { useTheme } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
+import { useAuth } from "context/auth-context";
 
-const ProfileAvatar = ({
-	photoURL = "",
-	style = {},
-	...props
-}: { photoURL: IUser["photoURL"] } & ViewProps) => {
+const ProfileAvatar = ({ style = {}, ...props }: ViewProps) => {
 	const { colors } = useTheme();
+	const { remoteUserData } = useAuth();
 
 	return (
 		<View
@@ -31,10 +29,10 @@ const ProfileAvatar = ({
 				end={{ x: 1, y: 1 }}
 			>
 				<ThemedView style={styles.avatarContainerWhite}>
-					{photoURL ? (
+					{remoteUserData?.photoURL ? (
 						<Image
 							source={{
-								uri: photoURL,
+								uri: remoteUserData.photoURL,
 							}}
 							style={{
 								width: 146,
@@ -50,12 +48,15 @@ const ProfileAvatar = ({
 								alignItems: "center",
 								justifyContent: "center",
 								borderRadius: 1000,
+								width: 146, 
+								height: 146
 							}}
 						>
 							<Feather
 								name="user"
 								size={40}
-								color={colors.text}
+								color={colors.icon}
+
 							/>
 						</View>
 					)}
@@ -78,8 +79,8 @@ const styles = StyleSheet.create({
 		width: 152,
 		height: 152,
 		borderRadius: 1000,
-		// alignItems: "center",
-		// justifyContent: "center",
+		alignItems: "center",
+		justifyContent: "center",
 	},
 });
 

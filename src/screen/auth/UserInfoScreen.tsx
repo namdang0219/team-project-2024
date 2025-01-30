@@ -6,6 +6,7 @@ import {
 	useWindowDimensions,
 	StyleSheet,
 	Image,
+	Alert,
 } from "react-native";
 import React, { useState } from "react";
 import { ThemedView } from "components/themed";
@@ -25,21 +26,20 @@ import * as ImagePicker from "expo-image-picker";
 import { GLOBAL_GRADIENT } from "util/theme/themeColors";
 import { AntDesign } from "@expo/vector-icons";
 import { useAuth } from "context/auth-context";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { getBlobFromUri } from "util/func/getBlobFromUri";
+import { auth, db, storage } from "../../../firebaseConfig";
+import { updateProfile } from "firebase/auth";
+import { doc, updateDoc } from "firebase/firestore";
 
 const UserInfoScreen = () => {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
-	const [showSexSheet, setShowSexSheet] = useState<boolean>(false);
-	const [sex, setSex] = useState<"male" | "female">("male");
-	const [showNationalitySheet, setShowNationalitySheet] =
-		useState<boolean>(false);
-	const [nationality, setNationality] = useState<
-		"japan" | "vietnam" | "thai"
-	>("japan");
 	const { bottom } = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
 	const [image, setImage] = useState<string | null>(null);
-	
+	const { currentUser } = useAuth();
+	const [loading, setLoading] = useState<boolean>(false);
 
 	const pickImage = async () => {
 		// No permissions request is necessary for launching the image library
@@ -54,6 +54,38 @@ const UserInfoScreen = () => {
 
 		if (!result.canceled) {
 			setImage(result.assets[0].uri);
+		}
+	};
+
+	const updateUserProfile = async () => {
+		if (!image) {
+			Alert.alert("写真を選択してください");
+			return;
+		}
+		try {
+			setLoading(true);
+			const timestamp = Date.now();
+			const fileName = `${timestamp}.jpg`;
+			const avatarRef = ref(storage, `0_avatars/${fileName}`);
+			const imageBlob = await getBlobFromUri(image);
+			await uploadBytes(avatarRef, imageBlob as Blob);
+			const downloadUrl = await getDownloadURL(avatarRef);
+			if (auth.currentUser) {
+				await updateProfile(auth.currentUser, {
+					photoURL: downloadUrl,
+				});
+				const userDoc = doc(db, "0_users", auth.currentUser.uid);
+				await updateDoc(userDoc, {
+					photoURL: downloadUrl,
+				});
+				navigate("GlobalStack", {
+					screen: "RequirePermisionsScreen",
+				});
+			}
+		} catch (error) {
+			console.log(error);
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -171,16 +203,21 @@ const UserInfoScreen = () => {
 									</LinearGradient>
 								</View>
 							</View>
+
+							<Text
+								style={{
+									fontSize: 24,
+									textAlign: "center",
+									fontWeight: "500",
+									marginTop: 20,
+								}}
+							>
+								{currentUser?.displayName}
+							</Text>
 						</View>
 
 						{/* button  */}
-						<Button
-							onPress={() =>
-								navigate("GlobalStack", {
-									screen: "RequirePermisionsScreen",
-								})
-							}
-						>
+						<Button onPress={updateUserProfile} loading={loading}>
 							次へ
 						</Button>
 					</View>

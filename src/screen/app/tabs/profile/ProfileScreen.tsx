@@ -1,4 +1,4 @@
-import { View, Text, Button as RNButton } from "react-native";
+import { View } from "react-native";
 import React, { useState } from "react";
 import { CustomTouchableOpacity } from "components/custom";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -6,7 +6,6 @@ import Header from "layout/Header";
 import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToggle } from "hook/useToggle";
-import { useCameraPermissions } from "expo-camera";
 import ProfileTab from "module/profile/ProfileTab";
 import QrCodeModal, { QrCodeModalState } from "module/profile/QrCodeModal";
 import { useNavigation } from "@react-navigation/native";
@@ -14,39 +13,10 @@ import { useNavigation } from "@react-navigation/native";
 const ProfileScreen = () => {
 	const insets = useSafeAreaInsets();
 	const [qrCodeModal, , setQrCodeModal] = useToggle(false);
-	const [permission, requestPermission] = useCameraPermissions();
 	const { navigate } = useNavigation<any>();
 
 	const [qrCodeModalState, setQrCodeModalState] =
 		useState<QrCodeModalState>("user-found");
-
-	if (!permission) {
-		// Camera permissions are still loading.
-		return (
-			<View style={{ flex: 1 }}>
-				<Text>No Permissions to access camera!</Text>
-			</View>
-		);
-	}
-
-	if (!permission.granted) {
-		// Camera permissions are not granted yet.
-		return (
-			<View
-				style={{
-					flex: 1,
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<Text>We need your permission to show the camera</Text>
-				<RNButton
-					onPress={requestPermission}
-					title="grant permission"
-				/>
-			</View>
-		);
-	}
 
 	return (
 		<View style={{ flex: 1 }}>

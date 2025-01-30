@@ -1,15 +1,11 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import React from "react";
 import { ThemedText } from "components/themed";
-import { IUser } from "types/IUser";
+import { useAuth } from "context/auth-context";
 
-const BaseInfo = ({
-	displayName = "user",
-	email = "user@example.com",
-}: {
-	displayName: IUser["displayName"] | null | undefined;
-	email?: IUser["email"] | null;
-}) => {
+const BaseInfo = () => {
+	const { remoteUserData } = useAuth();
+
 	return (
 		<View
 			style={{
@@ -18,7 +14,7 @@ const BaseInfo = ({
 				gap: 4,
 			}}
 		>
-			{displayName && (
+			{remoteUserData?.displayName && (
 				<ThemedText
 					style={{
 						fontSize: 20,
@@ -26,10 +22,14 @@ const BaseInfo = ({
 						marginTop: 6,
 					}}
 				>
-					{displayName}
+					{remoteUserData?.displayName}
 				</ThemedText>
 			)}
-			{email && <ThemedText style={{ opacity: 0.4 }}>{email}</ThemedText>}
+			{remoteUserData?.email && (
+				<ThemedText style={{ opacity: 0.4 }}>
+					{remoteUserData?.email}
+				</ThemedText>
+			)}
 		</View>
 	);
 };

@@ -21,12 +21,12 @@ enableLegacyWebImplementation(true);
 const App = () => {
 	const scheme = useColorScheme();
 	const { colors } = useTheme();
-	const { refreshAlbums } = useAlbum();
 
-	LogBox.ignoreLogs([
-		"Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.",
-		"@firebase/auth: Auth (11.2.0):",
-	]);
+	// LogBox.ignoreLogs([
+	// 	"Support for defaultProps will be removed from function components in a future major release. Use JavaScript default parameters instead.",
+	// 	"@firebase/auth: Auth (11.2.0):",
+	// ]);
+	LogBox.ignoreAllLogs();
 	const [isConnected, setIsConnected] = useState<boolean>(false);
 
 	useEffect(() => {
