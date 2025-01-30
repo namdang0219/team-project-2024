@@ -2,8 +2,13 @@ import { IUser } from "./IUser";
 
 export interface INotification {
 	nid: string;
-	noticeUser: IUser["uid"];
-	type: "NEW_POST" | "MENTION";
+	noticeUserId: IUser["uid"];
+	noticeUserData: {
+		displayName: IUser["displayName"];
+		photoURL: IUser["photoURL"];
+	};
+	toUser: IUser["uid"];
+	type: "NEW_POST" | "MENTION" | "FRIEND_REQUEST";
 	isChecked: boolean;
-	timestamp: number;
+	create_at: number;
 }

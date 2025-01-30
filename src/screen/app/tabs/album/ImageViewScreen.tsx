@@ -1,193 +1,165 @@
 import {
 	View,
-	StatusBar,
-	Dimensions,
-	Image,
-	useColorScheme,
+	Text,
+	SafeAreaView,
+	useWindowDimensions,
+	Modal,
 } from "react-native";
-import React, {
-	Dispatch,
-	RefObject,
-	SetStateAction,
-	useEffect,
-	useRef,
-	useState,
-} from "react";
-import Gallery, { GalleryRef } from "react-native-awesome-gallery";
-import { IImage } from "types/IImage";
-import { DIMENTIONS } from "constant/dimention";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { BlurView } from "expo-blur";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { Dispatch, SetStateAction, useState } from "react";
+import { StatusBar } from "expo-status-bar";
+import { darkTheme } from "util/theme/themeColors";
 import { CustomTouchableOpacity } from "components/custom";
-import Animated, {
-	FadeIn,
-	FadeInUp,
-	ZoomIn,
-	ZoomInDown,
-	ZoomOut,
-} from "react-native-reanimated";
-import { OptionModal } from "components/modal";
-import { useSelector } from "react-redux";
-import { RootState } from "store/configureStore";
+import { AntDesign, Feather, FontAwesome6, Fontisto } from "@expo/vector-icons";
+import { customStyle } from "style/customStyle";
+import { IImage } from "types/IImage";
 import { AutoHeightImage } from "components/image";
 import { useTheme } from "@react-navigation/native";
-import { useImageColors } from "hook/useImageColors";
-
-const { width } = Dimensions.get("screen");
-
-const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
+import { DIMENTIONS } from "constant/dimention";
+import ImageEditScreen from "./ImageEditScreen";
 
 const ImageViewScreen = ({
-	imageIds,
+	selectedImageData,
 	setShowImageModal,
-	imageModalImageId,
 }: {
-	imageIds: string[];
+	selectedImageData: IImage | undefined;
 	setShowImageModal: Dispatch<SetStateAction<boolean>>;
-	imageModalImageId: number;
 }) => {
-	const insets = useSafeAreaInsets();
+	const { width } = useWindowDimensions();
 	const { colors } = useTheme();
-	const images = useSelector((state: RootState) => state.image);
-	const scheme = useColorScheme();
+	const [editModalOpen, setEditModalOpen] = useState<boolean>(false);
+	const handleBackButton = () => {
+		setShowImageModal(false);
+	};
+	const [favorite, setFavorite] = useState<boolean>(false);
 
-	const imageData = images.filter((i: IImage) => imageIds.includes(i.iid));
-	const imageUrls = imageData.map((i: IImage) => i.uri);
-
-	const [currentImageIndex, setCurrentImageIndex] = useState<number>(0);
-
-	// const imageColors = useImageColors(imageUrls[currentImageIndex]);
-	// console.log("🚀 ~ imageColors:", imageColors);
-
-	// Hàm kiểm tra độ sáng của màu (chuyển HEX -> RGB -> tính toán độ sáng)
-	// const isColorBright = (hex: string) => {
-	// 	const rgb = hexToRgb(hex);
-	// 	if (!rgb) return false;
-	// 	const brightness = (rgb.r * 299 + rgb.g * 587 + rgb.b * 114) / 1000;
-	// 	return brightness > 128; // Giá trị 128 là ngưỡng sáng/tối
-	// };
-
-	// // Hàm chuyển HEX thành RGB
-	// const hexToRgb = (hex: string) => {
-	// 	const sanitizedHex = hex.replace("#", "");
-	// 	const bigint = parseInt(sanitizedHex, 16);
-	// 	const r = (bigint >> 16) & 255;
-	// 	const g = (bigint >> 8) & 255;
-	// 	const b = bigint & 255;
-	// 	return { r, g, b };
-	// };
-
-	const galleryRef = useRef<GalleryRef>(null);
-
-	useEffect(() => {
-		galleryRef.current?.setIndex(imageModalImageId);
-		setCurrentImageIndex(imageModalImageId);
-	}, [imageModalImageId]);
+	if (!selectedImageData) {
+		return (
+			<View
+				style={{
+					flex: 1,
+					backgroundColor: darkTheme.colors.background,
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<Text style={{ color: "white" }}>
+					画像が見つかりませんでした
+				</Text>
+			</View>
+		);
+	}
 
 	return (
-		<>
-			<StatusBar
-				barStyle={scheme == "dark" ? "light-content" : "dark-content"}
-			/>
-			<View style={{ flex: 1, position: "relative" }}>
-				<AnimatedBlurView
-					intensity={20}
+		<SafeAreaView
+			style={{ flex: 1, backgroundColor: darkTheme.colors.background }}
+		>
+			<StatusBar style="light" />
+			<View style={{ width, aspectRatio: "9/16", flexShrink: 0 }}>
+				<View
 					style={{
-						position: "absolute",
-						paddingTop: insets.top,
-						width,
-						top: 0,
-						left: 0,
-						zIndex: 1000,
+						flex: 1,
+						position: "relative",
+						alignItems: "center",
+						justifyContent: "center",
 					}}
-					entering={FadeInUp.duration(600).delay(50)}
 				>
+					{/* top bar  */}
 					<View
-						style={{
-							height: DIMENTIONS.HEADER_HEIGHT,
-							paddingHorizontal: DIMENTIONS.APP_PADDING,
-							flexDirection: "row",
-							alignItems: "center",
-							justifyContent: "space-between",
-							opacity: 0.75,
-						}}
-					>
-						{/* left container  */}
-						<CustomTouchableOpacity
-							onPress={() => setShowImageModal(false)}
-						>
-							<Feather name="x" size={24} color={colors.text} />
-						</CustomTouchableOpacity>
-
-						{/* right container  */}
-						<View
-							style={{
+						style={[
+							{
+								height: 50,
 								flexDirection: "row",
 								alignItems: "center",
-								gap: 20,
-							}}
+								justifyContent: "space-between",
+								paddingHorizontal: 10,
+								position: "absolute",
+								top: 0,
+								left: 0,
+								width: "100%",
+								zIndex: 1000,
+							},
+						]}
+					>
+						{/* x mark  */}
+						<CustomTouchableOpacity onPress={handleBackButton}>
+							<Feather
+								name="x"
+								size={30}
+								color={"white"}
+								style={customStyle.shadow}
+							/>
+						</CustomTouchableOpacity>
+						{/* edit button  */}
+						<CustomTouchableOpacity
+							onPress={() => setEditModalOpen(true)}
 						>
-							<CustomTouchableOpacity>
+							<Text
+								style={{
+									color: "white",
+									fontSize: 18,
+									...customStyle.shadow,
+								}}
+							>
 								<Feather
 									name="edit"
-									size={22}
-									color={colors.text}
+									color={"white"}
+									size={26}
 								/>
-							</CustomTouchableOpacity>
-							<CustomTouchableOpacity>
-								<MaterialCommunityIcons
-									name="tag-outline"
-									size={24}
-									color={colors.text}
-								/>
-							</CustomTouchableOpacity>
-							<OptionModal
-								options={[
-									{
-										label: "写真を削除",
-										action: () => null,
-										icon: (
-											<Ionicons
-												name="trash-outline"
-												size={20}
-											/>
-										),
-									},
-								]}
-								iconStyle={{ color: colors.text }}
-							/>
-						</View>
+							</Text>
+						</CustomTouchableOpacity>
 					</View>
-				</AnimatedBlurView>
-				<Gallery
-					ref={galleryRef}
-					data={imageUrls}
-					onSwipeToClose={() => setShowImageModal(false)}
-					loop
-					onIndexChange={(newIndex) => {
-						// console.log(newIndex);
-						setCurrentImageIndex(newIndex);
-					}}
-					style={{
-						backgroundColor: colors.background,
-					}}
-					renderItem={({ item }) => (
-						<Animated.View
-							style={{
-								backgroundColor: colors.background,
-								flex: 1,
-								justifyContent: "center",
-							}}
-							entering={ZoomIn.duration(200)}
-							exiting={ZoomOut}
-						>
-							<AutoHeightImage source={{ uri: item }} />
-						</Animated.View>
-					)}
-				/>
+					{/* image view  */}
+					<AutoHeightImage
+						source={{ uri: selectedImageData.uri }}
+						style={{ backgroundColor: "#0000003d" }}
+					/>
+
+					{/* bottom bar  */}
+				</View>
 			</View>
-		</>
+			<View
+				style={{
+					flex: 1,
+					borderTopColor: colors.icon,
+					borderTopWidth: 0.2,
+					flexDirection: "row",
+					alignItems: "center",
+					justifyContent: "space-between",
+					paddingHorizontal: DIMENTIONS.APP_PADDING + 40,
+				}}
+			>
+				<CustomTouchableOpacity onPress={() => setFavorite(!favorite)}>
+					<FontAwesome6
+						name="location-dot"
+						size={24}
+						color={"white"}
+						style={{ opacity: 0.6 }}
+					/>
+				</CustomTouchableOpacity>
+				<CustomTouchableOpacity onPress={() => setFavorite(!favorite)}>
+					<AntDesign
+						name={favorite ? "heart" : "hearto"}
+						color={favorite ? "red" : "white"}
+						size={24}
+					/>
+				</CustomTouchableOpacity>
+				<CustomTouchableOpacity onPress={() => setFavorite(!favorite)}>
+					<Fontisto
+						name="share-a"
+						size={24}
+						color="white"
+						style={{ opacity: 0.6 }}
+					/>
+				</CustomTouchableOpacity>
+			</View>
+
+			<Modal visible={editModalOpen}>
+				<ImageEditScreen
+					selectedImageData={selectedImageData}
+					setEditModalOpen={setEditModalOpen}
+				/>
+			</Modal>
+		</SafeAreaView>
 	);
 };
 

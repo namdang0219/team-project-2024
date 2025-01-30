@@ -6,6 +6,7 @@ export interface IImage {
 	uri: string;
 	author: IUser["uid"]; // uid
 	album: IAlbum["aid"][];
+	member: string[];
 	location: {
 		lat: number;
 		long: number;

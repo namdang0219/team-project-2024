@@ -1,9 +1,10 @@
 import React from "react";
+import { TextProps } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
 
-const IconRedo = () => {
+const IconRedo = ({...props} : TextProps) => {
 	return (
-		<Svg width={32} height={32} viewBox="0 0 24 24">
+		<Svg width={32} height={32} viewBox="0 0 24 24" {...props}>
 			<G
 				fill="none"
 				stroke="white"

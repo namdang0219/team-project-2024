@@ -1,44 +1,29 @@
 import {
 	View,
-	StyleSheet,
-	useWindowDimensions,
 	Text,
+	SafeAreaView,
+	StatusBar,
+	StyleSheet,
 	Animated,
-	TextInput,
-	Image,
 	Modal,
 	Pressable,
+	TextInput,
 	FlatList,
-	ImageBackground,
+	Image,
 	PanResponder,
+	useWindowDimensions,
 } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
-import {
-	SafeAreaView,
-	useSafeAreaInsets,
-} from "react-native-safe-area-context";
-import { useIsFocused } from "@react-navigation/native";
-import { StatusBar } from "expo-status-bar";
-import { CustomTouchableOpacity } from "components/custom";
-import { Camera, useCameraPermission } from "react-native-vision-camera";
-
+import React, {
+	Dispatch,
+	SetStateAction,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
+import { IImage } from "types/IImage";
 import { darkTheme } from "util/theme/themeColors";
-import {
-	IconColorFilter,
-	IconLocation,
-	IconPlus,
-	IconSlider,
-	IconTag,
-} from "icon/camera-edit";
-import GridSection from "module/camera/GridSection";
-import CameraSection from "module/camera/CameraSection";
-import { Sticker } from "module/camera/CaptureArea";
-import NonePhotoBottomFeature from "module/camera/NonePhotoBottomFeature";
-import { useToggle } from "hook/useToggle";
-import EffectModal from "module/camera/EffectModal";
-import CameraTopbar from "module/camera/CameraTopbar";
-import ExposureSlider from "module/camera/ExposureSlider";
-import CameraControl from "module/camera/CameraControl";
+import { CustomTouchableOpacity } from "components/custom";
+import { IconRedo, IconUndo } from "icon/camera-edit/drawPad";
 import {
 	IconDraw,
 	IconEffect,
@@ -46,41 +31,45 @@ import {
 	IconSticker,
 	IconText,
 } from "icon/camera-edit/add-item";
-import { BlurView } from "expo-blur";
-import { Feather } from "@expo/vector-icons";
-import { recentStickers, stickerList } from "mock/stickerMocks";
 import { Canvas, Path, Skia, SkPath } from "@shopify/react-native-skia";
-import { IconRedo, IconUndo } from "icon/camera-edit/drawPad";
+import {
+	IconColorFilter,
+	IconLocation,
+	IconPlus,
+	IconSlider,
+	IconTag,
+} from "icon/camera-edit";
+import styles from "toastify-react-native/components/styles";
+import EffectModal from "module/camera/EffectModal";
+import { BlurView } from "expo-blur";
+import { recentStickers, stickerList } from "mock/stickerMocks";
+import GridSection from "module/camera/GridSection";
+import { useToggle } from "hook/useToggle";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
+import { ISticker } from "types/ISticker";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AutoHeightImage } from "components/image";
+import { customStyle } from "style/customStyle";
+import CameraTopbar from "module/camera/CameraTopbar";
+import { useTheme } from "@react-navigation/native";
 
-const CameraScreen = () => {
-	const { hasPermission, requestPermission } = useCameraPermission();
+const ImageEditScreen = ({
+	selectedImageData,
+	setEditModalOpen,
+}: {
+	selectedImageData: IImage | undefined;
+	setEditModalOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
 	const { width: screenWidth, height } = useWindowDimensions();
-	const insets = useSafeAreaInsets();
-	const [photoUri, setPhotoUri] = useState<string | null>(null); // photoUri is image link of captured view after edit
-	const [previewPhotoUri, setPreviewPhotoUri] = useState<string | null>(
-		// null
-		"https://i.pinimg.com/736x/0e/c3/11/0ec311868b1d93c17786c69adc54bcb1.jpg"
-	); // previewPhotoUri is image link after press shutter button and before edit
-	const viewRef = useRef<View>(null);
-	const [exposureValue, setExposureValue] = useState<number>(0);
-	const isFocused = useIsFocused();
-	const [stickers, setStickers] = useState<ISticker[]>([]);
-
-	const addSticker = (stickerSource: string) => {
-		setStickers([...stickers, { source: stickerSource, id: Date.now() }]);
-	};
-
-	// toggle function to toggle show and hide (none preview image)
-	const [grid, toggleGrid] = useToggle(false);
-	const [backCamera, toggleCamera] = useToggle(false);
-	const [flash, toggleFlash] = useToggle(false);
-	const [showExposureSlider, toggleExposureSlider] = useToggle(false);
-	const [effectModal, toggleEffectModal] = useToggle(false);
+	const { colors } = useTheme();
 
 	// toggle function to toggle show and hide (have preview image)
 	const [showAddItem, toggleShowAddItem, setShowAddItem] = useToggle(false);
 	const [stikerModal, toggleStickerModal] = useToggle(false);
 	const [drawPad, toggleDrawPad, setDrawPad] = useToggle(false);
+	const [effectModal, toggleEffectModal] = useToggle(false);
+	const viewRef = useRef<View>(null);
+	const insets = useSafeAreaInsets();
 
 	const translateYAnim = useRef(new Animated.Value(75)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -124,49 +113,6 @@ const CameraScreen = () => {
 			]).start();
 		}
 	}, [showAddItem]);
-
-	useEffect(() => {
-		if (!hasPermission) {
-			requestPermission();
-		}
-	}, []);
-
-	const cameraRef = useRef<Camera>(null);
-
-	if (!hasPermission) return <Text>No permisson to access camera</Text>;
-
-	const styles = StyleSheet.create({
-		cameraContainer: {
-			backgroundColor: darkTheme.colors.background,
-			aspectRatio: "9/16",
-			borderRadius: 15,
-			overflow: "hidden",
-			position: "relative",
-			alignItems: "center",
-			justifyContent: "center",
-		},
-		cameraFeatureContainer: {
-			position: "absolute",
-			top: 0,
-			left: 0,
-			zIndex: 10,
-			aspectRatio: "9/16",
-			width: screenWidth,
-		},
-		featureItem: {
-			width: 40,
-			alignItems: "center",
-			justifyContent: "center",
-		},
-		itemContainer: {
-			backgroundColor: "white",
-			width: 48,
-			height: 48,
-			borderRadius: 1000,
-			alignItems: "center",
-			justifyContent: "center",
-		},
-	});
 
 	// handle drawpad with skia
 	const [paths, setPaths] = useState<SkPath[]>([]); // save all paths
@@ -230,9 +176,56 @@ const CameraScreen = () => {
 		onPanResponderRelease: endPath,
 	});
 
+	const styles = StyleSheet.create({
+		cameraContainer: {
+			backgroundColor: darkTheme.colors.background,
+			aspectRatio: "9/16",
+			borderRadius: 15,
+			overflow: "hidden",
+			position: "relative",
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		cameraFeatureContainer: {
+			position: "absolute",
+			top: 0,
+			left: 0,
+			zIndex: 10,
+			aspectRatio: "9/16",
+			width: screenWidth,
+		},
+		featureItem: {
+			width: 40,
+			alignItems: "center",
+			justifyContent: "center",
+		},
+		itemContainer: {
+			backgroundColor: "white",
+			width: 48,
+			height: 48,
+			borderRadius: 1000,
+			alignItems: "center",
+			justifyContent: "center",
+		},
+	});
+
+	if (!selectedImageData) {
+		return (
+			<View
+				style={{
+					flex: 1,
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<Text>エラーが発生しました</Text>
+			</View>
+		);
+	}
+
 	return (
-		<>
-			<StatusBar style="light" />
+		<View style={{ backgroundColor: "black", flex: 1 }}>
+			<StatusBar barStyle={"light-content"} />
 			<SafeAreaView
 				style={{
 					flex: 1,
@@ -240,34 +233,59 @@ const CameraScreen = () => {
 				}}
 			>
 				<View style={styles.cameraContainer}>
-					{/* grid ui  */}
-					{grid && <GridSection></GridSection>}
-
 					<View style={styles.cameraFeatureContainer}>
 						<View style={{ position: "relative", flex: 1 }}>
-							{/* top container  */}
-							<CameraTopbar
-								style={{
-									position: "absolute",
-									left: 0,
-									right: 0,
-									zIndex: 1000,
-								}}
-								photoUri={photoUri}
-								previewPhotoUri={previewPhotoUri}
-								setPhotoUri={setPhotoUri}
-								setPreviewPhotoUri={setPreviewPhotoUri}
-								viewRef={viewRef}
-								setStickers={setStickers}
-								setShowAddItem={setShowAddItem}
-							/>
-
-							{/* exposure slider  */}
-							<ExposureSlider
-								exposureValue={exposureValue}
-								setExposureValue={setExposureValue}
-								showExposureSlider={showExposureSlider}
-							/>
+							<View
+								style={[
+									{
+										height: 50,
+										flexDirection: "row",
+										alignItems: "center",
+										justifyContent: "space-between",
+										paddingHorizontal: 10,
+										zIndex: 1000,
+									},
+								]}
+							>
+								{/* x mark  */}
+								<CustomTouchableOpacity
+									onPress={() => {
+										setEditModalOpen(false);
+									}}
+								>
+									<Feather
+										name="x"
+										size={30}
+										color={"white"}
+										style={customStyle.shadow}
+									/>
+								</CustomTouchableOpacity>
+								{/* image flip  */}
+								<CustomTouchableOpacity>
+									<MaterialCommunityIcons
+										name="flip-horizontal"
+										size={26}
+										color={"white"}
+										style={customStyle.shadow}
+									/>
+								</CustomTouchableOpacity>
+								{/* save button  */}
+								<CustomTouchableOpacity
+								// onPress={handleNavigateToSave}
+								>
+									<Text
+										style={[
+											{
+												color: "white",
+												fontSize: 18,
+											},
+											customStyle.shadow,
+										]}
+									>
+										保存
+									</Text>
+								</CustomTouchableOpacity>
+							</View>
 
 							{/* draw pad  */}
 							{drawPad && (
@@ -288,7 +306,7 @@ const CameraScreen = () => {
 										onPress={undo}
 										disabled={paths.length === 0}
 									>
-										<IconUndo />
+										<IconUndo style={customStyle.shadow} />
 									</CustomTouchableOpacity>
 									<CustomTouchableOpacity
 										style={{
@@ -300,7 +318,7 @@ const CameraScreen = () => {
 										onPress={redo}
 										disabled={redoPaths.length === 0}
 									>
-										<IconRedo />
+										<IconRedo style={customStyle.shadow} />
 									</CustomTouchableOpacity>
 								</View>
 							)}
@@ -387,30 +405,28 @@ const CameraScreen = () => {
 								</CustomTouchableOpacity>
 							</Animated.View>
 
-							{/* camera control  */}
-							{!previewPhotoUri && (
-								<CameraControl
-									cameraRef={cameraRef}
-									flash={flash}
-									setPreviewPhotoUri={setPreviewPhotoUri}
-									setShowEffectModal={toggleEffectModal}
-								/>
-							)}
-
-							{previewPhotoUri && (
+							{selectedImageData.uri && (
 								<View
-									ref={viewRef}
-									style={StyleSheet.absoluteFill}
+									style={[
+										StyleSheet.absoluteFill,
+										{
+											aspectRatio: "9/16",
+											width: screenWidth,
+											alignItems: "center",
+											justifyContent: "center",
+										},
+									]}
 								>
-									<ImageBackground
-										source={{ uri: previewPhotoUri }}
-										style={[
-											{
-												aspectRatio: "9/16",
-												width: screenWidth,
-											},
-										]}
-									>
+									<View ref={viewRef}>
+										<AutoHeightImage
+											width={screenWidth}
+											style={{
+												backgroundColor: "#0000003d",
+											}}
+											source={{
+												uri: selectedImageData.uri,
+											}}
+										></AutoHeightImage>
 										{/* drawed pad  */}
 										<Canvas style={StyleSheet.absoluteFill}>
 											{paths.map((path, index) => (
@@ -431,48 +447,26 @@ const CameraScreen = () => {
 												/>
 											)}
 										</Canvas>
+									</View>
 
-										{/* sticker field  */}
-										<>
-											{stickers &&
-												stickers.map((sticker) => (
-													<Sticker
-														key={sticker.id}
-														source={sticker.source}
-													/>
-												))}
-										</>
-									</ImageBackground>
+									{/* sticker field  */}
+									{/* <>
+										{stickers &&
+											stickers.map((sticker) => (
+												<Sticker
+													key={sticker.id}
+													source={sticker.source}
+												/>
+											))}
+									</> */}
 								</View>
 							)}
 						</View>
 					</View>
-
-					{!previewPhotoUri && isFocused && (
-						<CameraSection
-							cameraSide={backCamera ? "back" : "front"}
-							cameraRef={cameraRef}
-							exposureValue={exposureValue}
-						/>
-					)}
 				</View>
 
-				{/* camera features - bottom container - image is null  */}
-				{!previewPhotoUri && (
-					<NonePhotoBottomFeature
-						grid={grid}
-						toggleGrid={toggleGrid}
-						flash={flash}
-						toggleFlash={toggleFlash}
-						backCamera={backCamera}
-						toggleCamera={toggleCamera}
-						showExposureSlider={showExposureSlider}
-						toggleExposureSlider={toggleExposureSlider}
-					/>
-				)}
-
 				{/* camera features - bottom container - image is string  */}
-				{previewPhotoUri && (
+				{selectedImageData.uri && (
 					<View
 						style={{
 							flexDirection: "row",
@@ -505,13 +499,11 @@ const CameraScreen = () => {
 					</View>
 				)}
 			</SafeAreaView>
-
 			{/* modal  */}
 			<EffectModal
 				showEffectModal={effectModal}
 				setShowEffectModal={toggleEffectModal}
 			/>
-
 			{/* sticker modal  */}
 			<Modal
 				transparent={true}
@@ -614,32 +606,37 @@ const CameraScreen = () => {
 															s.id
 														)
 													)
-													.map((item: ISticker) => (
-														<CustomTouchableOpacity
-															key={item.id}
-															onPress={() => {
-																addSticker(
-																	item.source
-																);
-																toggleStickerModal();
-																setShowAddItem(
-																	false
-																);
-															}}
-														>
-															<Image
-																source={{
-																	uri: item.source,
+													.map(
+														(
+															item: ISticker,
+															index
+														) => (
+															<CustomTouchableOpacity
+																key={index}
+																onPress={() => {
+																	// addSticker(
+																	// 	item.source
+																	// );
+																	toggleStickerModal();
+																	setShowAddItem(
+																		false
+																	);
 																}}
-																style={{
-																	width: itemSize,
-																	height: itemSize,
-																	objectFit:
-																		"contain",
-																}}
-															/>
-														</CustomTouchableOpacity>
-													))}
+															>
+																<Image
+																	source={{
+																		uri: item.source,
+																	}}
+																	style={{
+																		width: itemSize,
+																		height: itemSize,
+																		objectFit:
+																			"contain",
+																	}}
+																/>
+															</CustomTouchableOpacity>
+														)
+													)}
 											</View>
 											<Text
 												style={{
@@ -661,7 +658,7 @@ const CameraScreen = () => {
 										<CustomTouchableOpacity
 											key={item.id}
 											onPress={() => {
-												addSticker(item.source);
+												// addSticker(item.source);
 												toggleStickerModal();
 												setShowAddItem(false);
 											}}
@@ -684,8 +681,8 @@ const CameraScreen = () => {
 					</BlurView>
 				</View>
 			</Modal>
-		</>
+		</View>
 	);
 };
 
-export default CameraScreen;
+export default ImageEditScreen;

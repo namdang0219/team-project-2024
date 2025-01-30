@@ -2,7 +2,6 @@ import { View, Image, StyleSheet, ViewProps } from "react-native";
 import React, { useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemedView } from "components/themed";
-import { IUser } from "types/IUser";
 import { useTheme } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 import { useAuth } from "context/auth-context";

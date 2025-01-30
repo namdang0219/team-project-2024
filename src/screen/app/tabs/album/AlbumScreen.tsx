@@ -5,6 +5,8 @@ import {
 	ScrollView,
 	Modal,
 	RefreshControl,
+	TouchableWithoutFeedback,
+	Image,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -33,7 +35,7 @@ const AlbumScreen = () => {
 	const { albums, fetchingAlbums, refreshAlbums } = useAlbum();
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
-	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
+	const [createAlbumModal, setCreateAlbumModal] = useState<boolean>(false);
 	const [searchModal, toggleSearchModal] = useToggle(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const { colors } = useTheme();
@@ -42,11 +44,15 @@ const AlbumScreen = () => {
 	const [firstAlbumModalOpen, setFirstAlbumModalOpen] =
 		useState<boolean>(false);
 
+	const toggleCreateAlbumModal = () => {
+		setCreateAlbumModal(false);
+	};
+
 	const options: IOption[] = [
 		{
 			label: "アルバム作成",
 			icon: <MaterialIcons name="create" color={"black"} size={20} />,
-			action: toggleCreateAlbumModal,
+			action: () => setCreateAlbumModal(true),
 		},
 	];
 

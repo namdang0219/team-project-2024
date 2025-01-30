@@ -64,7 +64,7 @@ const AlbumTagFriendModal = ({
 					onPress={toggleTagFriendModal}
 					style={{ marginBottom: insets.bottom + 4, marginTop: 10 }}
 				>
-					完成
+					完了
 				</Button>
 			</View>
 		</TouchableWithoutFeedback>
@@ -100,8 +100,9 @@ const UserItem = ({
 					alignItems: "center",
 					justifyContent: "space-between",
 				}}
+
 			>
-				<View
+				<View 
 					style={{
 						flexDirection: "row",
 						alignItems: "center",
@@ -141,7 +142,7 @@ const UserItem = ({
 							fontWeight: "500",
 						}}
 					>
-						タグ
+						追加
 					</Text>
 				</CustomTouchableOpacity>
 			</View>

@@ -123,8 +123,8 @@ const AlbumCreateModal = ({
 			},
 			{
 				text: "はい",
-				onPress: () => {
-					createAlbum(value);
+				onPress: async () => {
+					await createAlbum(value);
 					toggleCreateAlbumModal();
 				},
 			},

@@ -84,7 +84,7 @@ const Header = ({
 						<Ionicons
 							name="chevron-back"
 							color={backIconColor}
-							size={20}
+							size={24}
 							style={backIconStyle}
 						/>
 						<Text

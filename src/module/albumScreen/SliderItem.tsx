@@ -1,12 +1,32 @@
-import { View, Text, StyleSheet, ImageBackground } from "react-native";
+import {
+	View,
+	Text,
+	StyleSheet,
+	ImageBackground,
+	ActivityIndicator,
+} from "react-native";
 import React from "react";
-import { CustomTouchableOpacity } from "components/custom";
-import { useNavigation } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 import { customStyle } from "style/customStyle";
+import { useAlbum } from "context/album-context";
+import { Skeleton } from "components/skeleton";
 
 const SliderItem = ({ item }: { item: IAlbum }) => {
-	const { navigate } = useNavigation<any>();
+	const { fetchingAlbums } = useAlbum();
+
+	if (fetchingAlbums) {
+		return (
+			<Skeleton
+				style={{
+					flex: 1,
+					alignItems: "center",
+					justifyContent: "center",
+				}}
+			>
+				<ActivityIndicator size={"large"} />
+			</Skeleton>
+		);
+	}
 
 	return (
 		<View
@@ -37,17 +57,23 @@ const SliderItem = ({ item }: { item: IAlbum }) => {
 					]}
 				>
 					<Text
-						style={[{
-							fontSize: 28,
-							color: "white",
-							fontWeight: "600",
-						}, customStyle.shadow]}
+						style={[
+							{
+								fontSize: 28,
+								color: "white",
+								fontWeight: "600",
+							},
+							customStyle.shadow,
+						]}
 						numberOfLines={1}
 					>
 						{item.title}
 					</Text>
 					<Text
-						style={[{ color: "white", fontSize: 16 }, customStyle.shadow]}
+						style={[
+							{ color: "white", fontSize: 16 },
+							customStyle.shadow,
+						]}
 					>{`${item.images.length}枚`}</Text>
 				</View>
 			</ImageBackground>

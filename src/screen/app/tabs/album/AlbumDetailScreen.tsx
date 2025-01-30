@@ -22,13 +22,15 @@ import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { ThemedText } from "components/themed";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { deleteDoc, doc, onSnapshot, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db, storage } from "../../../../../firebaseConfig";
 import { Toast } from "toastify-react-native";
 import { formatDate } from "util/func/formatDate";
 import { customStyle } from "style/customStyle";
 import { lightTheme } from "util/theme/themeColors";
 import { deleteObject, ref } from "firebase/storage";
+import { useAlbum } from "context/album-context";
+import { IImage } from "types/IImage";
 
 const { width } = Dimensions.get("screen");
 
@@ -40,36 +42,75 @@ const AlbumDetailScreen = () => {
 	const { navigate, goBack } = useNavigation<any>();
 	const { colors } = useTheme();
 	const [currentAlbum, setCurrentAlbum] = useState<IAlbum | null>(null);
-	const [loading, setLoading] = useState<boolean>(false);
 	const [changingFavorite, setChangingFavorite] = useState<boolean>(false);
+	const { albums } = useAlbum();
+
 	const aid = params.aid;
 
-	// get album
 	useEffect(() => {
-		const getCurrentAlbum = async () => {
-			try {
-				setLoading(true);
-				const docRef = doc(db, "0_albums", aid);
-
-				const unsub = onSnapshot(docRef, (doc) => {
-					setCurrentAlbum(doc.data() as IAlbum);
-				});
-
-				return unsub;
-			} catch (error) {
-				console.log(error);
-			} finally {
-				setLoading(false);
-			}
+		const getCurrentAlbum = () => {
+			const albumData = albums.find((album) => album.aid === aid);
+			setCurrentAlbum(albumData as IAlbum);
 		};
+
 		getCurrentAlbum();
 	}, []);
+
+	// get album
+	// useEffect(() => {
+	// 	const getCurrentAlbum = async () => {
+	// 		try {
+	// 			setLoading(true);
+	// 			const docRef = doc(db, "0_albums", aid);
+
+	// 			const unsub = onSnapshot(docRef, (doc) => {
+	// 				setCurrentAlbum(doc.data() as IAlbum);
+	// 			});
+
+	// 			return unsub;
+	// 		} catch (error) {
+	// 			console.log(error);
+	// 		} finally {
+	// 			setLoading(false);
+	// 		}
+	// 	};
+	// 	getCurrentAlbum();
+	// }, []);
 
 	async function handleRemoveAlbum(aid: string) {
 		try {
 			const docRef = doc(db, "0_albums", aid);
-			const coverRef = ref(storage, `0_images/${currentAlbum?.cover.fileName}`);
+
+			// delete cover image
+			const coverRef = ref(
+				storage,
+				`0_images/${currentAlbum?.cover.fileName}`
+			);
 			await deleteObject(coverRef);
+
+			// delete images in albums
+			const deleteImageTasks = currentAlbum?.images.map(
+				async (image: IImage) => {
+					try {
+						const filePath = image.iid 
+						const imageRef = ref(
+							storage,
+							`0_photos/${filePath}.jpg`
+						);
+						await deleteObject(imageRef);
+					} catch (error) {
+						console.error("エラー", error);
+					}
+				}
+			);
+
+			// Chờ tất cả ảnh được xóa xong
+			await Promise.all(deleteImageTasks as any);
+
+			// Xóa album khỏi Firestore
+			await deleteDoc(docRef);
+
+			// delete from db
 			await deleteDoc(docRef);
 			Toast.success("アルバムを削除しました");
 		} catch (error) {
@@ -171,21 +212,13 @@ const AlbumDetailScreen = () => {
 			<StatusBar barStyle={"light-content"} />
 			<View style={{ flex: 1, paddingBottom: insets.bottom }}>
 				<View style={{ flex: 1, position: "relative" }}>
-					{loading ? (
-						<View
-							style={[
-								{ backgroundColor: colors.input },
-								styles.image,
-							]}
-						></View>
-					) : (
-						<Image
-							source={{
-								uri: currentAlbum?.cover.uri,
-							}}
-							style={styles.image}
-						/>
-					)}
+					<Image
+						source={{
+							uri: currentAlbum?.cover.uri,
+						}}
+						style={styles.image}
+					/>
+
 					{/* header  */}
 					<View
 						style={{ paddingTop: insets.top, position: "absolute" }}

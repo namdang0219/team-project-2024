@@ -2,12 +2,17 @@ import { View, Text } from "react-native";
 import React from "react";
 import { SkeletonProps, Skeleton as ThemedUISkeleton } from "@rneui/themed";
 
-const Skeleton = ({ width = 50, height = 50, ...props }: SkeletonProps) => {
+const Skeleton = ({
+	width = 50,
+	height = 50,
+	rounded = 8,
+	...props
+}: SkeletonProps & { rounded?: number }) => {
 	return (
 		<View
 			style={{
 				opacity: 0.3,
-				borderRadius: 8,
+				borderRadius: rounded,
 				overflow: "hidden",
 				width,
 				height,
