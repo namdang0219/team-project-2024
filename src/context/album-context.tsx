@@ -28,7 +28,7 @@ const AlbumsProvider = ({ children }: { children: ReactNode }) => {
 	const { currentUser } = useAuth();
 	const [refresh, setRefresh] = useState<boolean>(false);
 
-	function refreshAlbums() {
+	async function refreshAlbums() {
 		setRefresh(!refresh);
 	}
 

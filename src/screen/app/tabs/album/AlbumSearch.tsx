@@ -32,18 +32,19 @@ const AlbumSearch = ({
 }: {
 	toggleSeachModal: Dispatch<SetStateAction<boolean>>;
 }) => {
+	const { albums } = useAlbum();
 	const { colors } = useTheme();
 	const inputRef = useRef<TextInput | null>(null);
 	const { navigate } = useNavigation<any>();
 	const [searchText, setSearchText] = useState<string>("");
-	const [results, setResults] = useState<IAlbum[]>([]);
-	const { albums } = useAlbum();
+	const [results, setResults] = useState<IAlbum[]>(albums);
+	console.log("🚀 ~ results:", results)
 
 	useEffect(() => {
-		if (searchText.trim() === "") {
-			setResults([]);
-			return;
-		}
+		// if (searchText.trim() === "") {
+		// 	setResults([]);
+		// 	return;
+		// }
 		const filteredResults = albums.filter((album) =>
 			album.title.toLowerCase().includes(searchText.toLowerCase())
 		);
@@ -146,7 +147,7 @@ const AlbumSearch = ({
 											String(item.aid)
 										}
 										renderItem={({ item }) => (
-											<AlbumItem item={item} />
+											<AlbumItem item={item} toggleSeachModal={toggleSeachModal} />
 										)}
 									/>
 								</View>

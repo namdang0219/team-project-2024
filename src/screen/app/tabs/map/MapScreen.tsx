@@ -96,8 +96,8 @@ const MapSection = ({
 	};
 
 	const testLocation = {
-		latitude: 37.787094190061325,
-		longitude: -122.40435593090945,
+		latitude: 34.70969234424215,
+		longitude: 135.50607706191374,
 	};
 
 	const getCurrentPosition = async () => {
@@ -416,39 +416,6 @@ const MapSection = ({
 						</View>
 					</CustomTouchableOpacity>
 				</Marker> */}
-
-				{/* cancel button   */}
-				{destination?.latitude !== 0 &&
-					destination?.longitudeDelta !== 0 && (
-						<CustomTouchableOpacity
-							onPress={() =>
-								setDestination({
-									latitude: 0,
-									longitude: 0,
-									latitudeDelta: LATITUDE_DELTA,
-									longitudeDelta: LONGITUDE_DELTA,
-								})
-							}
-							style={{
-								position: "absolute",
-								top: 120,
-								right: 120,
-								width: 100,
-								aspectRatio: 1,
-								borderRadius: 1000,
-								backgroundColor: "white",
-								alignItems: "center",
-								justifyContent: "center",
-								elevation: 1,
-								shadowRadius: 5,
-								shadowOpacity: 0.15,
-								shadowOffset: { width: 0, height: 0 },
-								zIndex: 10,
-							}}
-						>
-							<Feather name="x" size={20} color={"red"} />
-						</CustomTouchableOpacity>
-					)}
 
 				{destination?.latitude !== 0 &&
 					destination?.longitudeDelta !== 0 && (

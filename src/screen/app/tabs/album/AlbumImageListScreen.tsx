@@ -1,49 +1,29 @@
-import {
-	View,
-	StatusBar,
-	FlatList,
-	Modal,
-	useWindowDimensions,
-	Image,
-	Text,
-	StyleSheet,
-} from "react-native";
-import React, { useEffect, useRef, useState } from "react";
+import { View, StatusBar, Modal, Image, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
 import Header from "layout/Header";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CustomTouchableOpacity } from "components/custom";
-import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "store/configureStore";
+import { useRoute, useTheme } from "@react-navigation/native";
 import { IAlbum, ITaggedFriend } from "types/IAlbum";
 import { IImage } from "types/IImage";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { addImagesToAlbum } from "store/album/albumSlice";
 import { Toast } from "toastify-react-native";
-import { imageMocks } from "mock/imageMocks";
 import { useItemWidth } from "hook/useItemWidth";
 import { DIMENTIONS } from "constant/dimention";
-import Animated, {
-	BounceIn,
-	Easing,
-	FadeIn,
-	FadeOut,
-	LinearTransition,
-	useAnimatedStyle,
-	useSharedValue,
-	withRepeat,
-	withSequence,
-	withTiming,
-	ZoomIn,
-	ZoomInDown,
-	ZoomOutRotate,
-} from "react-native-reanimated";
-import { addImage } from "store/image/imageSlice";
-import { GalleryRef } from "react-native-awesome-gallery";
+import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import ImageViewScreen from "./ImageViewScreen";
-import { arrayUnion, doc, onSnapshot, updateDoc } from "firebase/firestore";
-import { auth, db, storage } from "../../../../../firebaseConfig";
+import {
+	arrayUnion,
+	collection,
+	doc,
+	onSnapshot,
+	query,
+	setDoc,
+	updateDoc,
+	where,
+} from "firebase/firestore";
+import { db, storage } from "../../../../../firebaseConfig";
 import { useAlbum } from "context/album-context";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { getBlobFromUri } from "util/func/getBlobFromUri";
@@ -56,18 +36,43 @@ const AlbumImageListScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { params } = useRoute<any>();
 	const { currentUser } = useAuth();
-	const { width, height } = useWindowDimensions();
 	const { colors } = useTheme();
-	const { albums } = useAlbum();
 	const itemWidth = useItemWidth(GAP, 3, 0);
 	const [showImageModal, setShowImageModal] = useState<boolean>(false);
-	const [selectedImageData, setSelectedImageData] = useState<IImage>();
+	const [selectedImageId, setSelectedImageId] = useState<string>();
 	const [adding, setAdding] = useState<boolean>(false);
+	const [images, setImages] = useState<IImage[]>([]);
+	console.log("🚀 ~ AlbumImageListScreen ~ images:", images);
 
 	const aid = params?.aid;
+	const [filteredAlbum, setFilteredAlbum] = useState<IAlbum>();
 
-	const filteredAlbum = albums.find((a: IAlbum) => aid == a.aid);
-	const images: IImage[] = filteredAlbum?.images || [];
+	useEffect(() => {
+		const unsub = onSnapshot(doc(db, "0_albums", aid), (doc) => {
+			setFilteredAlbum(doc.data() as IAlbum);
+		});
+
+		return unsub;
+	}, [aid]);
+
+	useEffect(() => {
+		if (filteredAlbum?.images.length && filteredAlbum?.images.length > 0) {
+			console.log(filteredAlbum.images);
+			const q = query(
+				collection(db, "0_images"),
+				where("iid", "in", filteredAlbum?.images)
+			);
+			const unsubscribe = onSnapshot(q, (querySnapshot) => {
+				const images: IImage[] = [];
+				querySnapshot.forEach((doc) => {
+					images.push(doc.data() as IImage);
+				});
+				setImages(images as IImage[]);
+			});
+
+			return unsubscribe;
+		}
+	}, [filteredAlbum]);
 
 	const pickImages = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -84,7 +89,7 @@ const AlbumImageListScreen = () => {
 				if (!result.assets || result.assets.length === 0) return;
 
 				const albumDoc = doc(db, "0_albums", aid);
-				const newImages: IImage[] = [];
+				const newImages: IImage["iid"][] = [];
 
 				const uploadTasks = result.assets.map(async (asset, index) => {
 					const timestamp = Date.now() + index;
@@ -109,7 +114,12 @@ const AlbumImageListScreen = () => {
 								long: 0,
 							},
 						};
-						newImages.push(newImage);
+						await setDoc(
+							doc(db, "0_images", timestamp.toString()),
+							newImage
+						);
+
+						newImages.push(newImage.iid);
 					}
 				});
 
@@ -119,8 +129,8 @@ const AlbumImageListScreen = () => {
 					await updateDoc(albumDoc, {
 						images: arrayUnion(...newImages),
 					});
-					Toast.success("写真追加済み");
 				}
+				Toast.success("写真追加済み");
 			} catch (error) {
 				console.log(error);
 				Toast.error("写真追加失敗");
@@ -367,7 +377,7 @@ const AlbumImageListScreen = () => {
 						<CustomTouchableOpacity
 							onPress={() => {
 								setShowImageModal(true);
-								setSelectedImageData(item);
+								setSelectedImageId(item.iid);
 							}}
 						>
 							<Animated.Image
@@ -384,7 +394,10 @@ const AlbumImageListScreen = () => {
 				/>
 			</View>
 			<Modal visible={showImageModal}>
-				<ImageViewScreen selectedImageData={selectedImageData} setShowImageModal={setShowImageModal} />
+				<ImageViewScreen
+					selectedImageId={selectedImageId}
+					setShowImageModal={setShowImageModal}
+				/>
 			</Modal>
 		</>
 	);

@@ -1,9 +1,4 @@
-import {
-	View,
-	Text,
-	ImageBackground,
-	StyleSheet,
-} from "react-native";
+import { View, Text, ImageBackground, StyleSheet } from "react-native";
 import React from "react";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
@@ -12,7 +7,7 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 import { useItemWidth } from "hook/useItemWidth";
 
-const AlbumItem = ({ item }: { item: IAlbum }) => {
+const AlbumItem = ({ item, toggleSeachModal }: { item: IAlbum }) => {
 	const { navigate } = useNavigation<any>();
 	const itemWidth = useItemWidth(DIMENTIONS.LIST_GAP, 2);
 	const { colors } = useTheme();
@@ -25,7 +20,7 @@ const AlbumItem = ({ item }: { item: IAlbum }) => {
 			height: (itemWidth / 5) * 6,
 			position: "relative",
 			overflow: "hidden",
-			backgroundColor: colors.input
+			backgroundColor: colors.input,
 		},
 		heartContainer: {
 			width: 25,
@@ -42,6 +37,7 @@ const AlbumItem = ({ item }: { item: IAlbum }) => {
 			fontSize: 16,
 			fontWeight: "medium",
 			marginTop: 6,
+			width: itemWidth,
 		},
 	});
 
@@ -49,12 +45,13 @@ const AlbumItem = ({ item }: { item: IAlbum }) => {
 		<CustomTouchableOpacity
 			key={item.aid}
 			style={{ marginBottom: 10 }}
-			onPress={() =>
+			onPress={() => {
+				toggleSeachModal();
 				navigate("GlobalStack", {
 					screen: "AlbumDetailScreen",
 					params: { aid: item.aid },
-				})
-			}
+				});
+			}}
 		>
 			<ImageBackground
 				source={{ uri: item.cover.uri }}

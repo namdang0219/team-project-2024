@@ -58,8 +58,8 @@ const CameraScreen = () => {
 	const insets = useSafeAreaInsets();
 	const [photoUri, setPhotoUri] = useState<string | null>(null); // photoUri is image link of captured view after edit
 	const [previewPhotoUri, setPreviewPhotoUri] = useState<string | null>(
-		// null
-		"https://i.pinimg.com/736x/0e/c3/11/0ec311868b1d93c17786c69adc54bcb1.jpg"
+		null
+		// "https://i.pinimg.com/736x/0e/c3/11/0ec311868b1d93c17786c69adc54bcb1.jpg"
 	); // previewPhotoUri is image link after press shutter button and before edit
 	const viewRef = useRef<View>(null);
 	const [exposureValue, setExposureValue] = useState<number>(0);

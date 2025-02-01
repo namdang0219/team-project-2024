@@ -8,7 +8,6 @@ import {
 	StyleSheet,
 	FlatList,
 	TouchableWithoutFeedback,
-	useWindowDimensions,
 } from "react-native";
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { DIMENTIONS } from "constant/dimention";
@@ -17,16 +16,16 @@ import { AntDesign, Entypo, Feather } from "@expo/vector-icons";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { ThemedText } from "components/themed";
 import { useAuth } from "context/auth-context";
-import { debounce } from "lodash";
 import {
+	arrayUnion,
 	collection,
 	doc,
 	getDoc,
 	getDocs,
 	limit,
-	orderBy,
 	Query,
 	query,
+	updateDoc,
 	where,
 } from "firebase/firestore";
 import { db } from "../../../firebaseConfig";
@@ -34,10 +33,11 @@ import { IUser } from "types/IUser";
 import { Button } from "components/button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Skeleton } from "components/skeleton";
+import { Toast } from "toastify-react-native";
 
 const width = Dimensions.get("screen").width;
 
-interface IFriendItem {
+export interface IFriendItem {
 	uid: string;
 	photoURL: string;
 	displayName: string;
@@ -46,7 +46,7 @@ interface IFriendItem {
 const WithFriend = () => {
 	const { colors } = useTheme();
 	const { navigate } = useNavigation<any>();
-	const { remoteUserData, currentUser } = useAuth();
+	const { remoteUserData } = useAuth();
 	const [friendModalOpen, setFriendModalOpen] = useState(false);
 
 	return (
@@ -94,7 +94,7 @@ const WithFriend = () => {
 				remoteUserData.friends.length > 0 ? (
 					remoteUserData?.friends
 						.slice(0, 4)
-						.map((item, index) => <FriendedItem uid={item} />)
+						.map((item, index) => <FriendedItem item={item} />)
 				) : (
 					<CustomTouchableOpacity
 						onPress={() => setFriendModalOpen(true)}
@@ -254,42 +254,21 @@ const FindFriendModal = ({
 	);
 };
 
-const FriendedItem = ({ uid }: { uid: string }) => {
+export const FriendedItem = ({ item }: { item: IFriendItem }) => {
 	const { navigate } = useNavigation<any>();
-	const [friendInfo, setFriendInfo] = useState<IUser | null>(null);
-
-	useEffect(() => {
-		async function getFriendInfo() {
-			try {
-				const docRef = doc(db, "0_users", uid);
-				const docSnap = await getDoc(docRef);
-
-				if (docSnap.exists()) {
-					setFriendInfo(docSnap.data() as IUser);
-				} else {
-					console.log("No such document!");
-				}
-			} catch (error) {
-				console.log(error);
-			}
-		}
-		getFriendInfo();
-	}, []);
-
-	if (!friendInfo) return null;
 
 	return (
 		<CustomTouchableOpacity
-			onPress={() =>
-				navigate("GlobalStack", {
-					screen: "AlbumWithFriendScreen",
-					params: { userId: uid },
-				})
-			}
+			// onPress={() =>
+			// 	navigate("GlobalStack", {
+			// 		screen: "AlbumWithFriendScreen",
+			// 		// params: { userId: uid },
+			// 	})
+			// }
 		>
 			<Image
 				source={{
-					uri: friendInfo.photoURL as string,
+					uri: item.photoURL as string,
 				}}
 				style={{
 					width: (width - DIMENTIONS.APP_PADDING * 2 - 10 * 3) / 4,
@@ -305,7 +284,7 @@ const FriendedItem = ({ uid }: { uid: string }) => {
 				}}
 				numberOfLines={1}
 			>
-				{friendInfo.displayName}
+				{item.displayName}
 			</ThemedText>
 		</CustomTouchableOpacity>
 	);
@@ -340,8 +319,18 @@ const FriendItem = ({ item }: { item: IFriendItem }) => {
 	const { remoteUserData } = useAuth();
 	const { colors } = useTheme();
 
-	function checkFriend() {
-		return remoteUserData?.friends.includes(item.uid);
+	async function handleAddFriend() {
+		if (!remoteUserData?.uid) return;
+		try {
+			const docRef = doc(db, "0_users", remoteUserData?.uid);
+			const newF: IFriendItem = {
+				displayName: item.displayName,
+				photoURL: item.photoURL,
+				uid: item.uid,
+			};
+			await updateDoc(docRef, { friends: arrayUnion(newF) });
+			Toast.success('追加済み')
+		} catch (error) {}
 	}
 
 	return (
@@ -376,12 +365,9 @@ const FriendItem = ({ item }: { item: IFriendItem }) => {
 				</View>
 
 				<CustomTouchableOpacity
-					// onPress={handleTagFriend}
-					activeOpacity={checkFriend() ? 1 : 0.8}
+					onPress={handleAddFriend}
 					style={{
-						backgroundColor: checkFriend()
-							? colors.input
-							: colors.primary,
+						backgroundColor: colors.primary,
 						width: 90,
 						paddingVertical: 8,
 						alignItems: "center",
@@ -391,11 +377,11 @@ const FriendItem = ({ item }: { item: IFriendItem }) => {
 				>
 					<Text
 						style={{
-							color: checkFriend() ? "gray" : "white",
+							color: "white",
 							fontWeight: "500",
 						}}
 					>
-						リクエスト
+						追加
 					</Text>
 				</CustomTouchableOpacity>
 			</View>

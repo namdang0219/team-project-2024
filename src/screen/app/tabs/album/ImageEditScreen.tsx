@@ -12,6 +12,7 @@ import {
 	Image,
 	PanResponder,
 	useWindowDimensions,
+	ActivityIndicator,
 } from "react-native";
 import React, {
 	Dispatch,
@@ -39,7 +40,6 @@ import {
 	IconSlider,
 	IconTag,
 } from "icon/camera-edit";
-import styles from "toastify-react-native/components/styles";
 import EffectModal from "module/camera/EffectModal";
 import { BlurView } from "expo-blur";
 import { recentStickers, stickerList } from "mock/stickerMocks";
@@ -50,15 +50,24 @@ import { ISticker } from "types/ISticker";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AutoHeightImage } from "components/image";
 import { customStyle } from "style/customStyle";
-import CameraTopbar from "module/camera/CameraTopbar";
 import { useTheme } from "@react-navigation/native";
+import { captureRef } from "react-native-view-shot";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { auth, db, storage } from "../../../../../firebaseConfig";
+import { getBlobFromUri } from "util/func/getBlobFromUri";
+import { collection, doc, getDocs, updateDoc } from "firebase/firestore";
+import { useAlbum } from "context/album-context";
+import { Toast } from "toastify-react-native";
+import { Sticker } from "module/camera/CaptureArea";
 
 const ImageEditScreen = ({
 	selectedImageData,
 	setEditModalOpen,
+	editModalOpen,
 }: {
 	selectedImageData: IImage | undefined;
 	setEditModalOpen: Dispatch<SetStateAction<boolean>>;
+	editModalOpen: boolean;
 }) => {
 	const { width: screenWidth, height } = useWindowDimensions();
 	const { colors } = useTheme();
@@ -70,14 +79,49 @@ const ImageEditScreen = ({
 	const [effectModal, toggleEffectModal] = useToggle(false);
 	const viewRef = useRef<View>(null);
 	const insets = useSafeAreaInsets();
+	const [saving, setSaving] = useState<boolean>(false);
 
 	const translateYAnim = useRef(new Animated.Value(75)).current;
 	const fadeAnim = useRef(new Animated.Value(0)).current;
 
 	const padding = 14;
 
+	const [stickers, setStickers] = useState<ISticker[]>([]);
+
+	const addSticker = (stickerSource: string) => {
+		setStickers([...stickers, { source: stickerSource, id: Date.now() }]);
+	};
+
 	const gap = 10;
 	const numColumns = 4;
+
+	const handleSaveImage = async () => {
+		if (!selectedImageData?.iid || !selectedImageData?.album) return;
+		try {
+			setSaving(true);
+			const capturedUri = await captureRef(viewRef, {
+				format: "jpg",
+				quality: 0.8,
+			});
+			const fileName = `${selectedImageData?.iid}.jpg`;
+			const fileRef = ref(storage, `0_photos/${fileName}`);
+			const imageBlob = await getBlobFromUri(capturedUri);
+			await uploadBytes(fileRef, imageBlob as Blob);
+			await updateDoc(doc(db, "0_images", selectedImageData?.iid), {
+				update_at: Date.now(),
+			});
+			await updateDoc(doc(db, "0_albums", selectedImageData?.album), {
+				update_at: Date.now(),
+			});
+
+			Toast.success("更新ずみ");
+			setEditModalOpen(false);
+		} catch (error) {
+			console.error("Something went wrong!", error);
+		} finally {
+			setSaving(false);
+		}
+	};
 
 	const availableSpace = screenWidth - (numColumns - 1) * gap - padding * 2;
 	const itemSize = availableSpace / numColumns;
@@ -252,6 +296,7 @@ const ImageEditScreen = ({
 									onPress={() => {
 										setEditModalOpen(false);
 									}}
+									style={{ width: 50 }}
 								>
 									<Feather
 										name="x"
@@ -271,19 +316,26 @@ const ImageEditScreen = ({
 								</CustomTouchableOpacity>
 								{/* save button  */}
 								<CustomTouchableOpacity
-								// onPress={handleNavigateToSave}
+									onPress={handleSaveImage}
+									style={{ width: 50 }}
 								>
-									<Text
-										style={[
-											{
-												color: "white",
-												fontSize: 18,
-											},
-											customStyle.shadow,
-										]}
-									>
-										保存
-									</Text>
+									<View style={{ marginLeft: "auto" }}>
+										{!saving ? (
+											<Text
+												style={[
+													{
+														color: "white",
+														fontSize: 18,
+													},
+													customStyle.shadow,
+												]}
+											>
+												保存
+											</Text>
+										) : (
+											<ActivityIndicator />
+										)}
+									</View>
 								</CustomTouchableOpacity>
 							</View>
 
@@ -428,7 +480,9 @@ const ImageEditScreen = ({
 											}}
 										></AutoHeightImage>
 										{/* drawed pad  */}
-										<Canvas style={StyleSheet.absoluteFill}>
+										<Canvas
+											style={[StyleSheet.absoluteFill]}
+										>
 											{paths.map((path, index) => (
 												<Path
 													key={index}
@@ -450,7 +504,7 @@ const ImageEditScreen = ({
 									</View>
 
 									{/* sticker field  */}
-									{/* <>
+									<>
 										{stickers &&
 											stickers.map((sticker) => (
 												<Sticker
@@ -458,7 +512,7 @@ const ImageEditScreen = ({
 													source={sticker.source}
 												/>
 											))}
-									</> */}
+									</>
 								</View>
 							)}
 						</View>
@@ -599,45 +653,7 @@ const ImageEditScreen = ({
 													flexWrap: "wrap",
 													gap,
 												}}
-											>
-												{stickerList
-													.filter((s) =>
-														recentStickers.includes(
-															s.id
-														)
-													)
-													.map(
-														(
-															item: ISticker,
-															index
-														) => (
-															<CustomTouchableOpacity
-																key={index}
-																onPress={() => {
-																	// addSticker(
-																	// 	item.source
-																	// );
-																	toggleStickerModal();
-																	setShowAddItem(
-																		false
-																	);
-																}}
-															>
-																<Image
-																	source={{
-																		uri: item.source,
-																	}}
-																	style={{
-																		width: itemSize,
-																		height: itemSize,
-																		objectFit:
-																			"contain",
-																	}}
-																/>
-															</CustomTouchableOpacity>
-														)
-													)}
-											</View>
+											></View>
 											<Text
 												style={{
 													color: "white",

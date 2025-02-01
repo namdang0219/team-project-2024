@@ -8,6 +8,8 @@ import {
 	Dimensions,
 	Text,
 	ActivityIndicator,
+	Modal,
+	TextInput,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { Button } from "components/button";
@@ -22,7 +24,18 @@ import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { ThemedText } from "components/themed";
 import Animated, { FadeInDown } from "react-native-reanimated";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+	collection,
+	deleteDoc,
+	doc,
+	getDocs,
+	limit,
+	onSnapshot,
+	Query,
+	query,
+	updateDoc,
+	where,
+} from "firebase/firestore";
 import { db, storage } from "../../../../../firebaseConfig";
 import { Toast } from "toastify-react-native";
 import { formatDate } from "util/func/formatDate";
@@ -31,6 +44,11 @@ import { lightTheme } from "util/theme/themeColors";
 import { deleteObject, ref } from "firebase/storage";
 import { useAlbum } from "context/album-context";
 import { IImage } from "types/IImage";
+import AlbumTagFriendModal from "./modal/AlbumTagFriendModal";
+import { FriendedItem, IFriendItem } from "module/albumScreen/WithFriend";
+import { FlatList } from "react-native";
+import { useAuth } from "context/auth-context";
+import { Skeleton } from "components/skeleton";
 
 const { width } = Dimensions.get("screen");
 
@@ -47,35 +65,24 @@ const AlbumDetailScreen = () => {
 
 	const aid = params.aid;
 
+	// get album
 	useEffect(() => {
-		const getCurrentAlbum = () => {
-			const albumData = albums.find((album) => album.aid === aid);
-			setCurrentAlbum(albumData as IAlbum);
-		};
+		const getCurrentAlbum = async () => {
+			try {
+				const docRef = doc(db, "0_albums", aid);
 
+				const unsub = onSnapshot(docRef, (doc) => {
+					setCurrentAlbum(doc.data() as IAlbum);
+				});
+
+				return unsub;
+			} catch (error) {
+				console.log(error);
+			} finally {
+			}
+		};
 		getCurrentAlbum();
 	}, []);
-
-	// get album
-	// useEffect(() => {
-	// 	const getCurrentAlbum = async () => {
-	// 		try {
-	// 			setLoading(true);
-	// 			const docRef = doc(db, "0_albums", aid);
-
-	// 			const unsub = onSnapshot(docRef, (doc) => {
-	// 				setCurrentAlbum(doc.data() as IAlbum);
-	// 			});
-
-	// 			return unsub;
-	// 		} catch (error) {
-	// 			console.log(error);
-	// 		} finally {
-	// 			setLoading(false);
-	// 		}
-	// 	};
-	// 	getCurrentAlbum();
-	// }, []);
 
 	async function handleRemoveAlbum(aid: string) {
 		try {
@@ -92,7 +99,7 @@ const AlbumDetailScreen = () => {
 			const deleteImageTasks = currentAlbum?.images.map(
 				async (image: IImage) => {
 					try {
-						const filePath = image.iid 
+						const filePath = image.iid;
 						const imageRef = ref(
 							storage,
 							`0_photos/${filePath}.jpg`
@@ -192,6 +199,55 @@ const AlbumDetailScreen = () => {
 			console.error(error.message);
 		}
 	};
+
+	const [tagFriendModal, setTagFriendModal] = useState(false);
+
+	const [friendInput, setFriendInput] = useState<string>("");
+	const [friendList, setFriendList] = useState<IFriendItem[]>([]);
+	const { remoteUserData } = useAuth();
+	const [loading, setLoading] = useState<boolean>(false);
+
+	useEffect(() => {
+		async function getUserLogic(q: Query) {
+			const friends: IFriendItem[] = [];
+			const querySnapshot = await getDocs(q);
+			querySnapshot.forEach((doc) => {
+				friends.push({
+					uid: doc.data().uid,
+					photoURL: doc.data().photoURL,
+					displayName: doc.data().displayName,
+				});
+			});
+			setFriendList(friends);
+		}
+
+		async function getUsers() {
+			setLoading(true);
+			try {
+				if (!friendInput) {
+					const q = query(
+						collection(db, "0_users"),
+						limit(10),
+						where("uid", "!=", remoteUserData?.uid)
+					);
+					getUserLogic(q);
+				} else {
+					const q = query(
+						collection(db, "0_users"),
+						limit(10),
+						where("uid", "!=", remoteUserData?.uid),
+						where("displayName", "==", friendInput)
+					);
+					getUserLogic(q);
+				}
+			} catch (error) {
+				console.log(error);
+			} finally {
+				setLoading(false);
+			}
+		}
+		getUsers();
+	}, [friendInput]);
 
 	if (!currentAlbum) {
 		return (
@@ -356,6 +412,44 @@ const AlbumDetailScreen = () => {
 									/>
 								</View>
 							)}
+							{currentAlbum?.taggedFriends.length == 0 && (
+								<CustomTouchableOpacity
+									onPress={() => setTagFriendModal(true)}
+									style={[
+										styles.taggedFriendNum4,
+										{ marginLeft: 0 },
+									]}
+								>
+									{currentAlbum?.taggedFriends[3]
+										?.photoURL && (
+										<Image
+											source={{
+												uri: currentAlbum
+													?.taggedFriends[3]
+													?.photoURL,
+											}}
+											style={{
+												flex: 1,
+												borderRadius: 1000,
+											}}
+										/>
+									)}
+									<View
+										style={[
+											{
+												backgroundColor: "black",
+												opacity: 0.35,
+											},
+											StyleSheet.absoluteFill,
+										]}
+									/>
+									<AntDesign
+										name="plus"
+										size={24}
+										color={"white"}
+									/>
+								</CustomTouchableOpacity>
+							)}
 						</CustomTouchableOpacity>
 
 						{/* right container  */}
@@ -470,6 +564,104 @@ const AlbumDetailScreen = () => {
 						アルバムを見る
 					</Button>
 				</View>
+
+				<Modal
+					visible={tagFriendModal}
+					animationType="slide"
+					presentationStyle="formSheet"
+					onRequestClose={() => setTagFriendModal(false)}
+				>
+					<View
+						style={{
+							paddingHorizontal: DIMENTIONS.APP_PADDING,
+							flex: 1,
+							paddingBottom: insets.bottom,
+						}}
+					>
+						<View style={styles.searchContainer}>
+							<TextInput
+								placeholder="友達を検索"
+								placeholderTextColor={"#9ca3af"}
+								style={styles.textInput}
+								onChangeText={(e) => setFriendInput(e)}
+							/>
+							<Feather
+								name="search" 
+								size={20}
+								style={styles.searchIcon}
+							/>
+						</View>
+						<View style={styles.contentContainer}>
+							{loading ? (
+								<View
+									style={{ flex: 1, marginTop: 6, gap: 10 }}
+								>
+									<View
+										style={{
+											flexDirection: "row",
+											gap: 10,
+											alignItems: "center",
+										}}
+									>
+										<Skeleton
+											width={50}
+											height={50}
+											rounded={1000}
+										/>
+										<Skeleton width={60} height={20} />
+									</View>
+									<View
+										style={{
+											flexDirection: "row",
+											gap: 10,
+											alignItems: "center",
+										}}
+									>
+										<Skeleton
+											width={50}
+											height={50}
+											rounded={1000}
+										/>
+										<Skeleton width={60} height={20} />
+									</View>
+									<View
+										style={{
+											flexDirection: "row",
+											gap: 10,
+											alignItems: "center",
+										}}
+									>
+										<Skeleton
+											width={50}
+											height={50}
+											rounded={1000}
+										/>
+										<Skeleton width={60} height={20} />
+									</View>
+								</View>
+							) : (
+								<FlatList
+									data={friendList.filter((item) =>
+										item.displayName
+											.toLowerCase()
+											.includes(friendInput.toLowerCase())
+									)}
+									contentContainerStyle={{ flex: 1 }}
+									keyExtractor={(item) => String(item.uid)}
+									renderItem={({ item, index }) => (
+										<FriendedItem
+											item={item}
+										></FriendedItem>
+									)}
+								/>
+							)}
+
+							<Button onPress={() => setTagFriendModal(false)}>
+								完了
+							</Button>
+						</View>
+					</View>
+				</Modal>
 			</View>
 		</>
 	);
@@ -518,6 +710,28 @@ const styles = StyleSheet.create({
 		width: 45,
 		height: 45,
 		borderRadius: 1000,
+	},
+	searchContainer: {
+		marginTop: 20,
+		position: "relative",
+	},
+	textInput: {
+		backgroundColor: "rgba(0,0,0,0.05)",
+		height: 35,
+		paddingHorizontal: 14,
+		borderRadius: 6,
+		color: "black",
+	},
+	searchIcon: {
+		position: "absolute",
+		right: 10,
+		top: 7,
+		color: "gray",
+	},
+	contentContainer: {
+		paddingVertical: 5,
+		flexGrow: 1,
+		flex: 1,
 	},
 });
 

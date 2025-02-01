@@ -14,7 +14,7 @@ import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
 import { Ionicons } from "@expo/vector-icons";
 import HeaderTitle from "../components/title/HeaderTitle";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 
 export type HeaderProps = {
 	title?: string;
@@ -43,6 +43,7 @@ const Header = ({
 	const { width } = useWindowDimensions();
 	const { goBack } = useNavigation();
 	const scheme = useColorScheme();
+	const { colors } = useTheme();
 
 	return (
 		<BlurView

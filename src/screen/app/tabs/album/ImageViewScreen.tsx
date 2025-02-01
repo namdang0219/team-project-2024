@@ -5,7 +5,7 @@ import {
 	useWindowDimensions,
 	Modal,
 } from "react-native";
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { StatusBar } from "expo-status-bar";
 import { darkTheme } from "util/theme/themeColors";
 import { CustomTouchableOpacity } from "components/custom";
@@ -16,12 +16,14 @@ import { AutoHeightImage } from "components/image";
 import { useTheme } from "@react-navigation/native";
 import { DIMENTIONS } from "constant/dimention";
 import ImageEditScreen from "./ImageEditScreen";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../../../../../firebaseConfig";
 
 const ImageViewScreen = ({
-	selectedImageData,
+	selectedImageId,
 	setShowImageModal,
 }: {
-	selectedImageData: IImage | undefined;
+	selectedImageId: string | undefined;
 	setShowImageModal: Dispatch<SetStateAction<boolean>>;
 }) => {
 	const { width } = useWindowDimensions();
@@ -31,8 +33,19 @@ const ImageViewScreen = ({
 		setShowImageModal(false);
 	};
 	const [favorite, setFavorite] = useState<boolean>(false);
+	const [image, setImage] = useState<IImage | null>(null);
 
-	if (!selectedImageData) {
+	useEffect(() => {
+		const unsub = onSnapshot(
+			doc(db, "0_images", selectedImageId as string),
+			(doc) => {
+				setImage(doc.data() as IImage);
+			}
+		);
+		return unsub;
+	}, [editModalOpen]);
+
+	if (!selectedImageId || !image) {
 		return (
 			<View
 				style={{
@@ -110,7 +123,7 @@ const ImageViewScreen = ({
 					</View>
 					{/* image view  */}
 					<AutoHeightImage
-						source={{ uri: selectedImageData.uri }}
+						source={{ uri: image.uri }}
 						style={{ backgroundColor: "#0000003d" }}
 					/>
 
@@ -155,8 +168,9 @@ const ImageViewScreen = ({
 
 			<Modal visible={editModalOpen}>
 				<ImageEditScreen
-					selectedImageData={selectedImageData}
+					selectedImageData={image}
 					setEditModalOpen={setEditModalOpen}
+					editModalOpen={editModalOpen}
 				/>
 			</Modal>
 		</SafeAreaView>

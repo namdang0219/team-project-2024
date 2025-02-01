@@ -33,6 +33,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { IAlbum } from "types/IAlbum";
 import { addImagesToAlbum } from "store/album/albumSlice";
+import { useAlbum } from "context/album-context";
+import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
+import { db, storage } from "../../../../firebaseConfig";
+import { IImage } from "types/IImage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { getBlobFromUri } from "util/func/getBlobFromUri";
+import { useAuth } from "context/auth-context";
 
 const SavePhotoScreen = ({ route }: { route: any }) => {
 	const { capturedUri } = route.params;
@@ -40,11 +47,13 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 	const { goBack, navigate } = useNavigation<any>();
 	const [loading, setLoading] = useState<boolean>(false);
 	const insets = useSafeAreaInsets();
-	const albums = useSelector((state: RootState) => state.album);
+	const { albums } = useAlbum();
 	const { colors } = useTheme();
 	const [selectedAlbumIds, setSelectedAlbumIds] = useState<IAlbum["aid"][]>(
 		[]
 	);
+	const [uploading, setUploading] = useState(false);
+	console.log("🚀 ~ SavePhotoScreen ~ selectedAlbumIds:", selectedAlbumIds);
 	const dispatch = useDispatch();
 
 	const actionSheetRef = useRef<ActionSheetRef>(null);
@@ -62,21 +71,46 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 		}
 	};
 
-	const handleDoneButton = () => {
-		const handleAddToAlbum = () => {
-			selectedAlbumIds.forEach((aid) => {
-				dispatch(
-					addImagesToAlbum({
-						aid: aid,
-						images: [
-							{
-								iid: Math.random(),
-								uri: capturedUri,
-							},
-						],
-					})
-				);
+	const { currentUser } = useAuth();
+
+	const handleDoneButton = async () => {
+		const handleAddToAlbum = async () => {
+			setUploading(true);
+
+			selectedAlbumIds.map(async (aid, index) => {
+				const timestamp = Date.now() + index;
+				const fileName = `${timestamp}.jpg`;
+				const photoRef = ref(storage, `0_photos/${fileName}`);
+				const imageBlob = await getBlobFromUri(capturedUri);
+				await uploadBytes(photoRef, imageBlob as Blob);
+				const downloadUrl = await getDownloadURL(photoRef);
+				const newImage: IImage = {
+					album: [aid],
+					author: currentUser?.uid as string,
+					member: [currentUser?.uid as string],
+					uri: downloadUrl,
+					create_at: Date.now(),
+					update_at: Date.now(),
+					iid: timestamp.toString(),
+					location: {
+						lat: 0,
+						long: 0,
+					},
+				};
+
+				await setDoc(doc(db, "0_images", timestamp.toString()), newImage);
+
+				await updateDoc(doc(db, "0_albums", aid), {
+					update_at: Date.now(),
+					images: arrayUnion(aid),
+				});
 			});
+
+			// const albumDoc = doc(db, "0_albums", aid);
+
+			Toast.success("写真追加済み");
+			setUploading(false);
+
 			navigate("AlbumStack", {
 				screen: "AlbumScreen",
 			});
@@ -389,7 +423,7 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 							marginTop: 30,
 							marginHorizontal: DIMENTIONS.APP_PADDING,
 						}}
-						loading={loading}
+						loading={uploading}
 						onPress={handleDoneButton}
 					>
 						{selectedAlbumIds.length > 0

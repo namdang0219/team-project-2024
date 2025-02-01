@@ -12,6 +12,25 @@ import { ThemedText } from "components/themed";
 
 const width = Dimensions.get("screen").width;
 
+const categories = [
+	{
+		title: "家族",
+		uri: "https://i.pinimg.com/736x/8e/73/b9/8e73b9c7dc43c2847543acdcadb9662b.jpg",
+	},
+	{
+		title: "子供",
+		uri: "https://i.pinimg.com/736x/ab/08/bb/ab08bb0adf4085a315d7982d29bf5ab2.jpg",
+	},
+	{
+		title: "旅行",
+		uri: "https://i.pinimg.com/736x/b3/03/3e/b3033ea89755cc2ed2d5862323a41b69.jpg",
+	},
+	{
+		title: "友達",
+		uri: "https://i.pinimg.com/736x/51/db/2a/51db2a09a914b315355785812412c2d6.jpg",
+	},
+];
+
 const Category = () => {
 	return (
 		<View style={{ paddingHorizontal: DIMENTIONS.APP_PADDING }}>
@@ -32,50 +51,46 @@ const Category = () => {
 					marginTop: 12,
 				}}
 			>
-				{Array(4)
-					.fill(null)
-					.map((item, index) => (
-						<CustomTouchableOpacity key={index}>
-							<ImageBackground
-								source={{
-									uri: "https://i.pinimg.com/736x/3b/12/87/3b12878320d3ee5120d8a405afa4b5b8.jpg",
-								}}
-								style={{
-									width:
-										(width -
-											DIMENTIONS.APP_PADDING * 2 -
-											12) /
-										2,
-									aspectRatio: "2/0.85",
-									borderRadius: 10,
-									overflow: "hidden",
-									position: "relative",
-								}}
+				{categories.map((item, index) => (
+					<CustomTouchableOpacity key={index}>
+						<ImageBackground
+							source={{
+								uri: item.uri,
+							}}
+							style={{
+								width:
+									(width - DIMENTIONS.APP_PADDING * 2 - 12) /
+									2,
+								aspectRatio: "2/0.85",
+								borderRadius: 10,
+								overflow: "hidden",
+								position: "relative",
+							}}
+						>
+							<View
+								style={[
+									StyleSheet.absoluteFill,
+									,
+									{
+										backgroundColor: "rgba(0,0,0,0.35)",
+										alignItems: "center",
+										justifyContent: "center",
+									},
+								]}
 							>
-								<View
-									style={[
-										StyleSheet.absoluteFill,
-										,
-										{
-											backgroundColor: "rgba(0,0,0,0.35)",
-											alignItems: "center",
-											justifyContent: "center",
-										},
-									]}
+								<Text
+									style={{
+										color: "white",
+										fontSize: 20,
+										fontWeight: "600",
+									}}
 								>
-									<Text
-										style={{
-											color: "white",
-											fontSize: 20,
-											fontWeight: "600",
-										}}
-									>
-										#芸術
-									</Text>
-								</View>
-							</ImageBackground>
-						</CustomTouchableOpacity>
-					))}
+									{`#${item.title}`}
+								</Text>
+							</View>
+						</ImageBackground>
+					</CustomTouchableOpacity>
+				))}
 			</View>
 		</View>
 	);
