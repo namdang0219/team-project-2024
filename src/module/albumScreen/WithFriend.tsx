@@ -94,7 +94,7 @@ const WithFriend = () => {
 				remoteUserData.friends.length > 0 ? (
 					remoteUserData?.friends
 						.slice(0, 4)
-						.map((item, index) => <FriendedItem item={item} />)
+						.map((item, index) => <FriendedItem key={index} item={item} />)
 				) : (
 					<CustomTouchableOpacity
 						onPress={() => setFriendModalOpen(true)}
