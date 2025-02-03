@@ -34,6 +34,7 @@ export const store = configureStore({
 					REGISTER,
 				],
 			},
+			// serializableCheck: false, // ignore serializable stringify 2 times
 		}),
 });
 

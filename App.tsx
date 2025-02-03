@@ -13,8 +13,6 @@ import { Provider } from "react-redux";
 import { persistor, store } from "store/configureStore";
 import { PersistGate } from "redux-persist/integration/react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { signOut } from "firebase/auth";
-import { auth } from "./firebaseConfig";
 
 enableLegacyWebImplementation(true);
 
@@ -27,7 +25,7 @@ const App = () => {
 	useEffect(() => {
 		async function getKeys() {
 			const keys = await AsyncStorage.getAllKeys();
-			console.log(keys)
+			console.log(keys);
 		}
 		getKeys();
 	}, []);

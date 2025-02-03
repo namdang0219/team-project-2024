@@ -20,6 +20,10 @@ import * as Yup from "yup";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { DIMENTIONS } from "constant/dimention";
+import { AutoHeightImage } from "components/image";
+import { useDispatch, useSelector } from "react-redux";
+import { signup } from "store/authState/authStateSlice";
+import { AppDispatch, RootState } from "store/configureStore";
 
 export interface IAuth {
 	email: string;
@@ -44,6 +48,7 @@ const SignupScreen = () => {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
 	const [isChecked, setIsChecked] = useState<boolean>(false);
+	const dispatch = useDispatch<AppDispatch>();
 	const {
 		handleSubmit,
 		control,
@@ -56,16 +61,22 @@ const SignupScreen = () => {
 		},
 		resolver: yupResolver(signupSchema),
 	});
+	const { loading } = useSelector((state: RootState) => state.authState);
 
-	const handleSignup = (values: IAuth) => {
+	const handleSignup = async (values: IAuth & { username: string }) => {
 		if (!isValid) {
 			return;
 		}
 		if (!isChecked) {
 			Alert.alert("利用規約に同意してください");
-            return;
+			return;
 		}
-		navigate("VerifyCodeScreen");
+
+		await dispatch(signup(values));
+
+		navigate("AlbumStack", {
+			screen: "AlbumScreen",
+		});
 	};
 
 	return (
@@ -80,16 +91,18 @@ const SignupScreen = () => {
 				>
 					<View>
 						{/* title  */}
-						<TitleAuth>新規登録</TitleAuth>
+						<TitleAuth style={{ marginBottom: 20 }}>
+							新規登録
+						</TitleAuth>
 						{/* logo  */}
-						<Image
-							source={require("./../../../assets/img/BreadCat.png")}
+						<AutoHeightImage
+							source={require("./../../../assets/img/logo.png")}
+							width={120}
 							style={{
-								width: 150,
-								height: 150,
 								marginHorizontal: "auto",
+								marginBottom: 14,
 							}}
-						></Image>
+						/>
 						<View style={{ gap: 22, marginTop: 20 }}>
 							<Controller
 								control={control}
@@ -158,6 +171,7 @@ const SignupScreen = () => {
 						<Button
 							style={{ marginTop: 10 }}
 							onPress={handleSubmit(handleSignup)}
+							loading={loading}
 						>
 							登録
 						</Button>

@@ -17,6 +17,8 @@ import Animated, {
 	useAnimatedStyle,
 	useSharedValue,
 } from "react-native-reanimated";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
 
 export default function IntroduceScreen() {
 	const { navigate } = useNavigation<any>();

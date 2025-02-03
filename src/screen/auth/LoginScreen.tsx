@@ -2,7 +2,6 @@ import {
 	View,
 	Text,
 	SafeAreaView,
-	Image,
 	TouchableWithoutFeedback,
 } from "react-native";
 import React from "react";
@@ -19,6 +18,10 @@ import { IAuth } from "./SignupScreen";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Input } from "components/input";
 import { DIMENTIONS } from "constant/dimention";
+import { AutoHeightImage } from "components/image";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "store/configureStore";
+import { login } from "store/authState/authStateSlice";
 
 const loginScheme = Yup.object().shape({
 	email: Yup.string()
@@ -33,6 +36,7 @@ const loginScheme = Yup.object().shape({
 export default function LoginScreen() {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
+	const dispatch = useDispatch<AppDispatch>();
 	const {
 		handleSubmit,
 		control,
@@ -45,10 +49,13 @@ export default function LoginScreen() {
 		resolver: yupResolver(loginScheme),
 	});
 
-	const handleLogin = (values: IAuth) => {
+	const handleLogin = async (values: IAuth) => {
 		if (!isValid) {
 			return;
 		}
+
+		await dispatch(login(values));
+
 		navigate("AppStack", { screen: "AlbumStack" });
 	};
 
@@ -64,16 +71,18 @@ export default function LoginScreen() {
 				>
 					<View>
 						{/* title  */}
-						<TitleAuth>ログイン</TitleAuth>
+						<TitleAuth style={{ marginBottom: 20 }}>
+							新規登録
+						</TitleAuth>
 						{/* logo  */}
-						<Image
-							source={require("./../../../assets/img/BreadCat.png")}
+						<AutoHeightImage
+							source={require("./../../../assets/img/logo.png")}
+							width={120}
 							style={{
-								width: 150,
-								height: 150,
 								marginHorizontal: "auto",
+								marginBottom: 14,
 							}}
-						></Image>
+						/>
 						<View style={{ gap: 22, marginTop: 20 }}>
 							<Controller
 								control={control}
@@ -118,7 +127,6 @@ export default function LoginScreen() {
 						{/* button  */}
 						<Button
 							style={{ marginTop: 10 }}
-							
 							onPress={handleSubmit(handleLogin)}
 						>
 							ログイン

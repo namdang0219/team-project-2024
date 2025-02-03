@@ -100,12 +100,12 @@ const AlbumSearch = ({
 					</View>
 
 					{/* results */}
-					<View
+					{/* <View
 						style={{
 							flex: 1,
 							paddingHorizontal: DIMENTIONS.APP_PADDING,
 							paddingTop: 6,
-						}}
+						}} 
 					>
 						{results.length == 0 && searchText !== "" && (
 							<View
@@ -149,7 +149,7 @@ const AlbumSearch = ({
 								</View>
 							</>
 						)}
-					</View>
+					</View> */}
 				</View>
 			</TouchableWithoutFeedback>
 		</SafeAreaView>

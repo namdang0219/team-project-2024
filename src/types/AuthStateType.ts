@@ -1,7 +1,14 @@
-export interface AuthState {
-	uid: string | null;
+import { User } from "firebase/auth";
+
+export type UserAuthType = {
+	uid: string;
 	email: string | null;
-	displayName: string | null;
-	photoURL: string | null;
+	displayName: string;
+	photoURL: string;
+};
+
+export type AuthStateType = {
+	user: UserAuthType | null;
+	loading: boolean;
 	isLoggedIn: boolean;
-}
+};

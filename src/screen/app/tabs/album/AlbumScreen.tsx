@@ -35,7 +35,6 @@ const AlbumScreen = () => {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const { colors } = useTheme();
 	const albums = useSelector((state: RootState) => state.album);
-	const images = useSelector((state: RootState) => state.image);
 
 	const options: IOption[] = [
 		{
@@ -149,9 +148,9 @@ const AlbumScreen = () => {
 					<Category />
 
 					{/* storage  */}
-					<Text style={{ color: "gray", textAlign: "center" }}>
+					{/* <Text style={{ color: "gray", textAlign: "center" }}>
 						{`${albums.length}アルバム、${images.length}記念`}
-					</Text>
+					</Text> */}
 				</View>
 			</ScrollView>
 		</View>

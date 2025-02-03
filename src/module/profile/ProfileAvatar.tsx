@@ -3,12 +3,12 @@ import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemedView } from "components/themed";
 import { IUser } from "types/IUser";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
 
-const ProfileAvatar = ({
-	photoURL = "",
-	style = {},
-	...props
-}: { photoURL: IUser["photoURL"] } & ViewProps) => {
+const ProfileAvatar = () => {
+	const {} = useSelector((state: RootState) => state.user)
+
 	return (
 		<View
 			style={[
@@ -16,9 +16,7 @@ const ProfileAvatar = ({
 					position: "relative",
 					marginHorizontal: "auto",
 				},
-				style,
 			]}
-			{...props}
 		>
 			<LinearGradient
 				colors={["#D823FF", "#9A33EF"]}
@@ -27,7 +25,7 @@ const ProfileAvatar = ({
 				end={{ x: 1, y: 1 }}
 			>
 				<ThemedView style={styles.avatarContainerWhite}>
-					<Image
+					{/* <Image
 						source={{
 							uri: photoURL,
 						}}
@@ -36,7 +34,7 @@ const ProfileAvatar = ({
 							height: 146,
 							borderRadius: 1000,
 						}}
-					/>
+					/> */}
 				</ThemedView>
 			</LinearGradient>
 		</View>
