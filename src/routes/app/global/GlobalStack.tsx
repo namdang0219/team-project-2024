@@ -10,6 +10,7 @@ import AlbumWithFriendScreen from "screen/app/tabs/album/AlbumWithFriend";
 import FriendListScreen from "screen/app/tabs/album/FriendListScreen";
 import ImageViewScreen from "screen/app/tabs/album/ImageViewScreen";
 import RequirePermisionsScreen from "screen/app/global/RequirePermisionsScreen";
+import UserInfoScreen from "screen/auth/UserInfoScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -46,6 +47,8 @@ const GlobalStack = () => {
 				name="FriendListScreen"
 				component={FriendListScreen}
 			/>
+			{/* user info  */}
+			<Stack.Screen name="UserInfoScreen" component={UserInfoScreen} />
 		</Stack.Navigator>
 	);
 };
