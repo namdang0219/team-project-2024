@@ -23,11 +23,11 @@ const App = () => {
 	]);
 
 	useEffect(() => {
-		async function getKeys() {
-			const keys = await AsyncStorage.getAllKeys();
-			console.log(keys);
-		}
-		getKeys();
+		// async function getKeys() {
+		// 	const keys = await AsyncStorage.getAllKeys();
+		// 	console.log(keys);
+		// }
+		// getKeys();
 	}, []);
 
 	return (

@@ -1,6 +1,5 @@
-import { View, ActivityIndicator, Dimensions } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import React from "react";
-import { useTheme } from "@react-navigation/native";
 
 const LoadingScreen = () => {
 	return (

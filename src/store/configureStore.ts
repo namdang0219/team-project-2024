@@ -11,13 +11,16 @@ import {
 	REGISTER,
 	REHYDRATE,
 } from "redux-persist";
+import hardSet from "redux-persist/lib/stateReconciler/hardSet";
 
 const persistConfig = {
 	key: "root",
 	storage: AsyncStorage,
 	debug: true, // Bật chế độ debug
+	stateReconciler: hardSet,
 };
 
+// @ts-ignore
 const persistedReducer = persistReducer(persistConfig, reducers);
 
 export const store = configureStore({

@@ -70,7 +70,7 @@ const RecentAlbum = () => {
 					>
 						<ImageBackground
 							source={{
-								uri: item.cover,
+								uri: item.cover.uri,
 							}}
 							style={{
 								width: 150,

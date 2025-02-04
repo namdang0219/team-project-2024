@@ -35,6 +35,7 @@ const AlbumScreen = () => {
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const { colors } = useTheme();
 	const albums = useSelector((state: RootState) => state.album);
+	console.log("🚀 ~ AlbumScreen ~ albums:", albums)
 
 	const options: IOption[] = [
 		{

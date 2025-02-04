@@ -3,6 +3,7 @@ import { albumMocks } from "mock/albumMocks";
 import { IAlbum } from "types/IAlbum";
 
 const initialState: IAlbum[] = albumMocks;
+console.log("🚀 ~ initialState:", initialState)
 
 const albumSlice = createSlice({
 	name: "album",
@@ -17,7 +18,7 @@ const albumSlice = createSlice({
 		removeAlbum: (state, action) => {
 			const index = state.findIndex((a) => a.aid === action.payload);
 			if (index > -1) {
-				state.splice(index, 1);
+				state.splice(index, 1); 
 			}
 		},
 		addImagesToAlbum: (state, action) => {

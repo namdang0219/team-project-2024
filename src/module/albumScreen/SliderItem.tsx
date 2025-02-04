@@ -5,8 +5,6 @@ import { useNavigation } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 
 const SliderItem = ({ item }: { item: IAlbum }) => {
-	const { navigate } = useNavigation<any>();
-
 	return (
 		<View
 			style={{
@@ -17,7 +15,7 @@ const SliderItem = ({ item }: { item: IAlbum }) => {
 		>
 			<ImageBackground
 				source={{
-					uri: item.cover,
+					uri: item.cover.uri,
 				}}
 				style={{
 					flex: 1,
