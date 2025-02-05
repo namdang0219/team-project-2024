@@ -5,7 +5,6 @@ import {
 	TextInput,
 	TouchableWithoutFeedback,
 	FlatList,
-	Dimensions,
 } from "react-native";
 import React, {
 	Dispatch,
@@ -17,12 +16,12 @@ import React, {
 import { DIMENTIONS } from "constant/dimention";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import handlePressBackground from "util/func/handlePressBackground";
-import { AntDesign, Feather } from "@expo/vector-icons";
+import { Feather } from "@expo/vector-icons";
 import { CustomTouchableOpacity } from "components/custom";
 import { IAlbum } from "types/IAlbum";
+import { AlbumItem } from "components/item";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { AlbumItem } from "components/item";
 
 const GAP = 8;
 
@@ -35,14 +34,14 @@ const AlbumSearch = ({
 	const inputRef = useRef<TextInput | null>(null);
 	const { navigate } = useNavigation<any>();
 	const [searchText, setSearchText] = useState<string>("");
-	const [results, setResults] = useState<IAlbum[]>([]);
-	const albums = useSelector((state: RootState) => state.album);
+	const albums = useSelector((state: RootState) => state.album as IAlbum[]);
+	const [results, setResults] = useState<IAlbum[]>(albums);
 
 	useEffect(() => {
-		if (searchText.trim() === "") {
-			setResults([]);
-			return;
-		}
+		// if (searchText.trim() === "") {
+		// 	setResults([]);
+		// 	return;
+		// }
 		const filteredResults = albums.filter((album) =>
 			album.title.toLowerCase().includes(searchText.toLowerCase())
 		);
@@ -95,17 +94,19 @@ const AlbumSearch = ({
 						<CustomTouchableOpacity
 							onPress={() => toggleSeachModal(false)}
 						>
-							<Text style={{ color: "blue" }}>キャンセル</Text>
+							<Text style={{ color: colors.iosBlue }}>
+								キャンセル
+							</Text>
 						</CustomTouchableOpacity>
 					</View>
 
 					{/* results */}
-					{/* <View
+					<View
 						style={{
 							flex: 1,
 							paddingHorizontal: DIMENTIONS.APP_PADDING,
 							paddingTop: 6,
-						}} 
+						}}
 					>
 						{results.length == 0 && searchText !== "" && (
 							<View
@@ -143,13 +144,18 @@ const AlbumSearch = ({
 											String(item.aid)
 										}
 										renderItem={({ item }) => (
-											<AlbumItem item={item} />
+											<AlbumItem
+												item={item}
+												toggleSeachModal={
+													toggleSeachModal
+												}
+											/>
 										)}
 									/>
 								</View>
 							</>
 						)}
-					</View> */}
+					</View>
 				</View>
 			</TouchableWithoutFeedback>
 		</SafeAreaView>

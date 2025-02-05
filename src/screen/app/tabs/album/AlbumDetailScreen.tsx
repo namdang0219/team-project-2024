@@ -19,16 +19,13 @@ import { IAlbum } from "types/IAlbum";
 import { userMocks } from "mock/userMocks";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import {
-	addAlbumToFavorites,
-	removeAlbum,
-	removeAlbumFromFavorites,
-} from "store/album/albumSlice";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { IUser } from "types/IUser";
 import { ThemedText } from "components/themed";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { CUSTOM_STYLES } from "style/customStyle";
+import { formatDate } from "util/func/formatDate";
 
 const { width } = Dimensions.get("screen");
 
@@ -36,10 +33,10 @@ const AnimatedThemedText = Animated.createAnimatedComponent(ThemedText);
 
 const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
-	const albums = useSelector((state: RootState) => state.album);
+	const albums = useSelector((state: RootState) => state.album as IAlbum[]);
 	const dispatch = useDispatch();
 
-	const filteredAlbum: IAlbum | undefined = albums.find(
+	const filteredAlbum = albums.find(
 		(item: IAlbum) => item.aid === params?.aid
 	);
 	const insets = useSafeAreaInsets();
@@ -51,16 +48,6 @@ const AlbumDetailScreen = () => {
 		filteredAlbum?.taggedFriends.includes(u.uid)
 	);
 
-	const [isFavorite, setIsFavorite] = useState(filteredAlbum?.favorite);
-
-	useEffect(() => {
-		if (isFavorite) {
-			dispatch(addAlbumToFavorites({ aid: filteredAlbum?.aid }));
-		} else {
-			dispatch(removeAlbumFromFavorites({ aid: filteredAlbum?.aid }));
-		}
-	}, [isFavorite]);
-
 	const removeCurrentAlbum = () => {
 		Alert.alert("アルバムを削除しますか？", "", [
 			{
@@ -71,7 +58,7 @@ const AlbumDetailScreen = () => {
 				text: "削除する",
 				style: "destructive",
 				onPress: () => {
-					dispatch(removeAlbum(filteredAlbum?.aid));
+					// dispatch(removeAlbum(filteredAlbum?.aid));
 					goBack();
 				},
 			},
@@ -125,7 +112,7 @@ const AlbumDetailScreen = () => {
 				<View style={{ flex: 1, position: "relative" }}>
 					<Image
 						source={{
-							uri: filteredAlbum?.cover,
+							uri: filteredAlbum?.cover.uri,
 						}}
 						style={styles.image}
 					/>
@@ -144,14 +131,17 @@ const AlbumDetailScreen = () => {
 							rightContainer={
 								<OptionModal
 									options={options}
-									iconStyle={{ color: "white" }}
+									iconStyle={[
+										{ color: "white" },
+										CUSTOM_STYLES.shadow,
+									]}
 								></OptionModal>
 							}
 						></Header>
 					</View>
 
 					{/* action bottom bar  */}
-					<View style={styles.actionBottomContainer}>
+					<View style={[styles.actionBottomContainer]}>
 						{/* left container  */}
 						<CustomTouchableOpacity
 							style={{ flexDirection: "row" }}
@@ -227,26 +217,36 @@ const AlbumDetailScreen = () => {
 							}}
 						>
 							{/* heart icon  */}
-							<View style={styles.reactionIcon}>
+							<View
+								style={[
+									styles.reactionIcon,
+									CUSTOM_STYLES.shadow,
+								]}
+							>
 								<CustomTouchableOpacity
 									style={{
 										flex: 1,
 										alignItems: "center",
 										justifyContent: "center",
 									}}
-									onPress={() => setIsFavorite(!isFavorite)}
+									onPress={() => {}}
 								>
 									<AntDesign
 										name="heart"
 										size={25}
-										color={isFavorite ? "red" : "#d1d5db"}
+										// color={isFavorite ? "red" : "#d1d5db"}
 										style={{ marginTop: 2 }}
 									/>
 								</CustomTouchableOpacity>
 							</View>
 
 							{/* share icon  */}
-							<View style={styles.reactionIcon}>
+							<View
+								style={[
+									styles.reactionIcon,
+									CUSTOM_STYLES.shadow,
+								]}
+							>
 								<CustomTouchableOpacity
 									onPress={onShare}
 									style={{
@@ -280,7 +280,7 @@ const AlbumDetailScreen = () => {
 						}}
 						entering={FadeInDown.duration(400)}
 					>
-						2024/12/02
+						{formatDate(filteredAlbum?.create_at as number)}
 					</AnimatedThemedText>
 					<AnimatedThemedText
 						style={{

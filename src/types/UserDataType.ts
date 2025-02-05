@@ -12,6 +12,7 @@ export type UserDataType = {
 			status: FriendRequestType["status"];
 		}
 	>[];
+	favorites: string[];
 	posts: string[];
 	create_at: number;
 };

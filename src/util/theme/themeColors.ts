@@ -11,6 +11,7 @@ export type ThemeTypes = Theme & {
 		icon: string; // Middle Gray
 		input: string; // Light Gray
 		subGray: string;
+		iosBlue: string;
 	};
 };
 
@@ -26,6 +27,7 @@ export const lightTheme: ThemeTypes = {
 		icon: "#A2A2A8",
 		input: "#F4F4F4",
 		subGray: "#868686",
+		iosBlue: "#007AFF",
 	},
 };
 
@@ -41,6 +43,7 @@ export const darkTheme: ThemeTypes = {
 		icon: "#A2A2A8",
 		input: "#262626",
 		subGray: "#868686",
+		iosBlue: "#007AFF",
 	},
 };
 

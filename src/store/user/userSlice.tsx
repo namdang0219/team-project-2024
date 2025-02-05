@@ -8,6 +8,7 @@ const initialState: UserDataType = {
 	photoURL: "",
 	albums: [],
 	friends: [],
+	favorites: [],
 	create_at: 0,
 	posts: [],
 };

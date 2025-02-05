@@ -7,9 +7,11 @@ import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { useNavigation, useTheme } from "@react-navigation/native";
 import { ThemedText } from "components/themed";
+import { UserDataType } from "types/UserDataType";
 
 const FavoriteAlbum = () => {
 	const albums = useSelector((state: RootState) => state.album);
+	const user = useSelector((state: RootState) => state.user as UserDataType);
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
 
@@ -55,7 +57,9 @@ const FavoriteAlbum = () => {
 			</View>
 			{albums && albums?.length !== 0 ? (
 				<FlatList
-					data={albums.filter((a) => a.favorite === true).slice(0, 5)}
+					data={albums
+						.filter((a) => user.favorites.includes(a.aid))
+						.slice(0, 5)}
 					contentContainerStyle={{
 						paddingHorizontal: DIMENTIONS.APP_PADDING,
 						gap: 10,
@@ -85,7 +89,7 @@ const FavoriteAlbum = () => {
 									overflow: "hidden",
 								}}
 							>
-								{item.favorite && (
+								{user.favorites.includes(item.aid) && (
 									<View
 										style={{
 											width: 24,

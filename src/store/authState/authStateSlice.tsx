@@ -42,6 +42,7 @@ export const signup = createAsyncThunk<
 					photoURL: user.photoURL ?? "",
 					albums: [],
 					friends: [],
+					favorites: [],
 					posts: [],
 					create_at: Date.now(),
 				};

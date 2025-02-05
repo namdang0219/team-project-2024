@@ -30,9 +30,8 @@ import AlbumTagFriendModal from "./AlbumTagFriendModal";
 import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
-import { useNavigation, useTheme } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
-import { addAlbum } from "store/album/albumSlice";
+import { useTheme } from "@react-navigation/native";
+import { useSelector } from "react-redux";
 import { IAlbum } from "types/IAlbum";
 import { RootState } from "store/configureStore";
 import { UserDataType } from "types/UserDataType";
@@ -154,7 +153,6 @@ const AlbumCreateModal = ({
 				},
 				title: value.title,
 				desc: value.description,
-				favorite: false,
 				taggedFriends: [],
 				images: [],
 				create_at: timestamp,

@@ -10,7 +10,6 @@ export interface IAlbum {
 		fileName: string;
 		uri: string;
 	};
-	favorite: boolean;
 	taggedFriends: string[];
 	images: IImage[];
 	create_at: number;

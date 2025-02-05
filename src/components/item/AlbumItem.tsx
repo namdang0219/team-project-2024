@@ -1,20 +1,26 @@
-import {
-	View,
-	Text,
-	ImageBackground,
-	StyleSheet,
-} from "react-native";
-import React from "react";
+import { View, Text, ImageBackground, StyleSheet } from "react-native";
+import React, { Dispatch, SetStateAction } from "react";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
 import { AntDesign } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useTheme } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 import { useItemWidth } from "hook/useItemWidth";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
+import { UserDataType } from "types/UserDataType";
 
-const AlbumItem = ({ item }: { item: IAlbum }) => {
+const AlbumItem = ({
+	item,
+	toggleSeachModal,
+}: {
+	item: IAlbum;
+	toggleSeachModal: Dispatch<SetStateAction<boolean>>;
+}) => {
 	const { navigate } = useNavigation<any>();
+	const user = useSelector((state: RootState) => state.user as UserDataType);
 	const itemWidth = useItemWidth(DIMENTIONS.LIST_GAP, 2);
+	const { colors } = useTheme();
 
 	const styles = StyleSheet.create({
 		background: {
@@ -24,6 +30,7 @@ const AlbumItem = ({ item }: { item: IAlbum }) => {
 			height: (itemWidth / 5) * 6,
 			position: "relative",
 			overflow: "hidden",
+			backgroundColor: colors.input,
 		},
 		heartContainer: {
 			width: 25,
@@ -47,18 +54,19 @@ const AlbumItem = ({ item }: { item: IAlbum }) => {
 		<CustomTouchableOpacity
 			key={item.aid}
 			style={{ marginBottom: 10 }}
-			onPress={() =>
+			onPress={() => {
 				navigate("GlobalStack", {
 					screen: "AlbumDetailScreen",
 					params: { aid: item.aid },
-				})
-			}
+				});
+				toggleSeachModal(false);
+			}}
 		>
 			<ImageBackground
-				source={{ uri: item.cover }}
+				source={{ uri: item.cover.uri }}
 				style={styles.background}
 			>
-				{item.favorite && (
+				{user.favorites.includes(item.aid) && (
 					<View style={styles.heartContainer}>
 						<AntDesign name="heart" color={"red"} />
 					</View>

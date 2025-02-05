@@ -9,10 +9,12 @@ import LoadingScreen from "screen/app/global/LoadingScreen";
 import useAuth from "hook/useAuth";
 import useUserDataListener from "hook/useUserDataListener";
 import useSyncWithFirebase from "hook/useSyncWithFirebase";
+import { useAlbumListener } from "hook/useAlbumListener";
 
 const Stack = createNativeStackNavigator();
 
 const RootStack = () => {
+	useAlbumListener();
 	// Authenticate user on app start
 	useAuth();
 	const authState = useSelector((state: RootState) => state.authState);

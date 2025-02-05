@@ -7,11 +7,13 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { ThemedText } from "components/themed";
+import { UserDataType } from "types/UserDataType";
 
 const RecentAlbum = () => {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
 	const albums = useSelector((state: RootState) => state.album);
+	const user = useSelector((state: RootState) => state.user as UserDataType);
 
 	return (
 		<View>
@@ -81,7 +83,7 @@ const RecentAlbum = () => {
 									overflow: "hidden",
 								}}
 							>
-								{item.favorite && (
+								{user.favorites.includes(item.aid) && (
 									<View
 										style={{
 											width: 24,
