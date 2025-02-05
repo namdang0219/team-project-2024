@@ -21,6 +21,7 @@ const AutoHeightImage = forwardRef(
 			source,
 			style,
 			width = screenWidth,
+			...props
 		}: {
 			source: ImageURISource | ImageRequireSource;
 			width?: number;
@@ -65,6 +66,7 @@ const AutoHeightImage = forwardRef(
 				source={source}
 				resizeMode="contain"
 				style={[{ height, width }, style]}
+				{...props}
 			/>
 		);
 	}

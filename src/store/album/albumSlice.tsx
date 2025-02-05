@@ -1,11 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { albumMocks } from "mock/albumMocks";
 import { IAlbum } from "types/IAlbum";
 
-const initialState: IAlbum[] = albumMocks;
-console.log("🚀 ~ initialState:", initialState)
+const initialState: IAlbum[] = [];
 
-const albumSlice = createSlice({
+export const albumSlice = createSlice({
 	name: "album",
 	initialState: initialState,
 	reducers: {
@@ -61,5 +59,3 @@ export const {
 	addAlbumToFavorites,
 	removeAlbumFromFavorites,
 } = albumSlice.actions;
-
-export default albumSlice.reducer;

@@ -1,20 +1,19 @@
 import React, { useRef } from "react";
-import {
-	Dimensions,
-	View,
-} from "react-native";
-import {
-	useSharedValue,
-} from "react-native-reanimated";
+import { Dimensions, View } from "react-native";
+import { useSharedValue } from "react-native-reanimated";
 import Carousel, { Pagination } from "react-native-reanimated-carousel";
 import SliderItem from "./SliderItem";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
+import { Text } from "react-native";
+import { IAlbum } from "types/IAlbum";
+import { useTheme } from "@react-navigation/native";
 
 const Slider = () => {
-	const albums = useSelector((state: RootState) => state.album)
+	const albums = useSelector((state: RootState) => state.album as IAlbum[]);
 	const ref = useRef<any>();
 	const progress = useSharedValue<number>(0);
+	const { colors } = useTheme();
 
 	const HEIGHT = 250;
 
@@ -30,6 +29,23 @@ const Slider = () => {
 			animated: true,
 		});
 	};
+
+	if (albums.length == 0) {
+		return (
+			<View
+				style={{
+					height: HEIGHT,
+					backgroundColor: colors.input,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<Text style={{ color: colors.icon, fontSize: 16 }}>
+					アルバムはまだありません
+				</Text>
+			</View>
+		);
+	}
 
 	return (
 		<View>
@@ -55,14 +71,14 @@ const Slider = () => {
 						parallaxAdjacentItemScale: 0.72,
 					}}
 					onProgressChange={progress}
-					renderItem={({item}) => (
+					renderItem={({ item }) => (
 						<SliderItem item={item}></SliderItem>
 					)}
 				/>
 			</View>
 
 			{/* pagination  */}
-			<Pagination.Basic
+			{/* <Pagination.Basic
 				progress={progress}
 				data={albums}
 				size={7.5}
@@ -79,7 +95,7 @@ const Slider = () => {
 				}}
 				horizontal
 				onPress={onPressPagination}
-			/>
+			/> */}
 		</View>
 	);
 };
