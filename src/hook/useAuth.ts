@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { auth } from "../../firebaseConfig";
 import { clearUser, setUser } from "store/authState/authStateSlice";
-import { UserAuthType } from "types/AuthStateType";
+import { AuthStateType } from "types/AuthStateType";
 
 const useAuth = () => {
 	const dispatch = useDispatch();
@@ -11,13 +11,8 @@ const useAuth = () => {
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
 			if (user) {
-				const userData: UserAuthType = {
-					uid: user?.uid,
-					email: user?.email,
-					displayName: user?.displayName as string,
-					photoURL: user?.photoURL ?? "",
-				};
-				dispatch(setUser(userData));
+				const userId: AuthStateType["userId"] = user.uid;
+				dispatch(setUser(userId));
 			} else {
 				dispatch(clearUser());
 			}

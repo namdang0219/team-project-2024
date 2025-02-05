@@ -23,8 +23,6 @@ import FavoriteAlbum from "module/albumScreen/FavoriteAlbum";
 import Category from "module/albumScreen/Category";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
-import { useSelector } from "react-redux";
-import { RootState } from "store/configureStore";
 import { useTheme } from "@react-navigation/native";
 
 const AlbumScreen = () => {
@@ -34,8 +32,6 @@ const AlbumScreen = () => {
 	const [searchModal, toggleSearchModal] = useToggle(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const { colors } = useTheme();
-	const albums = useSelector((state: RootState) => state.album);
-	console.log("🚀 ~ AlbumScreen ~ albums:", albums)
 
 	const options: IOption[] = [
 		{

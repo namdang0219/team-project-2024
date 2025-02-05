@@ -12,12 +12,14 @@ const initialState: UserDataType = {
 	posts: [],
 };
 
-const userSlice = createSlice({
+export const userSlice = createSlice({
 	name: "user",
 	initialState,
-	reducers: {},
+	reducers: {
+		setUserData: (state, action) => {
+			return { ...state, ...action.payload } as UserDataType;
+		},
+	},
 });
 
-export const {} = userSlice.actions;
-
-export default userSlice.reducer;
+export const { setUserData } = userSlice.actions;

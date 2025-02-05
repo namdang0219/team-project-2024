@@ -2,14 +2,15 @@ import { View, Text } from "react-native";
 import React from "react";
 import { ThemedText } from "components/themed";
 import { IUser } from "types/IUser";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
+import { UserDataType } from "types/UserDataType";
 
-const BaseInfo = ({
-	displayName,
-	email,
-}: {
-	displayName: IUser["displayName"];
-	email?: IUser["email"];
-}) => {
+const BaseInfo = () => {
+	const { displayName, email } = useSelector(
+		(state: RootState) => state.user as UserDataType
+	);
+
 	return (
 		<View
 			style={{

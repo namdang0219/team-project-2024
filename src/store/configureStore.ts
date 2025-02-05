@@ -16,7 +16,7 @@ import hardSet from "redux-persist/lib/stateReconciler/hardSet";
 const persistConfig = {
 	key: "root",
 	storage: AsyncStorage,
-	debug: true, // Bật chế độ debug
+	debug: true,
 	stateReconciler: hardSet,
 };
 

@@ -1,13 +1,5 @@
-
-export type UserAuthType = {
-	uid: string;
-	email: string | null;
-	displayName: string;
-	photoURL: string;
-};
-
 export type AuthStateType = {
-	user: UserAuthType | null;
+	userId: string;
 	loading: boolean;
 	isLoggedIn: boolean;
 };

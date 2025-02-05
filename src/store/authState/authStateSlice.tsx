@@ -5,20 +5,20 @@ import {
 	updateProfile,
 	signOut,
 } from "firebase/auth";
-import { AuthStateType, UserAuthType } from "types/AuthStateType";
+import { AuthStateType } from "types/AuthStateType";
 import { auth, db } from "../../../firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
 import { UserDataType } from "types/UserDataType";
 
 const initialState: AuthStateType = {
-	user: null,
+	userId: "",
 	loading: false,
 	isLoggedIn: false,
 };
 
 // ✅ Signup
 export const signup = createAsyncThunk<
-	UserAuthType,
+	AuthStateType["userId"],
 	{ email: string; password: string; username: string },
 	{ rejectValue: string }
 >(
@@ -47,12 +47,7 @@ export const signup = createAsyncThunk<
 				};
 				await setDoc(doc(db, "00_users", user.uid), newUser);
 
-				return {
-					uid: user.uid,
-					email: user.email,
-					displayName: user.displayName ?? "",
-					photoURL: user.photoURL ?? "",
-				};
+				return user.uid;
 			}
 			throw new Error("User creation failed");
 		} catch (error: any) {
@@ -63,7 +58,7 @@ export const signup = createAsyncThunk<
 
 // ✅ Login
 export const login = createAsyncThunk<
-	UserAuthType,
+	AuthStateType["userId"],
 	{ email: string; password: string },
 	{ rejectValue: string }
 >("authState/login", async ({ email, password }, { rejectWithValue }) => {
@@ -71,12 +66,7 @@ export const login = createAsyncThunk<
 		const userCre = await signInWithEmailAndPassword(auth, email, password);
 		if (userCre) {
 			const user = userCre.user;
-			return {
-				uid: user.uid,
-				email: user.email,
-				displayName: user.displayName ?? "",
-				photoURL: user.photoURL ?? "",
-			};
+			return user.uid;
 		}
 		throw new Error("Login failed");
 	} catch (error: any) {
@@ -100,12 +90,12 @@ const authStateSlice = createSlice({
 	name: "authState",
 	initialState,
 	reducers: {
-		setUser: (state, action: PayloadAction<UserAuthType | null>) => {
-			state.user = action.payload;
+		setUser: (state, action: PayloadAction<AuthStateType["userId"]>) => {
+			state.userId = action.payload;
 			state.isLoggedIn = !!action.payload;
 		},
 		clearUser: (state) => {
-			state.user = null;
+			state.userId = "";
 			state.isLoggedIn = false;
 		},
 	},
@@ -115,7 +105,7 @@ const authStateSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(signup.fulfilled, (state, action) => {
-			state.user = action.payload;
+			state.userId = action.payload;
 			state.loading = false;
 			state.isLoggedIn = true;
 		});
@@ -130,14 +120,13 @@ const authStateSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(login.fulfilled, (state, action) => {
-			state.user = action.payload;
+			state.userId = action.payload;
 			state.loading = false;
 			state.isLoggedIn = true;
 		});
 		builder.addCase(login.rejected, (state, action) => {
 			state.loading = false;
 			state.isLoggedIn = false;
-			console.error("Login failed:", action.payload);
 		});
 
 		// ✅ Signout
@@ -145,13 +134,12 @@ const authStateSlice = createSlice({
 			state.loading = true;
 		});
 		builder.addCase(signout.fulfilled, (state) => {
-			state.user = null;
+			state.userId = "";
 			state.loading = false;
 			state.isLoggedIn = false;
 		});
-		builder.addCase(signout.rejected, (state, action) => {
+		builder.addCase(signout.rejected, (state) => {
 			state.loading = false;
-			console.error("Signout failed:", action.payload);
 		});
 	},
 });

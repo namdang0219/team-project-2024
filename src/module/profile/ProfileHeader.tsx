@@ -7,12 +7,15 @@ import { ThemedText } from "components/themed";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { Feather } from "@expo/vector-icons";
+import { UserDataType } from "types/UserDataType";
 
 const ProfileHeader = () => {
 	const { colors } = useTheme();
-	const { photoURL, displayName, email, posts, friends } = useSelector(
-		(state: RootState) => state.user
+	const { photoURL, displayName, posts, friends } = useSelector(
+		(state: RootState) => state.user as UserDataType
 	);
+	console.log("🚀 ~ ProfileHeader ~ friends:", friends)
+	console.log("🚀 ~ ProfileHeader ~ posts:", posts)
 	const { navigate } = useNavigation<any>();
 
 	const styles = StyleSheet.create({
@@ -45,23 +48,23 @@ const ProfileHeader = () => {
 
 	return (
 		<>
-			<ProfileAvatar photoURL={photoURL} />
+			<ProfileAvatar />
 
 			{/* base info  */}
-			<BaseInfo displayName={displayName} email={email} />
+			<BaseInfo />
 
 			{/* post and friends number  */}
 			<View style={styles.analyticContainer}>
 				<View style={{ alignItems: "center", gap: 2 }}>
 					<ThemedText style={{ opacity: 0.4 }}>投稿</ThemedText>
 					<ThemedText style={{ fontWeight: "600", fontSize: 20 }}>
-						{posts}
+						{posts.length}
 					</ThemedText>
 				</View>
 				<View style={{ alignItems: "center", gap: 2 }}>
 					<ThemedText style={{ opacity: 0.4 }}>友達</ThemedText>
 					<ThemedText style={{ fontWeight: "600", fontSize: 20 }}>
-						{friends}
+						{friends.length}
 					</ThemedText>
 				</View>
 			</View>
