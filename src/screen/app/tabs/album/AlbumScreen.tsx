@@ -30,20 +30,18 @@ import { RootState } from "store/configureStore";
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { width } = useWindowDimensions();
-	const [createAlbumModal, toggleCreateAlbumModal] = useToggle(false);
+	const [createAlbumModal, setCreateAlbumModal] = useState(false);
 	const [searchModal, toggleSearchModal] = useToggle(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const { colors } = useTheme();
-	
-	const albums = useSelector((state: RootState) => state.albums)
-	console.log("🚀 ~ AlbumScreen ~ albums:", albums)
-	
+
+	const albums = useSelector((state: RootState) => state.albums);
 
 	const options: IOption[] = [
 		{
 			label: "アルバム作成",
 			icon: <MaterialIcons name="create" color={"black"} size={20} />,
-			action: toggleCreateAlbumModal,
+			action: () => setCreateAlbumModal(true),
 		},
 	];
 
@@ -99,8 +97,8 @@ const AlbumScreen = () => {
 									presentationStyle="fullScreen"
 								>
 									<AlbumCreateModal
-										toggleCreateAlbumModal={
-											toggleCreateAlbumModal
+										setCreateAlbumModal={
+											setCreateAlbumModal
 										}
 									/>
 								</Modal>
@@ -136,7 +134,7 @@ const AlbumScreen = () => {
 				}
 			>
 				<View style={{ flex: 1, gap: 35, paddingBottom: 250 }}>
-					{/* <Slider /> */}
+					<Slider />
 
 					{/* recent album  */}
 					<RecentAlbum />
@@ -151,9 +149,9 @@ const AlbumScreen = () => {
 					<Category />
 
 					{/* storage  */}
-					{/* <Text style={{ color: "gray", textAlign: "center" }}>
-						{`${albums.length}アルバム、${images.length}記念`}
-					</Text> */}
+					<Text style={{ color: "gray", textAlign: "center" }}>
+						{`${albums && albums.length}アルバム`}
+					</Text>
 				</View>
 			</ScrollView>
 		</View>

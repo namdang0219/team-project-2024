@@ -40,6 +40,7 @@
     "react-native-awesome-gallery": "^0.4.3",
     "react-native-collapsible-tab-view": "^8.0.0",
     "react-native-confirmation-code-field": "^7.4.0",
+    "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.16.1",
     "react-native-image-colors": "^2.4.0",
     "react-native-maps": "1.14.0",

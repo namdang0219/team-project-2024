@@ -6,13 +6,13 @@ import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { useRoute } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
-import { UserDataType } from "types/UserType";
+import { UserType } from "types/UserType";
 
 const AlbumListScreen = () => {
-	const albums = useSelector((state: RootState) => state.album as IAlbum[]);
+	const albums = useSelector((state: RootState) => state.albums as IAlbum[]);
 	const { params } = useRoute<any>();
 	const [displayAlbums, setDisplayAlbums] = useState<IAlbum[]>([]);
-	const user = useSelector((state: RootState) => state.user as UserDataType);
+	const user = useSelector((state: RootState) => state.user as UserType);
 
 	useEffect(() => {
 		if (params.type === "recent") {

@@ -15,7 +15,6 @@ import Header from "layout/Header";
 import { CustomTouchableOpacity } from "components/custom";
 import { AntDesign, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
-import { IAlbum } from "types/IAlbum";
 import { userMocks } from "mock/userMocks";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store/configureStore";
@@ -27,6 +26,11 @@ import Animated, { FadeInDown } from "react-native-reanimated";
 import { CUSTOM_STYLES } from "style/customStyle";
 import { formatDate } from "util/func/formatDate";
 import { UserType } from "types/UserType";
+import { setUserData } from "store/user/userSlice";
+import { removeAlbum, updateAlbum } from "store/album/albumSlice";
+import { AlbumType } from "types/AlbumType";
+import * as FileSystem from "expo-file-system";
+import { Toast } from "toastify-react-native";
 
 const { width } = Dimensions.get("screen");
 
@@ -34,13 +38,15 @@ const AnimatedThemedText = Animated.createAnimatedComponent(ThemedText);
 
 const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
-	const albums = useSelector((state: RootState) => state.albums as IAlbum[]);
+	const albums = useSelector(
+		(state: RootState) => state.albums as AlbumType[]
+	);
 	const dispatch = useDispatch<AppDispatch>();
 	const user = useSelector((state: RootState) => state.user as UserType);
 
 	const aid = params?.aid;
 
-	const filteredAlbum = albums.find((item: IAlbum) => item.aid === aid);
+	const filteredAlbum = albums.find((item: AlbumType) => item.aid === aid);
 	const insets = useSafeAreaInsets();
 	const { navigate, goBack } = useNavigation<any>();
 
@@ -49,6 +55,43 @@ const AlbumDetailScreen = () => {
 	const taggedFriends = userMocks.filter((u) =>
 		filteredAlbum?.taggedFriends.includes(u.uid)
 	);
+
+	const deleteAlbum = async () => {
+		if (!filteredAlbum) return;
+		try {
+			// Delete album from the list
+			if (filteredAlbum.cover?.uri) {
+				await FileSystem.deleteAsync(filteredAlbum.cover.uri, {
+					idempotent: true,
+				});
+				console.log(
+					"Cover image was deleted:",
+					filteredAlbum.cover.uri
+				);
+			}
+
+			for (const image of filteredAlbum.images) {
+				await FileSystem.deleteAsync(image.uri, { idempotent: true });
+				console.log("Image was deleted:", image.uri);
+			}
+
+			// Delete album from user favorites if include
+			dispatch(
+				setUserData({
+					favorites: user.favorites.includes(aid)
+						? user.favorites.filter((f) => f != aid)
+						: [...user.favorites],
+				})
+			);
+
+			dispatch(removeAlbum(aid));
+			goBack();
+			Toast.success("アルバム削除成功");
+		} catch (error) {
+			console.error("Lỗi khi xóa album:", error);
+			Toast.error("削除失敗");
+		}
+	};
 
 	const removeCurrentAlbum = () => {
 		Alert.alert("アルバムを削除しますか？", "", [
@@ -59,7 +102,7 @@ const AlbumDetailScreen = () => {
 			{
 				text: "削除する",
 				style: "destructive",
-				onPress: () => {},
+				onPress: () => deleteAlbum(),
 			},
 		]);
 	};
@@ -84,6 +127,30 @@ const AlbumDetailScreen = () => {
 	];
 
 	async function handleToggleAlbumFavorite() {
+		const updateUpdateTime = () => {
+			dispatch(
+				updateAlbum({
+					...(filteredAlbum as AlbumType),
+					update_at: Date.now(),
+				})
+			);
+		};
+
+		if (user.favorites.includes(aid)) {
+			dispatch(
+				setUserData({
+					favorites: user.favorites.filter((f) => f != aid),
+				})
+			);
+			updateUpdateTime();
+		} else if (!user.favorites.includes(aid)) {
+			dispatch(
+				setUserData({
+					favorites: [...user.favorites, aid],
+				})
+			);
+			updateUpdateTime();
+		}
 	}
 
 	const onShare = async () => {
@@ -156,7 +223,7 @@ const AlbumDetailScreen = () => {
 							{taggedFriends.length > 0 &&
 								taggedFriends
 									.slice(0, 3)
-									.map((f: IUser, index) => (
+									.map((f: UserType, index) => (
 										<View
 											key={f.uid}
 											style={[

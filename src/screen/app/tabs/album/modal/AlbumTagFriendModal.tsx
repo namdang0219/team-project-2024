@@ -17,6 +17,9 @@ import { userMocks } from "mock/userMocks";
 import { IUser } from "types/IUser";
 import { Button } from "components/button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { UserType } from "types/UserType";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "store/configureStore";
 
 const AlbumTagFriendModal = ({
 	toggleTagFriendModal,
@@ -51,7 +54,7 @@ const AlbumTagFriendModal = ({
 					style={{ marginTop: 6 }}
 					keyExtractor={(item) => String(item.uid)}
 					contentContainerStyle={styles.contentContainer}
-					renderItem={({ item }: { item: IUser }) => (
+					renderItem={({ item }: { item: UserType }) => (
 						<UserItem
 							item={item}
 							taggedFriendId={taggedFriendId}
@@ -76,11 +79,12 @@ const UserItem = ({
 	taggedFriendId,
 	setTaggedFriendId,
 }: {
-	item: IUser;
+	item: UserType;
 	taggedFriendId: IUser["uid"][];
 	setTaggedFriendId: Dispatch<SetStateAction<IUser["uid"][]>>;
 }) => {
 	const { colors } = useTheme();
+	const dispatch = useDispatch<AppDispatch>();
 
 	const isTagged = taggedFriendId.includes(item.uid);
 

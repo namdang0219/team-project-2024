@@ -34,7 +34,7 @@ const AlbumSearch = ({
 	const inputRef = useRef<TextInput | null>(null);
 	const { navigate } = useNavigation<any>();
 	const [searchText, setSearchText] = useState<string>("");
-	const albums = useSelector((state: RootState) => state.album as IAlbum[]);
+	const albums = useSelector((state: RootState) => state.albums as IAlbum[]);
 	const [results, setResults] = useState<IAlbum[]>(albums);
 
 	useEffect(() => {

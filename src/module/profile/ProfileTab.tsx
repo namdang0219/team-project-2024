@@ -25,7 +25,7 @@ const ProfileTab = () => {
 		>
 			<Tabs.Tab name="posts" label="投稿">
 				<Tabs.FlatList
-					data={new Array(20).fill(null)}
+					data={new Array(0).fill(null)}
 					columnWrapperStyle={{ gap: 5 }}
 					contentContainerStyle={{
 						paddingTop: 10,
@@ -54,7 +54,7 @@ const ProfileTab = () => {
 
 			<Tabs.Tab name="tags" label="タグ">
 				<Tabs.FlatList
-					data={new Array(10).fill(null)}
+					data={new Array(0).fill(null)}
 					columnWrapperStyle={{ gap: 5 }}
 					contentContainerStyle={{
 						paddingTop: 16,

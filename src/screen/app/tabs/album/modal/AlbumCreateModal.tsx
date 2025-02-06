@@ -32,16 +32,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useTheme } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
-import { IAlbum } from "types/IAlbum";
 import { AppDispatch, RootState } from "store/configureStore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { db, storage } from "../../../../../../firebaseConfig";
-import { getBlobFromUri } from "util/func/getBlobFromUri";
-import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
 import { Toast } from "toastify-react-native";
 import { UserType } from "types/UserType";
 import * as FileSystem from "expo-file-system";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AlbumType } from "types/AlbumType";
 import { addNewAlbum } from "store/album/albumSlice";
 
@@ -58,19 +52,16 @@ const createAlbumScheme = Yup.object().shape({
 });
 
 const AlbumCreateModal = ({
-	toggleCreateAlbumModal,
 	setCreateAlbumModal,
 	setFirstAlbumCreateModal = () => {},
 	cancelable = true,
 }: {
-	toggleCreateAlbumModal?: () => void;
-	setCreateAlbumModal?: Dispatch<SetStateAction<boolean>>;
+	setCreateAlbumModal: Dispatch<SetStateAction<boolean>>;
 	setFirstAlbumCreateModal?: Dispatch<SetStateAction<boolean>>;
 	cancelable?: boolean;
 }) => {
 	const insets = useSafeAreaInsets();
 	const user = useSelector((state: RootState) => state.user as UserType);
-	console.log("🚀 ~ user:", user);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [taggedFriendId, setTaggedFriendId] = useState<IUser["uid"][]>([]);
 	const itemWidth = useItemWidth(10, 5);
@@ -92,7 +83,7 @@ const AlbumCreateModal = ({
 	// data field
 	const [image, setImage] = useState<string>("");
 
-	const taggedFriend: IUser[] = userMocks.filter((u: IUser) =>
+	const taggedFriend: UserType[] = userMocks.filter((u: UserType) =>
 		taggedFriendId.includes(u.uid)
 	);
 
@@ -117,8 +108,7 @@ const AlbumCreateModal = ({
 			{
 				text: "破壊",
 				onPress: () => {
-					setCreateAlbumModal && setCreateAlbumModal(false);
-					toggleCreateAlbumModal && toggleCreateAlbumModal();
+					setCreateAlbumModal(false);
 				},
 				style: "destructive",
 			},
@@ -165,7 +155,7 @@ const AlbumCreateModal = ({
 					fileName,
 					uri: newPath,
 				},
-				taggedFriends: [],
+				taggedFriends: taggedFriendId,
 				images: [],
 				create_at: Date.now(),
 				update_at: Date.now(),
@@ -174,7 +164,7 @@ const AlbumCreateModal = ({
 			dispatch(addNewAlbum(newAlbum));
 
 			console.log("Ảnh đã lưu vào:", newPath);
-
+			setCreateAlbumModal(false);
 			Toast.success("アルバム作成成功");
 		} catch (error) {
 			console.log(error);
@@ -233,7 +223,7 @@ const AlbumCreateModal = ({
 		},
 	});
 
-	const FriendItem = ({ user }: { user: IUser }) => {
+	const FriendItem = ({ user }: { user: UserType }) => {
 		const handleUntagFriend = () => {
 			const index = taggedFriendId.indexOf(user.uid);
 			if (index >= 0) {
@@ -402,7 +392,7 @@ const AlbumCreateModal = ({
 									gap: 10,
 								}}
 							>
-								{taggedFriend.map((item: IUser) => (
+								{taggedFriend.map((item: UserType) => (
 									<FriendItem key={item.uid} user={item} />
 								))}
 								<CustomTouchableOpacity

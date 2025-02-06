@@ -15,6 +15,9 @@ const RecentAlbum = () => {
 	const albums = useSelector((state: RootState) => state.albums);
 	const user = useSelector((state: RootState) => state.user as UserType);
 
+	const sortedAlbums =
+		albums && [...albums].sort((a, b) => b.update_at - a.update_at);
+
 	return (
 		<View>
 			<View
@@ -51,9 +54,9 @@ const RecentAlbum = () => {
 					/>
 				</CustomTouchableOpacity>
 			</View>
-			{albums && albums?.length !== 0 ? (
+			{sortedAlbums && sortedAlbums?.length !== 0 ? (
 				<FlatList
-					data={albums.slice(0, 5)}
+					data={sortedAlbums.slice(0, 5)}
 					contentContainerStyle={{
 						paddingHorizontal: DIMENTIONS.APP_PADDING,
 						gap: 10,
