@@ -31,15 +31,19 @@ import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useTheme } from "@react-navigation/native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { IAlbum } from "types/IAlbum";
-import { RootState } from "store/configureStore";
-import { UserDataType } from "types/UserType";
+import { AppDispatch, RootState } from "store/configureStore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "../../../../../../firebaseConfig";
 import { getBlobFromUri } from "util/func/getBlobFromUri";
 import { arrayUnion, doc, setDoc, updateDoc } from "firebase/firestore";
 import { Toast } from "toastify-react-native";
+import { UserType } from "types/UserType";
+import * as FileSystem from "expo-file-system";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AlbumType } from "types/AlbumType";
+import { addNewAlbum } from "store/album/albumSlice";
 
 const { width } = Dimensions.get("screen");
 
@@ -65,12 +69,13 @@ const AlbumCreateModal = ({
 	cancelable?: boolean;
 }) => {
 	const insets = useSafeAreaInsets();
-	const user = useSelector((state: RootState) => state.user as UserDataType);
+	const user = useSelector((state: RootState) => state.user as UserType);
 	console.log("🚀 ~ user:", user);
 	const [loading, setLoading] = useState<boolean>(false);
 	const [taggedFriendId, setTaggedFriendId] = useState<IUser["uid"][]>([]);
 	const itemWidth = useItemWidth(10, 5);
 	const [tagFriendModal, toggleTagFriendModal] = useToggle(false);
+	const dispatch = useDispatch<AppDispatch>();
 	const {
 		handleSubmit,
 		control,
@@ -138,36 +143,39 @@ const AlbumCreateModal = ({
 
 	const createAlbum = async (value: ICreateAlbum) => {
 		try {
-			setLoading(true);
-			const timestamp = Date.now();
-			const fileName = `${timestamp}.jpg`;
-			const imageRef = ref(storage, `00_covers/${fileName}`);
-			const imageBlob = await getBlobFromUri(image);
-			await uploadBytes(imageRef, imageBlob as Blob);
-			const downloadUrl = await getDownloadURL(imageRef);
-			const newAlbum: IAlbum = {
-				aid: String(timestamp),
-				author: user?.uid,
-				cover: {
-					fileName: fileName,
-					uri: downloadUrl,
-				},
+			// Lưu ảnh vào bộ nhớ ứng dụng
+			const fileName = image.split("/").pop(); // Lấy tên file từ URI
+			const newPath = `${FileSystem.documentDirectory}${fileName}`; // Đường dẫn mới
+
+			// Sao chép ảnh vào bộ nhớ ứng dụng
+			await FileSystem.copyAsync({
+				from: image,
+				to: newPath,
+			});
+
+			if (!fileName) return;
+
+			// Lưu đường dẫn vào AsyncStorage
+			const newAlbum: AlbumType = {
+				aid: `${Date.now()}`,
+				author: user.uid,
 				title: value.title,
 				desc: value.description,
+				cover: {
+					fileName,
+					uri: newPath,
+				},
 				taggedFriends: [],
 				images: [],
-				create_at: timestamp,
-				update_at: timestamp,
+				create_at: Date.now(),
+				update_at: Date.now(),
 			};
-			await setDoc(doc(db, "00_albums", String(timestamp)), newAlbum);
-			await updateDoc(doc(db, "00_users", String(user?.uid)), {
-				albums: arrayUnion(newAlbum.aid),
-			});
+
+			dispatch(addNewAlbum(newAlbum));
+
+			console.log("Ảnh đã lưu vào:", newPath);
+
 			Toast.success("アルバム作成成功");
-			if (setCreateAlbumModal) {
-				setCreateAlbumModal(false);
-				setFirstAlbumCreateModal(false);
-			}
 		} catch (error) {
 			console.log(error);
 			Toast.error("作成失敗");

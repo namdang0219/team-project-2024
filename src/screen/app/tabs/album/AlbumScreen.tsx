@@ -136,7 +136,7 @@ const AlbumScreen = () => {
 				}
 			>
 				<View style={{ flex: 1, gap: 35, paddingBottom: 250 }}>
-					<Slider />
+					{/* <Slider /> */}
 
 					{/* recent album  */}
 					<RecentAlbum />

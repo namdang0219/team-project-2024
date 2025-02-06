@@ -1,4 +1,4 @@
-import { View, Image, StyleSheet, ViewProps, Text } from "react-native";
+import { View, Image, StyleSheet, Text } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { ThemedView } from "components/themed";
@@ -9,11 +9,7 @@ import { UserType } from "types/UserType";
 
 const ProfileAvatar = () => {
 	const { colors } = useTheme();
-	// const { photoURL, displayName } = useSelector(
-	// 	(state: RootState) => state.user as UserType
-	// );
-	const user = useSelector((state: RootState) => state.user);
-	console.log("🚀 ~ ProfileAvatar ~ user:", user)
+	const {photoURL, displayName} = useSelector((state: RootState) => state.user as UserType);
 
 	const styles = StyleSheet.create({
 		avatarContainerGradient: {
@@ -54,7 +50,7 @@ const ProfileAvatar = () => {
 				end={{ x: 1, y: 1 }}
 			>
 				<ThemedView style={styles.avatarContainerWhite}>
-					{/* {photoURL ? (
+					{photoURL ? (
 						<Image
 							source={{
 								uri: photoURL,
@@ -80,7 +76,7 @@ const ProfileAvatar = () => {
 								{displayName.slice(0, 1)}
 							</Text>
 						</View>
-					)} */}
+					)}
 				</ThemedView>
 			</LinearGradient>
 		</View>

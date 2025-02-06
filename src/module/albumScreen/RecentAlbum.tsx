@@ -7,13 +7,13 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { ThemedText } from "components/themed";
-import { UserDataType } from "types/UserType";
+import { UserType } from "types/UserType";
 
 const RecentAlbum = () => {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
-	const albums = useSelector((state: RootState) => state.album);
-	const user = useSelector((state: RootState) => state.user as UserDataType);
+	const albums = useSelector((state: RootState) => state.albums);
+	const user = useSelector((state: RootState) => state.user as UserType);
 
 	return (
 		<View>

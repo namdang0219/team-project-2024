@@ -34,14 +34,14 @@ const BottomTab = () => {
 	const [createAlbumModal, toogleCreateAlbumModal, setCreateAlbumModal] =
 		useToggle(false);
 
-	// useEffect(() => {
-	// 	if (albums && albums.length === 0) {
-	// 		setFirstAlbumCreateModal(true);
-	// 	}
-	// 	return () => {
-	// 		setFirstAlbumCreateModal(false);
-	// 	};
-	// }, [albums]);
+	useEffect(() => {
+		if (albums && albums.length === 0) {
+			setFirstAlbumCreateModal(true);
+		}
+		return () => {
+			setFirstAlbumCreateModal(false);
+		};
+	}, [albums]);
 
 	return (
 		<>
