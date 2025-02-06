@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { useRoute } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
-import { UserDataType } from "types/UserDataType";
+import { UserDataType } from "types/UserType";
 
 const AlbumListScreen = () => {
 	const albums = useSelector((state: RootState) => state.album as IAlbum[]);

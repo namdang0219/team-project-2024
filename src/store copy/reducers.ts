@@ -1,8 +1,10 @@
 import { combineReducers } from "@reduxjs/toolkit";
-import { albumSlice } from "./album/albumSlice";
+import authStateSlice from "./authState/authStateSlice";
 import { userSlice } from "./user/userSlice";
+import { albumSlice } from "./album/albumSlice";
 
 export const reducers = combineReducers({
-	albums: albumSlice.reducer,
 	user: userSlice.reducer,
+	album: albumSlice.reducer,
+	authState: authStateSlice,
 });

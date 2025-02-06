@@ -4393,10 +4393,10 @@ expo-asset@~10.0.10:
     invariant "^2.2.4"
     md5-file "^3.2.3"
 
-expo-blur@~13.0.2:
-  version "13.0.2"
-  resolved "https://registry.npmjs.org/expo-blur/-/expo-blur-13.0.2.tgz"
-  integrity sha512-t2p7BChO3Reykued++QJRMZ/og6J3aXtSQ+bU31YcBeXhZLkHwjWEhiPKPnJka7J2/yTs4+jOCNDY0kCZmcE3w==
+expo-blur@^13.0.3:
+  version "13.0.3"
+  resolved "https://registry.npmjs.org/expo-blur/-/expo-blur-13.0.3.tgz"
+  integrity sha512-z5W9ZGlG6ZiRLuoJZG1AHRvjK8j+2+nc/mtvEtyAa8T/8iTNpUnX4eC8xXDoTL/H4y2pc3cHvytDjCXJG26pcQ==
 
 expo-camera@~15.0.16:
   version "15.0.16"
@@ -4430,10 +4430,10 @@ expo-image-loader@~4.7.0:
   resolved "https://registry.npmjs.org/expo-image-loader/-/expo-image-loader-4.7.0.tgz"
   integrity sha512-cx+MxxsAMGl9AiWnQUzrkJMJH4eNOGlu7XkLGnAXSJrRoIiciGaKqzeaD326IyCTV+Z1fXvIliSgNW+DscvD8g==
 
-expo-image-picker@~15.0.7:
-  version "15.0.7"
-  resolved "https://registry.npmjs.org/expo-image-picker/-/expo-image-picker-15.0.7.tgz"
-  integrity sha512-u8qiPZNfDb+ap6PJ8pq2iTO7JKX+ikAUQ0K0c7gXGliKLxoXgDdDmXxz9/6QdICTshJBJlBvI0MwY5NWu7A/uw==
+expo-image-picker@^15.1.0:
+  version "15.1.0"
+  resolved "https://registry.npmjs.org/expo-image-picker/-/expo-image-picker-15.1.0.tgz"
+  integrity sha512-6cE10S7d0qG7+pcHtsYukRKuFL44ssOM0/v+5JIBzRwxpIgGA6qokr8PxasFEpxOA9NpN0gwry33jmq1qLXJTg==
   dependencies:
     expo-image-loader "~4.7.0"
 

@@ -8,7 +8,7 @@ import { IAlbum } from "types/IAlbum";
 import { useItemWidth } from "hook/useItemWidth";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { UserDataType } from "types/UserDataType";
+import { UserDataType } from "types/UserType";
 
 const AlbumItem = ({
 	item,

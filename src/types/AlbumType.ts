@@ -1,9 +1,9 @@
 import { ImageType } from "./ImageType";
-import { IUser } from "./IUser";
+import { UserType } from "./UserType";
 
-export interface IAlbum {
+export interface AlbumType {
 	aid: string;
-	author: IUser["uid"];
+	author: UserType["uid"];
 	title: string;
 	desc: string;
 	cover: {

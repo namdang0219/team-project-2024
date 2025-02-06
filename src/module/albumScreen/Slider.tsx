@@ -10,7 +10,7 @@ import { IAlbum } from "types/IAlbum";
 import { useTheme } from "@react-navigation/native";
 
 const Slider = () => {
-	const albums = useSelector((state: RootState) => state.album as IAlbum[]);
+	const albums = useSelector((state: RootState) => state.albums as IAlbum[]);
 	const ref = useRef<any>();
 	const progress = useSharedValue<number>(0);
 	const { colors } = useTheme();

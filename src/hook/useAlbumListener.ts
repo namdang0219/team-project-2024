@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { db } from "../../firebaseConfig";
-import { UserDataType } from "types/UserDataType";
+import { UserDataType } from "types/UserType";
 import { setAlbums } from "store/album/albumSlice";
 import { IAlbum } from "types/IAlbum";
 

@@ -1,4 +1,4 @@
-import { IImage } from "types/IImage";
+import { IImage } from "types/ImageType";
 
 export const imageMocks: IImage[] = [
 	// 1 ~ 5

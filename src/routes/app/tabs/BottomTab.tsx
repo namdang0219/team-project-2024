@@ -23,7 +23,7 @@ const AnimatedImage = Reanimated.createAnimatedComponent(AutoHeightImage);
 const AnimatedButton = Reanimated.createAnimatedComponent(CustomButton);
 
 const BottomTab = () => {
-	const albums = useSelector((state: RootState) => state.album);
+	const albums = useSelector((state: RootState) => state.albums);
 	const { colors } = useTheme();
 	const { width } = useWindowDimensions();
 	const [

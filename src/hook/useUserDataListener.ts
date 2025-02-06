@@ -8,17 +8,17 @@ import { AppDispatch } from "store/configureStore";
 const useUserDataListener = (userId: string) => {
 	const dispatch = useDispatch<AppDispatch>();
 
-	useEffect(() => {
-		if (!userId) return;
-		const unsubscribe = onSnapshot(doc(db, "00_users", userId), (doc) => {
-			if (doc.exists()) {
-				const userData = doc.data();
-				dispatch(setUserData(userData));
-			}
-		});
+	// useEffect(() => {
+	// 	if (!userId) return;
+	// 	const unsubscribe = onSnapshot(doc(db, "00_users", userId), (doc) => {
+	// 		if (doc.exists()) {
+	// 			const userData = doc.data();
+	// 			dispatch(setUserData(userData));
+	// 		}
+	// 	});
 
-		return () => unsubscribe();
-	}, [userId]);
+	// 	return () => unsubscribe();
+	// }, [userId]);
 };
 
 export default useUserDataListener;

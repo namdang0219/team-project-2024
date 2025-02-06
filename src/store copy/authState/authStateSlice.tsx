@@ -8,7 +8,7 @@ import {
 import { AuthStateType } from "types/AuthStateType";
 import { auth, db } from "../../../firebaseConfig";
 import { doc, setDoc } from "firebase/firestore";
-import { UserDataType } from "types/UserDataType";
+import { UserDataType } from "types/UserType";
 
 const initialState: AuthStateType = {
 	userId: "",

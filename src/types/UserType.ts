@@ -1,6 +1,6 @@
 import { FriendRequestType } from "./FriendRequestType";
 
-export type UserDataType = {
+export type UserType = {
 	uid: string;
 	displayName: string;
 	photoURL: string;

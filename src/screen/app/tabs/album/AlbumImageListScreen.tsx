@@ -7,7 +7,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { IAlbum } from "types/IAlbum";
-import { IImage } from "types/IImage";
+import { IImage } from "types/ImageType";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { addImagesToAlbum } from "store/album/albumSlice";

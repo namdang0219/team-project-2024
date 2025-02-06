@@ -1,10 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserType } from "types/UserType";
+import { UserDataType } from "types/UserType";
 
-const initialState: UserType = {
-	uid: "userid01",
-	displayName: "MeowCopter",
-	email: "meowcopter@gmail.com",
+const initialState: UserDataType = {
+	uid: "",
+	displayName: "",
+	email: "",
 	photoURL: "",
 	friends: [],
 	favorites: [],
@@ -17,7 +17,7 @@ export const userSlice = createSlice({
 	initialState,
 	reducers: {
 		setUserData: (state, action) => {
-			return { ...state, ...action.payload } as UserType;
+			return { ...state, ...action.payload } as UserDataType;
 		},
 	},
 });

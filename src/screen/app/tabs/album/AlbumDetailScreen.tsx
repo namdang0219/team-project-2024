@@ -26,8 +26,7 @@ import { ThemedText } from "components/themed";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { CUSTOM_STYLES } from "style/customStyle";
 import { formatDate } from "util/func/formatDate";
-import { deleteAlbum, toggleAlbumFavorite } from "store/album/albumSlice";
-import { UserDataType } from "types/UserDataType";
+import { UserType } from "types/UserType";
 
 const { width } = Dimensions.get("screen");
 
@@ -35,9 +34,9 @@ const AnimatedThemedText = Animated.createAnimatedComponent(ThemedText);
 
 const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
-	const albums = useSelector((state: RootState) => state.album as IAlbum[]);
+	const albums = useSelector((state: RootState) => state.albums as IAlbum[]);
 	const dispatch = useDispatch<AppDispatch>();
-	const user = useSelector((state: RootState) => state.user as UserDataType);
+	const user = useSelector((state: RootState) => state.user as UserType);
 
 	const aid = params?.aid;
 
@@ -60,10 +59,7 @@ const AlbumDetailScreen = () => {
 			{
 				text: "削除する",
 				style: "destructive",
-				onPress: async () => {
-					await dispatch(deleteAlbum({ albumId: aid }));
-					goBack();
-				},
+				onPress: () => {},
 			},
 		]);
 	};
@@ -88,7 +84,6 @@ const AlbumDetailScreen = () => {
 	];
 
 	async function handleToggleAlbumFavorite() {
-		dispatch(toggleAlbumFavorite({ userId: user.uid, albumId: aid }));
 	}
 
 	const onShare = async () => {

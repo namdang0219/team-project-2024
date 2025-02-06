@@ -14,7 +14,7 @@ import React, {
 	useState,
 } from "react";
 import Gallery, { GalleryRef } from "react-native-awesome-gallery";
-import { IImage } from "types/IImage";
+import { IImage } from "types/ImageType";
 import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BlurView } from "expo-blur";

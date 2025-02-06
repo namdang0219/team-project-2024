@@ -7,15 +7,13 @@ import { ThemedText } from "components/themed";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { Feather } from "@expo/vector-icons";
-import { UserDataType } from "types/UserDataType";
+import { UserType } from "types/UserType";
 
 const ProfileHeader = () => {
 	const { colors } = useTheme();
 	const { photoURL, displayName, posts, friends } = useSelector(
-		(state: RootState) => state.user as UserDataType
+		(state: RootState) => state.user as UserType
 	);
-	console.log("🚀 ~ ProfileHeader ~ friends:", friends)
-	console.log("🚀 ~ ProfileHeader ~ posts:", posts)
 	const { navigate } = useNavigation<any>();
 
 	const styles = StyleSheet.create({

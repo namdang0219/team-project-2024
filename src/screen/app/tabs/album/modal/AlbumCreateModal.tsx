@@ -34,7 +34,7 @@ import { useTheme } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { IAlbum } from "types/IAlbum";
 import { RootState } from "store/configureStore";
-import { UserDataType } from "types/UserDataType";
+import { UserDataType } from "types/UserType";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { db, storage } from "../../../../../../firebaseConfig";
 import { getBlobFromUri } from "util/func/getBlobFromUri";

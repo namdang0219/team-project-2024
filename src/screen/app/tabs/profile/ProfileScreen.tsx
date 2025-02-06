@@ -14,39 +14,10 @@ import { useNavigation } from "@react-navigation/native";
 const ProfileScreen = () => {
 	const insets = useSafeAreaInsets();
 	const [qrCodeModal, , setQrCodeModal] = useToggle(false);
-	const [permission, requestPermission] = useCameraPermissions();
 	const { navigate } = useNavigation<any>();
 
 	const [qrCodeModalState, setQrCodeModalState] =
 		useState<QrCodeModalState>("user-found");
-
-	if (!permission) {
-		// Camera permissions are still loading.
-		return (
-			<View style={{ flex: 1 }}>
-				<Text>No Permissions to access camera!</Text>
-			</View>
-		);
-	}
-
-	if (!permission.granted) {
-		// Camera permissions are not granted yet.
-		return (
-			<View
-				style={{
-					flex: 1,
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<Text>We need your permission to show the camera</Text>
-				<RNButton
-					onPress={requestPermission}
-					title="grant permission"
-				/>
-			</View>
-		);
-	}
 
 	return (
 		<View style={{ flex: 1 }}>

@@ -7,7 +7,7 @@ import { useNavigation, useTheme } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { ThemedText } from "components/themed";
-import { UserDataType } from "types/UserDataType";
+import { UserDataType } from "types/UserType";
 
 const RecentAlbum = () => {
 	const { navigate } = useNavigation<any>();

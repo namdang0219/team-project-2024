@@ -4,12 +4,15 @@ import { ThemedText } from "components/themed";
 import { IUser } from "types/IUser";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { UserDataType } from "types/UserDataType";
+import { UserType } from "types/UserType";
 
 const BaseInfo = () => {
 	const { displayName, email } = useSelector(
-		(state: RootState) => state.user as UserDataType
+		(state: RootState) => state.user as UserType
 	);
+	console.log("🚀 ~ BaseInfo ~ email:", email)
+	console.log("🚀 ~ BaseInfo ~ displayName:", displayName)
+	
 
 	return (
 		<View
