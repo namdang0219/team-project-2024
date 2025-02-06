@@ -40,7 +40,6 @@ export const signup = createAsyncThunk<
 					displayName: user.displayName ?? "",
 					email: user.email ?? "",
 					photoURL: user.photoURL ?? "",
-					albums: [],
 					friends: [],
 					favorites: [],
 					posts: [],

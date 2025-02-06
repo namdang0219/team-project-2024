@@ -2,7 +2,6 @@ import { FriendRequestType } from "./FriendRequestType";
 
 export type UserDataType = {
 	uid: string;
-	albums: string[];
 	displayName: string;
 	photoURL: string;
 	email: string;

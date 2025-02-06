@@ -24,6 +24,8 @@ import Category from "module/albumScreen/Category";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { useTheme } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
 
 const AlbumScreen = () => {
 	const insets = useSafeAreaInsets();
@@ -32,6 +34,10 @@ const AlbumScreen = () => {
 	const [searchModal, toggleSearchModal] = useToggle(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const { colors } = useTheme();
+	
+	const albums = useSelector((state: RootState) => state.album)
+	console.log("🚀 ~ AlbumScreen ~ albums:", albums)
+	
 
 	const options: IOption[] = [
 		{

@@ -87,6 +87,7 @@ const FavoriteAlbum = () => {
 									borderRadius: 12,
 									position: "relative",
 									overflow: "hidden",
+									backgroundColor: colors.input,
 								}}
 							>
 								{user.favorites.includes(item.aid) && (

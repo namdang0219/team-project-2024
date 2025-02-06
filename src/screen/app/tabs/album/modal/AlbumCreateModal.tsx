@@ -57,7 +57,7 @@ const AlbumCreateModal = ({
 	toggleCreateAlbumModal,
 	setCreateAlbumModal,
 	setFirstAlbumCreateModal = () => {},
-	cancelable = false,
+	cancelable = true,
 }: {
 	toggleCreateAlbumModal?: () => void;
 	setCreateAlbumModal?: Dispatch<SetStateAction<boolean>>;
@@ -113,6 +113,7 @@ const AlbumCreateModal = ({
 				text: "破壊",
 				onPress: () => {
 					setCreateAlbumModal && setCreateAlbumModal(false);
+					toggleCreateAlbumModal && toggleCreateAlbumModal();
 				},
 				style: "destructive",
 			},

@@ -6,7 +6,6 @@ const initialState: UserDataType = {
 	displayName: "",
 	email: "",
 	photoURL: "",
-	albums: [],
 	friends: [],
 	favorites: [],
 	create_at: 0,

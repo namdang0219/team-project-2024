@@ -7,7 +7,7 @@ import {
 	Alert,
 	Dimensions,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Button } from "components/button";
 import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,7 +18,7 @@ import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 import { userMocks } from "mock/userMocks";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "store/configureStore";
+import { AppDispatch, RootState } from "store/configureStore";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
 import { IUser } from "types/IUser";
@@ -26,6 +26,8 @@ import { ThemedText } from "components/themed";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { CUSTOM_STYLES } from "style/customStyle";
 import { formatDate } from "util/func/formatDate";
+import { toggleAlbumFavorite } from "store/album/albumSlice";
+import { UserDataType } from "types/UserDataType";
 
 const { width } = Dimensions.get("screen");
 
@@ -34,11 +36,12 @@ const AnimatedThemedText = Animated.createAnimatedComponent(ThemedText);
 const AlbumDetailScreen = () => {
 	const { params } = useRoute<any>();
 	const albums = useSelector((state: RootState) => state.album as IAlbum[]);
-	const dispatch = useDispatch();
+	const dispatch = useDispatch<AppDispatch>();
+	const user = useSelector((state: RootState) => state.user as UserDataType);
 
-	const filteredAlbum = albums.find(
-		(item: IAlbum) => item.aid === params?.aid
-	);
+	const aid = params?.aid;
+
+	const filteredAlbum = albums.find((item: IAlbum) => item.aid === aid);
 	const insets = useSafeAreaInsets();
 	const { navigate, goBack } = useNavigation<any>();
 
@@ -83,6 +86,10 @@ const AlbumDetailScreen = () => {
 			action: removeCurrentAlbum,
 		},
 	];
+
+	async function handleToggleAlbumFavorite() {
+		dispatch(toggleAlbumFavorite({ userId: user.uid, albumId: aid }));
+	}
 
 	const onShare = async () => {
 		try {
@@ -229,7 +236,7 @@ const AlbumDetailScreen = () => {
 										alignItems: "center",
 										justifyContent: "center",
 									}}
-									onPress={() => {}}
+									onPress={handleToggleAlbumFavorite}
 								>
 									<AntDesign
 										name="heart"
