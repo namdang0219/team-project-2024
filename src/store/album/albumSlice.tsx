@@ -2,10 +2,15 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
 	arrayRemove,
 	arrayUnion,
+	collection,
 	deleteDoc,
 	doc,
 	getDoc,
+	getDocs,
+	query,
 	updateDoc,
+	where,
+	writeBatch,
 } from "firebase/firestore";
 import { IAlbum } from "types/IAlbum";
 import { db } from "../../../firebaseConfig";
@@ -59,10 +64,27 @@ export const deleteAlbum = createAsyncThunk<string, { albumId: string }>(
 	"albumSlice/deleteAlbum",
 	async ({ albumId }, { rejectWithValue }) => {
 		try {
-			await deleteDoc(doc(db, "00_albums", albumId));
-			// await updateDoc(doc(db, "00_users", userId), {
-			// 	albums: arrayRemove(albumId),
-			// });
+			const batch = writeBatch(db);
+
+			const albumRef = doc(db, "albums", albumId);
+			batch.delete(albumRef);
+
+			const usersRef = collection(db, "00_users");
+
+			const favoritesQuery = query(
+				usersRef,
+				where("favorites", "array-contains", albumId)
+			);
+			const favoritesSnapshot = await getDocs(favoritesQuery);
+
+			favoritesSnapshot.forEach((docSnap) => {
+				const userRef = doc(db, "00_users", docSnap.id);
+				console.log(docSnap.data());
+				batch.update(userRef, { favorites: arrayRemove(albumId) });
+			});
+
+			await batch.commit();
+
 			Toast.success("削除済み！🎉");
 			return albumId;
 		} catch (error: any) {

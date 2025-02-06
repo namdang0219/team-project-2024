@@ -1,4 +1,10 @@
-import { collection, onSnapshot, query, where } from "firebase/firestore";
+import {
+	collection,
+	onSnapshot,
+	orderBy,
+	query,
+	where,
+} from "firebase/firestore";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
@@ -15,13 +21,18 @@ export const useAlbumListener = () => {
 	useEffect(() => {
 		if (!uid) return;
 
-		const albumsRef = collection(db, "albums");
+		const albumsRef = collection(db, "00_albums");
 
-		const userAlbumsQuery = query(albumsRef, where("author", "==", uid));
+		const userAlbumsQuery = query(
+			albumsRef,
+			where("author", "==", uid),
+			orderBy("updated_at", "desc")
+		);
 
 		const taggedAlbumsQuery = query(
 			albumsRef,
-			where("taggedFriends", "array-contains", uid)
+			where("taggedUsers", "array-contains", uid),
+			orderBy("updated_at", "desc")
 		);
 
 		const unsubscribeUserAlbums = onSnapshot(

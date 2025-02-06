@@ -26,7 +26,7 @@ import { ThemedText } from "components/themed";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { CUSTOM_STYLES } from "style/customStyle";
 import { formatDate } from "util/func/formatDate";
-import { toggleAlbumFavorite } from "store/album/albumSlice";
+import { deleteAlbum, toggleAlbumFavorite } from "store/album/albumSlice";
 import { UserDataType } from "types/UserDataType";
 
 const { width } = Dimensions.get("screen");
@@ -60,8 +60,8 @@ const AlbumDetailScreen = () => {
 			{
 				text: "削除する",
 				style: "destructive",
-				onPress: () => {
-					// dispatch(removeAlbum(filteredAlbum?.aid));
+				onPress: async () => {
+					await dispatch(deleteAlbum({ albumId: aid }));
 					goBack();
 				},
 			},
@@ -241,7 +241,11 @@ const AlbumDetailScreen = () => {
 									<AntDesign
 										name="heart"
 										size={25}
-										// color={isFavorite ? "red" : "#d1d5db"}
+										color={
+											user.favorites.includes(aid)
+												? "red"
+												: "#d1d5db"
+										}
 										style={{ marginTop: 2 }}
 									/>
 								</CustomTouchableOpacity>

@@ -12,10 +12,10 @@ import { UserDataType } from "types/UserDataType";
 
 const AlbumItem = ({
 	item,
-	toggleSeachModal,
+	toggleSeachModal = () => {},
 }: {
 	item: IAlbum;
-	toggleSeachModal: Dispatch<SetStateAction<boolean>>;
+	toggleSeachModal?: Dispatch<SetStateAction<boolean>>;
 }) => {
 	const { navigate } = useNavigation<any>();
 	const user = useSelector((state: RootState) => state.user as UserDataType);
@@ -47,6 +47,7 @@ const AlbumItem = ({
 			fontSize: 16,
 			fontWeight: "medium",
 			marginTop: 6,
+			width: itemWidth
 		},
 	});
 
