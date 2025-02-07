@@ -4,7 +4,7 @@ import Header from "layout/Header";
 import { AlbumList } from "components/list";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useTheme } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 import { UserType } from "types/UserType";
 
@@ -13,6 +13,7 @@ const AlbumListScreen = () => {
 	const { params } = useRoute<any>();
 	const [displayAlbums, setDisplayAlbums] = useState<IAlbum[]>([]);
 	const user = useSelector((state: RootState) => state.user as UserType);
+	const { colors } = useTheme();
 
 	useEffect(() => {
 		if (params.type === "recent") {
@@ -37,8 +38,8 @@ const AlbumListScreen = () => {
 			<Header
 				leftTitle="Album"
 				canGoBack
-				leftTitleStyle={{ color: "black" }}
-				backIconColor="black"
+				leftTitleStyle={{ color: colors.iosBlue }}
+				backIconColor={colors.iosBlue}
 			/>
 
 			<AlbumList data={displayAlbums}></AlbumList>

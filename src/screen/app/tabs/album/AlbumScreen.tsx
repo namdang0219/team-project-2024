@@ -34,6 +34,7 @@ const AlbumScreen = () => {
 	const [searchModal, toggleSearchModal] = useToggle(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const { colors } = useTheme();
+	
 
 	const albums = useSelector((state: RootState) => state.albums);
 

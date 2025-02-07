@@ -49,7 +49,6 @@ const ImageViewScreen = ({
 }) => {
 	const insets = useSafeAreaInsets();
 	const { colors } = useTheme();
-	const images = useSelector((state: RootState) => state.image);
 	const scheme = useColorScheme();
 
 	const imageData = images.filter((i: IImage) => imageIds.includes(i.iid));

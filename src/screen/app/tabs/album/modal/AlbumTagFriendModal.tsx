@@ -18,8 +18,6 @@ import { IUser } from "types/IUser";
 import { Button } from "components/button";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { UserType } from "types/UserType";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "store/configureStore";
 
 const AlbumTagFriendModal = ({
 	toggleTagFriendModal,
@@ -27,7 +25,7 @@ const AlbumTagFriendModal = ({
 	setTaggedFriendId,
 }: {
 	toggleTagFriendModal: () => void;
-	taggedFriendId: IUser["uid"][];
+	taggedFriendId: UserType["uid"][];
 	setTaggedFriendId: Dispatch<SetStateAction<IUser["uid"][]>>;
 }) => {
 	const insets = useSafeAreaInsets();
@@ -84,15 +82,15 @@ const UserItem = ({
 	setTaggedFriendId: Dispatch<SetStateAction<IUser["uid"][]>>;
 }) => {
 	const { colors } = useTheme();
-	const dispatch = useDispatch<AppDispatch>();
 
 	const isTagged = taggedFriendId.includes(item.uid);
 
 	const handleTagFriend = () => {
 		if (isTagged) {
-			return;
+			setTaggedFriendId((prev) => prev.filter((i) => i != item.uid));
+		} else {
+			setTaggedFriendId((prev) => [...prev, item.uid]);
 		}
-		setTaggedFriendId((prev) => [...prev, item.uid]);
 	};
 
 	return (
@@ -145,7 +143,7 @@ const UserItem = ({
 							fontWeight: "500",
 						}}
 					>
-						タグ
+						{isTagged ? "削除" : "タグ"}
 					</Text>
 				</CustomTouchableOpacity>
 			</View>

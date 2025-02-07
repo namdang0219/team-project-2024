@@ -6,8 +6,9 @@ import {
 	Share,
 	Alert,
 	Dimensions,
+	Modal,
 } from "react-native";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "components/button";
 import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -20,7 +21,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "store/configureStore";
 import { OptionModal } from "components/modal";
 import { IOption } from "components/modal/OptionModal";
-import { IUser } from "types/IUser";
 import { ThemedText } from "components/themed";
 import Animated, { FadeInDown } from "react-native-reanimated";
 import { CUSTOM_STYLES } from "style/customStyle";
@@ -31,6 +31,8 @@ import { removeAlbum, updateAlbum } from "store/album/albumSlice";
 import { AlbumType } from "types/AlbumType";
 import * as FileSystem from "expo-file-system";
 import { Toast } from "toastify-react-native";
+import { useToggle } from "hook/useToggle";
+import AlbumTagFriendModal from "./modal/AlbumTagFriendModal";
 
 const { width } = Dimensions.get("screen");
 
@@ -49,6 +51,21 @@ const AlbumDetailScreen = () => {
 	const filteredAlbum = albums.find((item: AlbumType) => item.aid === aid);
 	const insets = useSafeAreaInsets();
 	const { navigate, goBack } = useNavigation<any>();
+	const [tagFriendModal, toggleTagFriendModal] = useToggle(false);
+	const [taggedFriendId, setTaggedFriendId] = useState<AlbumType["aid"][]>(
+		filteredAlbum?.taggedFriends || []
+	);
+
+	useEffect(() => {
+		if (!filteredAlbum) return;
+		dispatch(
+			updateAlbum({
+				...filteredAlbum,
+				update_at: Date.now(),
+				taggedFriends: taggedFriendId,
+			})
+		);
+	}, [taggedFriendId]);
 
 	const { colors } = useTheme();
 
@@ -214,11 +231,9 @@ const AlbumDetailScreen = () => {
 						{/* left container  */}
 						<CustomTouchableOpacity
 							style={{ flexDirection: "row" }}
-							onPress={() =>
-								navigate("GlobalStack", {
-									screen: "AlbumTaggedFriend",
-								})
-							}
+							onPress={() => {
+								toggleTagFriendModal();
+							}}
 						>
 							{taggedFriends.length > 0 &&
 								taggedFriends
@@ -259,6 +274,32 @@ const AlbumDetailScreen = () => {
 											StyleSheet.absoluteFill,
 										]}
 									/>
+									<View
+										style={[
+											{
+												backgroundColor: "black",
+												opacity: 0.35,
+											},
+											StyleSheet.absoluteFill,
+										]}
+									/>
+									<AntDesign
+										name="plus"
+										size={24}
+										color={"white"}
+									/>
+								</View>
+							)}
+							{taggedFriends.length == 0 && (
+								<View
+									style={[
+										styles.taggedFriendNum4,
+										{
+											backgroundColor: colors.input,
+											marginLeft: 0,
+										},
+									]}
+								>
 									<View
 										style={[
 											{
@@ -386,6 +427,18 @@ const AlbumDetailScreen = () => {
 					</Button>
 				</View>
 			</View>
+
+			<Modal
+				visible={tagFriendModal}
+				animationType="slide"
+				presentationStyle="formSheet"
+			>
+				<AlbumTagFriendModal
+					toggleTagFriendModal={toggleTagFriendModal}
+					taggedFriendId={taggedFriendId}
+					setTaggedFriendId={setTaggedFriendId}
+				/>
+			</Modal>
 		</>
 	);
 };

@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import React from "react";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useTheme } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 import Header from "layout/Header";
 import { userMocks } from "mock/userMocks";
@@ -12,6 +12,7 @@ import { AlbumType } from "types/AlbumType";
 const AlbumWithFriendScreen = () => {
 	const { params } = useRoute<any>();
 	const albums = useSelector((state: RootState) => state.albums);
+	const { colors } = useTheme();
 
 	const filteredUser = userMocks.find((u) => u.uid === params.userId);
 
@@ -27,8 +28,8 @@ const AlbumWithFriendScreen = () => {
 			<Header
 				canGoBack
 				leftTitle={filteredUser?.displayName}
-				leftTitleStyle={{ color: "black" }}
-				backIconColor="black"
+				leftTitleStyle={{ color: colors.iosBlue }}
+				backIconColor={colors.iosBlue}
 			/>
 
 			<AlbumList data={filteredAlbums} />

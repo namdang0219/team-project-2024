@@ -1,11 +1,10 @@
-import { AlbumType } from "./AlbumType";
 import { UserType } from "./UserType";
 
 export interface ImageType {
 	iid: string;
-	uri: string;
+	source: { fileName: string; uri: string };
 	author: UserType["uid"];
-	album: AlbumType["aid"][];
+	album: string;
 	location: {
 		lat: number;
 		long: number;

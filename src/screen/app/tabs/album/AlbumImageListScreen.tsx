@@ -1,41 +1,40 @@
-import { View, StatusBar, FlatList, Modal } from "react-native";
-import React, { useRef, useState } from "react";
+import { View, StatusBar, Modal, Text, Image, Dimensions } from "react-native";
+import React, { useState } from "react";
 import Header from "layout/Header";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CustomTouchableOpacity } from "components/custom";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useRoute, useTheme } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { IAlbum } from "types/IAlbum";
-import { IImage } from "types/ImageType";
 import { AntDesign } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { addImagesToAlbum } from "store/album/albumSlice";
 import { Toast } from "toastify-react-native";
 import { useItemWidth } from "hook/useItemWidth";
 import { DIMENTIONS } from "constant/dimention";
-import Animated, {
-	FadeIn,
-	LinearTransition,
-} from "react-native-reanimated";
+import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
+import { AlbumType } from "types/AlbumType";
+import { ImageType } from "types/ImageType";
+import * as FileSystem from "expo-file-system";
+import { updateAlbum } from "store/album/albumSlice";
 import ImageViewScreen from "./ImageViewScreen";
+import { AutoHeightImage } from "components/image";
 
 const GAP = 4;
+const { width } = Dimensions.get("screen");
 
 const AlbumImageListScreen = () => {
 	const insets = useSafeAreaInsets();
 	const { params } = useRoute<any>();
-	const albums = useSelector((state: RootState) => state.album);
+	const albums = useSelector((state: RootState) => state.albums);
 	const dispatch = useDispatch();
 	const user = useSelector((state: RootState) => state.user);
 	const itemWidth = useItemWidth(GAP, 3, 0);
 	const [showImageModal, setShowImageModal] = useState<boolean>(false);
-	const [imageModalImageId, setImageModalImageId] = useState<number>(0);
+	const [showingImage, setShowingImage] = useState<ImageType | null>(null);
+	const { colors } = useTheme();
 
 	const aid = params?.aid;
-	const filteredAlbum = albums.find((a: IAlbum) => aid == a.aid);
-	const imageIds = filteredAlbum?.images || [];
-
+	const filteredAlbum = albums && albums.find((a: AlbumType) => aid == a.aid);
 
 	const pickImages = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -46,22 +45,46 @@ const AlbumImageListScreen = () => {
 		});
 
 		if (!result.canceled) {
-			const newImages: IImage[] = result.assets.map((a) => ({
-				iid: a?.fileName + String(Date.now()),
-				uri: a?.uri,
-				album: [filteredAlbum?.aid as string],
-				author: user.uid,
-				location: {
-					lat: 0,
-					long: 0,
-				},
-				create_at: Number(new Date()),
-				update_at: Number(new Date()),
-			}));
+			if (!user) return;
+			const newImages: ImageType[] = await Promise.all(
+				result.assets.map(async (a, index) => {
+					const fileName =
+						a.fileName && a.fileName + index + Date.now();
+					const newPath = `${FileSystem.documentDirectory}${fileName}`;
+
+					await FileSystem.copyAsync({
+						from: a.uri,
+						to: newPath,
+					});
+
+					console.log("Image copied successfully");
+
+					return {
+						iid: `${a?.fileName}index` as string,
+						album: filteredAlbum?.aid as string,
+						author: user.uid,
+						location: {
+							lat: 0,
+							long: 0,
+						},
+						source: {
+							uri: newPath,
+							fileName: a.uri.split("/").pop() as string,
+						},
+						create_at: Number(new Date()),
+						update_at: Number(new Date()),
+					};
+				})
+			);
+
 			dispatch(
-				addImagesToAlbum({
-					aid: aid,
-					imageIds: newImages.map((i) => String(i.iid)),
+				updateAlbum({
+					...(filteredAlbum as AlbumType),
+					images: [
+						...(filteredAlbum?.images as ImageType[]),
+						...newImages,
+					],
+					update_at: Date.now(),
 				})
 			);
 
@@ -81,18 +104,22 @@ const AlbumImageListScreen = () => {
 					canGoBack
 					intensity={100}
 					leftTitle={filteredAlbum?.title}
-					leftTitleStyle={{ color: "black" }}
-					backIconColor="black"
+					leftTitleStyle={{ color: colors.iosBlue }}
+					backIconColor={colors.iosBlue}
 					rightContainer={
 						<View>
 							<CustomTouchableOpacity onPress={pickImages}>
-								<AntDesign name="plus" size={22} />
+								<AntDesign
+									name="plus"
+									size={22}
+									color={colors.iosBlue}
+								/>
 							</CustomTouchableOpacity>
 						</View>
 					}
 				></Header>
 				<Animated.FlatList
-					// data={imageData}
+					data={filteredAlbum?.images}
 					keyExtractor={(item) => item.iid}
 					numColumns={3}
 					itemLayoutAnimation={LinearTransition}
@@ -107,25 +134,32 @@ const AlbumImageListScreen = () => {
 						<CustomTouchableOpacity
 							onPress={() => {
 								setShowImageModal(true);
-								setImageModalImageId(index);
+								setShowingImage(item);
 							}}
 						>
 							<Animated.Image
-								source={{ uri: item.uri }}
+								source={{ uri: item.source.uri }}
 								style={{ width: itemWidth, aspectRatio: 1 }}
 								entering={FadeIn.duration((index + 1) * 150)}
-								// sharedTransitionTag={item.iid}
 							/>
 						</CustomTouchableOpacity>
 					)}
 				/>
 			</View>
 			<Modal visible={showImageModal}>
-				<ImageViewScreen
-					imageIds={imageIds}
-					imageModalImageId={imageModalImageId}
-					setShowImageModal={setShowImageModal}
-				/>
+				<View
+					style={{
+						flex: 1,
+						backgroundColor: colors.background,
+						alignItems: "center",
+						justifyContent: "center",
+					}}
+				>
+					<AutoHeightImage
+						source={{ uri: showingImage?.source.uri }}
+						width={width}
+					/>
+				</View>
 			</Modal>
 		</>
 	);
