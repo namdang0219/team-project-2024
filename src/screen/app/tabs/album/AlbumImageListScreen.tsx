@@ -1,4 +1,4 @@
-import { View, StatusBar, Modal, Text, Image, Dimensions } from "react-native";
+import { View, StatusBar, Modal, Text, Dimensions, LogBox } from "react-native";
 import React, { useState } from "react";
 import Header from "layout/Header";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -6,7 +6,7 @@ import { CustomTouchableOpacity } from "components/custom";
 import { useRoute, useTheme } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { AntDesign } from "@expo/vector-icons";
+import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { Toast } from "toastify-react-native";
 import { useItemWidth } from "hook/useItemWidth";
@@ -15,9 +15,9 @@ import Animated, { FadeIn, LinearTransition } from "react-native-reanimated";
 import { AlbumType } from "types/AlbumType";
 import { ImageType } from "types/ImageType";
 import * as FileSystem from "expo-file-system";
-import { updateAlbum } from "store/album/albumSlice";
-import ImageViewScreen from "./ImageViewScreen";
+import { removeImage, updateAlbum } from "store/album/albumSlice";
 import { AutoHeightImage } from "components/image";
+import { OptionModal } from "components/modal";
 
 const GAP = 4;
 const { width } = Dimensions.get("screen");
@@ -32,9 +32,11 @@ const AlbumImageListScreen = () => {
 	const [showImageModal, setShowImageModal] = useState<boolean>(false);
 	const [showingImage, setShowingImage] = useState<ImageType | null>(null);
 	const { colors } = useTheme();
+	LogBox.ignoreLogs(["Failed to get size for image file"]);
 
 	const aid = params?.aid;
 	const filteredAlbum = albums && albums.find((a: AlbumType) => aid == a.aid);
+	console.log("🚀 ~ AlbumImageListScreen ~ filteredAlbum:", filteredAlbum);
 
 	const pickImages = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -92,6 +94,59 @@ const AlbumImageListScreen = () => {
 		}
 	};
 
+	const deleteImageFromAlbum = async (imageId: string) => {
+		try {
+			if (!filteredAlbum) return;
+
+			const imageToDelete = filteredAlbum.images.find(
+				(img) => img.iid === imageId
+			);
+			if (!imageToDelete) return;
+
+			await FileSystem.deleteAsync(imageToDelete.source.uri, {
+				idempotent: true,
+			});
+			console.log("Image was deleted:", imageToDelete.source.uri);
+
+			const updatedImages = filteredAlbum.images.filter(
+				(img) => img.iid !== imageId
+			);
+			dispatch(
+				removeImage({
+					albumId: aid,
+					imageId: showingImage?.iid as string,
+				})
+			);
+
+			dispatch(
+				updateAlbum({
+					...filteredAlbum,
+					update_at: Date.now(),
+					images: updatedImages,
+				})
+			);
+			setShowImageModal(false);
+			Toast.success("写真を削除しました");
+		} catch (error) {
+			console.error("Lỗi khi xóa ảnh:", error);
+			Toast.error("削除失敗");
+		}
+	};
+
+	if (!filteredAlbum) {
+		return (
+			<View
+				style={{
+					flex: 1,
+					justifyContent: "center",
+					alignItems: "center",
+				}}
+			>
+				<Text>アルバムが見つかりません</Text>
+			</View>
+		);
+	}
+
 	return (
 		<>
 			<StatusBar barStyle={"dark-content"} />
@@ -119,7 +174,9 @@ const AlbumImageListScreen = () => {
 					}
 				></Header>
 				<Animated.FlatList
-					data={filteredAlbum?.images}
+					data={[...filteredAlbum?.images].sort(
+						(a, b) => b.update_at - a.update_at
+					)}
 					keyExtractor={(item) => item.iid}
 					numColumns={3}
 					itemLayoutAnimation={LinearTransition}
@@ -147,14 +204,90 @@ const AlbumImageListScreen = () => {
 				/>
 			</View>
 			<Modal visible={showImageModal}>
+				{/* main container  */}
 				<View
 					style={{
 						flex: 1,
 						backgroundColor: colors.background,
 						alignItems: "center",
 						justifyContent: "center",
+						position: "relative",
 					}}
 				>
+					<View
+						style={{
+							height: DIMENTIONS.HEADER_HEIGHT,
+							position: "absolute",
+							top: 0,
+							left: 0,
+							width,
+							paddingHorizontal: DIMENTIONS.APP_PADDING,
+							marginTop: insets.top,
+							flexDirection: "row",
+							alignItems: "center",
+							justifyContent: "space-between",
+							backgroundColor: colors.background,
+							borderBottomColor: colors.input,
+							borderBottomWidth: 1,
+							zIndex: 100,
+						}}
+					>
+						<CustomTouchableOpacity
+							style={{
+								flexDirection: "row",
+								alignItems: "center",
+								gap: 10,
+							}}
+							onPress={() => setShowImageModal(false)}
+						>
+							<AntDesign
+								name="close"
+								size={22}
+								color={colors.iosBlue}
+							/>
+							<Text
+								style={{ color: colors.iosBlue, fontSize: 18 }}
+							>
+								写真表示
+							</Text>
+						</CustomTouchableOpacity>
+
+						<View
+							style={{
+								flexDirection: "row",
+								alignItems: "center",
+								gap: 20,
+							}}
+						>
+							<CustomTouchableOpacity>
+								<Feather
+									name="edit"
+									color={colors.iosBlue}
+									size={22}
+								/>
+							</CustomTouchableOpacity>
+							<OptionModal
+								iconStyle={{ color: colors.iosBlue }}
+								options={[
+									{
+										label: "写真を削除",
+										icon: (
+											<Ionicons
+												name="trash-outline"
+												size={16}
+											/>
+										),
+										action: () => {
+											showingImage &&
+												deleteImageFromAlbum(
+													showingImage?.iid
+												);
+										},
+									},
+								]}
+							/>
+						</View>
+					</View>
 					<AutoHeightImage
 						source={{ uri: showingImage?.source.uri }}
 						width={width}

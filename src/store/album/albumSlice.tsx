@@ -25,7 +25,19 @@ export const albumSlice = createSlice({
 				(album) => album.aid !== action.payload
 			));
 		},
+
+		removeImage: (
+			state,
+			action: PayloadAction<{ albumId: string; imageId: string }>
+		) => {
+			const album = state.find((a) => a.aid === action.payload.albumId);
+			if (album) {
+				album.images = album.images.filter(
+					(img) => img.iid !== action.payload.imageId
+				);
+			}
+		},
 	},
 });
 
-export const { addNewAlbum, updateAlbum, removeAlbum } = albumSlice.actions;
+export const { addNewAlbum, updateAlbum, removeAlbum,removeImage } = albumSlice.actions;
