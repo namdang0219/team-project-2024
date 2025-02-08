@@ -32,7 +32,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { IAlbum } from "types/IAlbum";
-import { addImagesToAlbum } from "store/album/albumSlice";
+import { addImagesToAlbum, updateAlbum } from "store/album/albumSlice";
+import { ImageType } from "types/ImageType";
+import * as FileSystem from "expo-file-system";
+import { AlbumType } from "types/AlbumType";
 
 const SavePhotoScreen = ({ route }: { route: any }) => {
 	const { capturedUri } = route.params;
@@ -40,12 +43,13 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 	const { goBack, navigate } = useNavigation<any>();
 	const [loading, setLoading] = useState<boolean>(false);
 	const insets = useSafeAreaInsets();
-	const albums = useSelector((state: RootState) => state.album);
+	const albums = useSelector((state: RootState) => state.albums);
 	const { colors } = useTheme();
 	const [selectedAlbumIds, setSelectedAlbumIds] = useState<IAlbum["aid"][]>(
 		[]
 	);
 	const dispatch = useDispatch();
+	const user = useSelector((state: RootState) => state.user);
 
 	const actionSheetRef = useRef<ActionSheetRef>(null);
 
@@ -63,24 +67,53 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 	};
 
 	const handleDoneButton = () => {
-		const handleAddToAlbum = () => {
-			selectedAlbumIds.forEach((aid) => {
-				dispatch(
-					addImagesToAlbum({
-						aid: aid,
-						images: [
-							{
-								iid: Math.random(),
-								uri: capturedUri,
-							},
-						],
-					})
-				);
-			});
+		if (!user) return;
+		const handleAddToAlbum = async () => {
+			await Promise.all(
+				selectedAlbumIds.map(async (aid, index) => {
+					const fileName = Date.now().toString();
+					const newPath = `${FileSystem.documentDirectory}${fileName}`;
+
+					await FileSystem.copyAsync({
+						from: capturedUri,
+						to: newPath,
+					});
+
+					console.log("Image copied successfully");
+
+					const newImage: ImageType = {
+						iid: `${Date.now()}${index}` as string,
+						album: aid,
+						author: user.uid as string,
+						location: {
+							lat: 0,
+							long: 0,
+						},
+						source: {
+							uri: newPath,
+							fileName: capturedUri.split("/").pop() as string,
+						},
+						create_at: Number(new Date()),
+						update_at: Number(new Date()),
+					};
+
+					const filteredAlbum =
+						albums && albums.find((a) => a.aid === aid);
+
+					if (!filteredAlbum) return;
+
+					dispatch(
+						updateAlbum({
+							...(filteredAlbum as AlbumType),
+							images: [...filteredAlbum.images, newImage],
+							update_at: Date.now(),
+						})
+					);
+				})
+			);
 			navigate("AlbumStack", {
 				screen: "AlbumScreen",
 			});
-			Toast.success("写真をアルバムに追加しました");
 		};
 
 		if (selectedAlbumIds.length == 0) {
@@ -345,7 +378,7 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 									}}
 								>
 									<Image
-										source={{ uri: item.cover }}
+										source={{ uri: item.cover.uri }}
 										style={{
 											width: 45,
 											aspectRatio: 1,

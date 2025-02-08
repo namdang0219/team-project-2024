@@ -37,6 +37,7 @@ const AlbumScreen = () => {
 	
 
 	const albums = useSelector((state: RootState) => state.albums);
+	console.log("🚀 ~ AlbumScreen ~ albums:", albums)
 
 	const options: IOption[] = [
 		{
