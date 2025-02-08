@@ -1,4 +1,12 @@
-import { View, StatusBar, Modal, Text, Dimensions, LogBox } from "react-native";
+import {
+	View,
+	StatusBar,
+	Modal,
+	Text,
+	Dimensions,
+	LogBox,
+	useColorScheme,
+} from "react-native";
 import React, { useState } from "react";
 import Header from "layout/Header";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,6 +31,7 @@ const GAP = 4;
 const { width } = Dimensions.get("screen");
 
 const AlbumImageListScreen = () => {
+	const scheme = useColorScheme();
 	const insets = useSafeAreaInsets();
 	const { params } = useRoute<any>();
 	const albums = useSelector((state: RootState) => state.albums);
@@ -149,7 +158,9 @@ const AlbumImageListScreen = () => {
 
 	return (
 		<>
-			<StatusBar barStyle={"dark-content"} />
+			<StatusBar
+				barStyle={scheme === "dark" ? "light-content" : "dark-content"}
+			/>
 			<View
 				style={{
 					flex: 1,

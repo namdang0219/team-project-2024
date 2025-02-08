@@ -133,11 +133,9 @@ const AlbumCreateModal = ({
 
 	const createAlbum = async (value: ICreateAlbum) => {
 		try {
-			// Lưu ảnh vào bộ nhớ ứng dụng
-			const fileName = image.split("/").pop(); // Lấy tên file từ URI
-			const newPath = `${FileSystem.documentDirectory}${fileName}`; // Đường dẫn mới
+			const fileName = image.split("/").pop();
+			const newPath = `${FileSystem.documentDirectory}${fileName}`;
 
-			// Sao chép ảnh vào bộ nhớ ứng dụng
 			await FileSystem.copyAsync({
 				from: image,
 				to: newPath,
@@ -145,7 +143,6 @@ const AlbumCreateModal = ({
 
 			if (!fileName) return;
 
-			// Lưu đường dẫn vào AsyncStorage
 			const newAlbum: AlbumType = {
 				aid: `${Date.now()}`,
 				author: user.uid,

@@ -27,7 +27,7 @@ export default GridSection;
 const styles = StyleSheet.create({
 	line: {
 		position: "absolute",
-		backgroundColor: "rgba(255, 255, 255, 0.5)",
+		backgroundColor: "rgba(255, 255, 255, 0.25)",
 	},
 	horizontalLine: {
 		width: "100%",

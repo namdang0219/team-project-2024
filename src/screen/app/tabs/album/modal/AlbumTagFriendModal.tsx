@@ -29,11 +29,17 @@ const AlbumTagFriendModal = ({
 	setTaggedFriendId: Dispatch<SetStateAction<IUser["uid"][]>>;
 }) => {
 	const insets = useSafeAreaInsets();
+	const { colors } = useTheme();
 
 	return (
 		<TouchableWithoutFeedback onPress={handlePressBackground}>
 			{/* content  */}
-			<View style={{ flex: 1, marginHorizontal: DIMENTIONS.APP_PADDING }}>
+			<View
+				style={{
+					flex: 1,
+					marginHorizontal: DIMENTIONS.APP_PADDING,
+				}}
+			>
 				<View style={styles.searchContainer}>
 					<TextInput
 						placeholder="友達を検索"

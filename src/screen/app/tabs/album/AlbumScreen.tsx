@@ -5,6 +5,7 @@ import {
 	ScrollView,
 	Modal,
 	RefreshControl,
+	Image,
 } from "react-native";
 import React, { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -34,10 +35,8 @@ const AlbumScreen = () => {
 	const [searchModal, toggleSearchModal] = useToggle(false);
 	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	const { colors } = useTheme();
-	
 
 	const albums = useSelector((state: RootState) => state.albums);
-	console.log("🚀 ~ AlbumScreen ~ albums:", albums)
 
 	const options: IOption[] = [
 		{
@@ -56,6 +55,15 @@ const AlbumScreen = () => {
 
 	return (
 		<View style={{ flex: 1 }}>
+			<Image
+				source={{
+					uri: "file:///var/mobile/Containers/Data/Application/E02C2A04-F5B7-445D-B3E1-01D4E2B5F026/Documents/1739038345833",
+				}}
+				width={500}
+				height={400}
+				resizeMode="contain"
+			/>
+
 			{/* header : top + 50  */}
 			<BlurView
 				style={{

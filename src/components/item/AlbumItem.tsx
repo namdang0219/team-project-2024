@@ -1,4 +1,4 @@
-import { View, Text, ImageBackground, StyleSheet } from "react-native";
+import { View, ImageBackground, StyleSheet } from "react-native";
 import React, { Dispatch, SetStateAction } from "react";
 import { DIMENTIONS } from "constant/dimention";
 import { CustomTouchableOpacity } from "components/custom";
@@ -8,7 +8,8 @@ import { IAlbum } from "types/IAlbum";
 import { useItemWidth } from "hook/useItemWidth";
 import { useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { UserDataType } from "types/UserType";
+import { ThemedText } from "components/themed";
+import { UserType } from "types/UserType";
 
 const AlbumItem = ({
 	item,
@@ -18,7 +19,7 @@ const AlbumItem = ({
 	toggleSeachModal?: Dispatch<SetStateAction<boolean>>;
 }) => {
 	const { navigate } = useNavigation<any>();
-	const user = useSelector((state: RootState) => state.user as UserDataType);
+	const user = useSelector((state: RootState) => state.user as UserType);
 	const itemWidth = useItemWidth(DIMENTIONS.LIST_GAP, 2);
 	const { colors } = useTheme();
 
@@ -47,7 +48,7 @@ const AlbumItem = ({
 			fontSize: 16,
 			fontWeight: "medium",
 			marginTop: 6,
-			width: itemWidth
+			width: itemWidth,
 		},
 	});
 
@@ -73,9 +74,9 @@ const AlbumItem = ({
 					</View>
 				)}
 			</ImageBackground>
-			<Text numberOfLines={1} style={styles.title}>
+			<ThemedText numberOfLines={1} style={styles.title}>
 				{item.title}
-			</Text>
+			</ThemedText>
 		</CustomTouchableOpacity>
 	);
 };

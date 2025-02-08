@@ -32,22 +32,21 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import { IAlbum } from "types/IAlbum";
-import { addImagesToAlbum, updateAlbum } from "store/album/albumSlice";
+import { updateAlbum } from "store/album/albumSlice";
 import { ImageType } from "types/ImageType";
 import * as FileSystem from "expo-file-system";
 import { AlbumType } from "types/AlbumType";
 
 const SavePhotoScreen = ({ route }: { route: any }) => {
 	const { capturedUri } = route.params;
+	console.log("🚀 ~ SavePhotoScreen ~ capturedUri:", capturedUri);
 	const { width: screenWidth } = useWindowDimensions();
 	const { goBack, navigate } = useNavigation<any>();
 	const [loading, setLoading] = useState<boolean>(false);
 	const insets = useSafeAreaInsets();
 	const albums = useSelector((state: RootState) => state.albums);
 	const { colors } = useTheme();
-	const [selectedAlbumIds, setSelectedAlbumIds] = useState<IAlbum["aid"][]>(
-		[]
-	);
+	const [selectedAlbumId, setSelectedAlbumId] = useState<IAlbum["aid"]>("");
 	const dispatch = useDispatch();
 	const user = useSelector((state: RootState) => state.user);
 
@@ -68,47 +67,46 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 
 	const handleDoneButton = () => {
 		if (!user) return;
+
 		const handleAddToAlbum = async () => {
-			await Promise.all(
-				selectedAlbumIds.map(async (aid, index) => {
-					const fileName = Date.now().toString();
-					const newPath = `${FileSystem.documentDirectory}${fileName}`;
+			const fileName = capturedUri.split("/").pop();
+			const newPath = `${FileSystem.documentDirectory}${fileName}`;
 
-					await FileSystem.copyAsync({
-						from: capturedUri,
-						to: newPath,
-					});
+			await FileSystem.copyAsync({
+				from: capturedUri,
+				to: newPath,
+			});
 
-					console.log("Image copied successfully");
+			console.log("🚀 ~ handleAddToAlbum ~ newPath:", newPath);
 
-					const newImage: ImageType = {
-						iid: `${Date.now()}${index}` as string,
-						album: aid,
-						author: user.uid as string,
-						location: {
-							lat: 0,
-							long: 0,
-						},
-						source: {
-							uri: newPath,
-							fileName: capturedUri.split("/").pop() as string,
-						},
-						create_at: Number(new Date()),
-						update_at: Number(new Date()),
-					};
+			console.log("Image copied successfully");
 
-					const filteredAlbum =
-						albums && albums.find((a) => a.aid === aid);
+			const newImage: ImageType = {
+				iid: `${Date.now()}`,
+				album: selectedAlbumId,
+				author: user.uid as string,
+				location: {
+					lat: 0,
+					long: 0,
+				},
+				source: {
+					uri: newPath,
+					fileName,
+				},
+				create_at: Date.now(),
+				update_at: Date.now(),
+			};
 
-					if (!filteredAlbum) return;
+			const filteredAlbum =
+				albums && albums.find((a) => a.aid === selectedAlbumId);
 
-					dispatch(
-						updateAlbum({
-							...(filteredAlbum as AlbumType),
-							images: [...filteredAlbum.images, newImage],
-							update_at: Date.now(),
-						})
-					);
+			if (!filteredAlbum) return;
+
+			dispatch(
+				updateAlbum({
+					...(filteredAlbum as AlbumType),
+					images: [...filteredAlbum.images, newImage],
+					update_at: Date.now(),
 				})
 			);
 			navigate("AlbumStack", {
@@ -116,12 +114,12 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 			});
 		};
 
-		if (selectedAlbumIds.length == 0) {
+		if (!selectedAlbumId) {
 			navigate("AlbumStack", {
 				screen: "AlbumScreen",
 			});
 			return;
-		} else if (selectedAlbumIds.length > 0) {
+		} else if (selectedAlbumId) {
 			Alert.alert("選択したアルバムに追加してもよろしいですか？", "", [
 				{
 					text: "キャンセル",
@@ -353,20 +351,10 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 							}}
 							renderItem={({ item }) => (
 								<CustomTouchableOpacity
-									onPress={() =>
-										setSelectedAlbumIds((prev) => {
-											if (prev.includes(item.aid)) {
-												return prev.filter(
-													(id) => id !== item.aid
-												);
-											} else {
-												return [...prev, item.aid];
-											}
-										})
-									}
+									onPress={() => setSelectedAlbumId(item.aid)}
 									style={{
 										backgroundColor:
-											selectedAlbumIds.includes(item.aid)
+											selectedAlbumId == item.aid
 												? colors.primary
 												: colors.input,
 										padding: 10,
@@ -390,11 +378,10 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 											numberOfLines={1}
 											style={{
 												fontWeight: "500",
-												color: selectedAlbumIds.includes(
-													item.aid
-												)
-													? "white"
-													: "black",
+												color:
+													selectedAlbumId == item.aid
+														? "white"
+														: "black",
 											}}
 										>
 											{item.title}
@@ -403,11 +390,10 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 											numberOfLines={1}
 											style={{
 												marginTop: 5,
-												color: selectedAlbumIds.includes(
-													item.aid
-												)
-													? "white"
-													: colors.subGray,
+												color:
+													selectedAlbumId == item.aid
+														? "white"
+														: colors.subGray,
 												fontSize: 12,
 											}}
 										>{`${item.images.length}枚`}</Text>
@@ -425,7 +411,7 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 						loading={loading}
 						onPress={handleDoneButton}
 					>
-						{selectedAlbumIds.length > 0
+						{selectedAlbumId
 							? "追加してアルバムへ"
 							: "アルバムに戻る"}
 					</Button>

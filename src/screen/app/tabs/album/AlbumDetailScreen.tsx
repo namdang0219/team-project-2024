@@ -88,8 +88,10 @@ const AlbumDetailScreen = () => {
 			}
 
 			for (const image of filteredAlbum.images) {
-				await FileSystem.deleteAsync(image.uri, { idempotent: true });
-				console.log("Image was deleted:", image.uri);
+				await FileSystem.deleteAsync(image.source.uri, {
+					idempotent: true,
+				});
+				console.log("Image was deleted:", image.source.uri);
 			}
 
 			// Delete album from user favorites if include

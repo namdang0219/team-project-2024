@@ -43,7 +43,7 @@ export const darkTheme: ThemeTypes = {
 		icon: "#A2A2A8",
 		input: "#262626",
 		subGray: "#868686",
-		iosBlue: "#007AFF",
+		iosBlue: "#0A84FF",
 	},
 };
 
