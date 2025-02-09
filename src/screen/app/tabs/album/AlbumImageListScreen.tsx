@@ -45,7 +45,6 @@ const AlbumImageListScreen = () => {
 
 	const aid = params?.aid;
 	const filteredAlbum = albums && albums.find((a: AlbumType) => aid == a.aid);
-	console.log("🚀 ~ AlbumImageListScreen ~ filteredAlbum:", filteredAlbum);
 
 	const pickImages = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({

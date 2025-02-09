@@ -1,8 +1,4 @@
-import {
-	View,
-	StyleSheet,
-	Dimensions,
-} from "react-native";
+import { View, StyleSheet, Dimensions } from "react-native";
 import React from "react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
@@ -63,7 +59,7 @@ export const Sticker = ({ source }: { source: string }) => {
 			position: "absolute",
 			top: Dimensions.get("window").height / 2 - 50,
 			left: Dimensions.get("window").width / 2 - 50,
-			zIndex: 100000,
+			zIndex: 100,
 		},
 	});
 
@@ -77,6 +73,7 @@ export const Sticker = ({ source }: { source: string }) => {
 		>
 			<Animated.Image
 				source={{ uri: source }}
+				resizeMode="contain"
 				style={[styles.sticker, animatedStyle]}
 			/>
 		</GestureDetector>

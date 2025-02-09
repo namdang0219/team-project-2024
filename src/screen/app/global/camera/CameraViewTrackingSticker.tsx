@@ -1,4 +1,10 @@
-import { View, Image, StyleSheet, useWindowDimensions } from "react-native";
+import {
+	View,
+	Image,
+	StyleSheet,
+	useWindowDimensions,
+	LogBox,
+} from "react-native";
 import React, { FC } from "react";
 import { TrackingStickerType } from "../CameraScreen";
 import { Face } from "react-native-vision-camera-face-detector";
@@ -17,6 +23,9 @@ const CameraViewTrackingSticker: FC<CameraViewTrackingStickerProps> = ({
 		width: width,
 		height: (width / 9) * 16,
 	};
+	LogBox.ignoreLogs([
+		'Each child in a list should have a unique "key" prop.',
+	]);
 
 	return (
 		<View style={[StyleSheet.absoluteFill]}>
@@ -35,7 +44,7 @@ const CameraViewTrackingSticker: FC<CameraViewTrackingStickerProps> = ({
 						) => (
 							<>
 								<View
-									key={currentTrackingSticker.sid}
+									key={index}
 									style={{
 										position: "absolute",
 										width:

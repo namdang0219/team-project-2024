@@ -4,7 +4,7 @@ import { CustomTouchableOpacity } from "components/custom";
 import { useNavigation } from "@react-navigation/native";
 import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { captureRef } from "react-native-view-shot";
-import { ISticker } from "./CaptureArea";
+import { ISticker } from "./Sticker";
 
 type CameraTopbarProps = {
 	previewPhotoUri: string | null;

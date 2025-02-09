@@ -19,10 +19,6 @@ const AlbumListScreen = () => {
 		if (params.type === "recent") {
 			setDisplayAlbums(albums);
 		} else if (params.type === "favorites") {
-			// const favoriteAlbums = albums.filter(
-			// 	(a: IAlbum) => a.favorite == true
-			// );
-			// setDisplayAlbums(favoriteAlbums);
 			const userFavorites = user.favorites;
 			const favoriteAlbums = albums.filter((a: IAlbum) =>
 				userFavorites.includes(a.aid)

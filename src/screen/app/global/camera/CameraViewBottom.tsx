@@ -72,7 +72,6 @@ const CameraViewBottom: FC<CameraViewBottomProps> = ({
 	const handleCaptureImage = async () => {
 		if (cameraRef.current) {
 			try {
-				// Chụp ảnh từ camera
 				const photo = await cameraRef?.current.takePhoto({
 					flash: flash ? "on" : "off",
 				});

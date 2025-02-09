@@ -26,7 +26,7 @@ import Svg, {
 	Stop,
 } from "react-native-svg";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
-import { Toast } from "toastify-react-native";
+import ToastManager, { Toast } from "toastify-react-native";
 import ActionSheet, { ActionSheetRef } from "react-native-actions-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,7 +39,6 @@ import { AlbumType } from "types/AlbumType";
 
 const SavePhotoScreen = ({ route }: { route: any }) => {
 	const { capturedUri } = route.params;
-	console.log("🚀 ~ SavePhotoScreen ~ capturedUri:", capturedUri);
 	const { width: screenWidth } = useWindowDimensions();
 	const { goBack, navigate } = useNavigation<any>();
 	const [loading, setLoading] = useState<boolean>(false);
@@ -77,10 +76,6 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 				to: newPath,
 			});
 
-			console.log("🚀 ~ handleAddToAlbum ~ newPath:", newPath);
-
-			console.log("Image copied successfully");
-
 			const newImage: ImageType = {
 				iid: `${Date.now()}`,
 				album: selectedAlbumId,
@@ -109,9 +104,11 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 					update_at: Date.now(),
 				})
 			);
+			actionSheetRef.current?.hide();
 			navigate("AlbumStack", {
 				screen: "AlbumScreen",
 			});
+			ToastManager.success("追加済み！✅");
 		};
 
 		if (!selectedAlbumId) {
@@ -283,38 +280,52 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 					</View>
 				</View>
 
-				{/* download button  */}
-				<Button
-					style={{ marginTop: 16 }}
-					loading={loading}
-					onPress={() => {
-						Alert.alert(
-							"写真をカメラロールに保存してもよろしいですか？",
-							"",
-							[
-								{
-									text: "キャンセル",
-									style: "cancel",
-								},
-								{
-									text: "はい",
-									onPress: () =>
-										savePhotoToCameraRoll(capturedUri),
-								},
-							]
-						);
-					}}
-				>
-					<View style={styles.buttonContent}>
-						<Feather
-							name="download"
-							color="white"
-							size={20}
-							style={{ position: "absolute", left: -90 }}
-						/>
-						<Text style={styles.buttonText}>デバイスに保存</Text>
+				<View>
+					<View style={{ marginTop: 20 }}>
+						<CustomTouchableOpacity
+							style={{ marginHorizontal: "auto" }}
+							onPress={() => actionSheetRef.current?.show()}
+						>
+							<Text style={{ color: "white", fontSize: 16 }}>
+								アルバムに追加
+							</Text>
+						</CustomTouchableOpacity>
 					</View>
-				</Button>
+					{/* download button  */}
+					<Button
+						style={{ marginTop: 20 }}
+						loading={loading}
+						onPress={() => {
+							Alert.alert(
+								"写真をカメラロールに保存してもよろしいですか？",
+								"",
+								[
+									{
+										text: "キャンセル",
+										style: "cancel",
+									},
+									{
+										text: "はい",
+										onPress: () =>
+											savePhotoToCameraRoll(capturedUri),
+									},
+								]
+							);
+						}}
+					>
+						<View style={styles.buttonContent}>
+							<Feather
+								name="download"
+								color="white"
+								size={20}
+								style={{ position: "absolute", left: -90 }}
+							/>
+							<Text style={styles.buttonText}>
+								デバイスに保存
+							</Text>
+						</View>
+					</Button>
+				</View>
 			</View>
 			<ActionSheet
 				ref={actionSheetRef}

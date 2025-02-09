@@ -1,4 +1,4 @@
-import { View, Text, Button as RNButton } from "react-native";
+import { View } from "react-native";
 import React, { useState } from "react";
 import { CustomTouchableOpacity } from "components/custom";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
@@ -6,7 +6,6 @@ import Header from "layout/Header";
 import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToggle } from "hook/useToggle";
-import { useCameraPermissions } from "expo-camera";
 import ProfileTab from "module/profile/ProfileTab";
 import QrCodeModal, { QrCodeModalState } from "module/profile/QrCodeModal";
 import { useNavigation } from "@react-navigation/native";

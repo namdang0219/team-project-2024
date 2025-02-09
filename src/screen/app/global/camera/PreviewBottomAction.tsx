@@ -38,7 +38,6 @@ const PreviewBottomAction: FC<PreviewBottomActionProps> = ({
 			<CustomTouchableOpacity
 				style={styles.featureItem}
 				onPress={toggleShowAddItem}
-				// onPress={toggleStickerModal}
 			>
 				<IconPlus gradient={showAddItem} />
 			</CustomTouchableOpacity>

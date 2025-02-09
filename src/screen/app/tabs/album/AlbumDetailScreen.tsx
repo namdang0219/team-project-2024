@@ -73,6 +73,7 @@ const AlbumDetailScreen = () => {
 		filteredAlbum?.taggedFriends.includes(u.uid)
 	);
 
+	// delete album
 	const deleteAlbum = async () => {
 		if (!filteredAlbum) return;
 		try {
@@ -162,6 +163,7 @@ const AlbumDetailScreen = () => {
 				})
 			);
 			updateUpdateTime();
+			Toast.success("お気に入りから削除済み");
 		} else if (!user.favorites.includes(aid)) {
 			dispatch(
 				setUserData({
@@ -169,6 +171,7 @@ const AlbumDetailScreen = () => {
 				})
 			);
 			updateUpdateTime();
+			Toast.success("お気に入りに追加済み");
 		}
 	}
 

@@ -11,12 +11,14 @@ type CameraViewTopBarProps = {
 	previewPhotoUri: string | null;
 	setIsCameraVisible: Dispatch<SetStateAction<boolean>>;
 	setPreviewPhotoUri: Dispatch<SetStateAction<string>>;
+	viewRef: React.RefObject<View>;
 };
 
 const CameraViewTopBar: FC<CameraViewTopBarProps> = ({
 	previewPhotoUri,
 	setIsCameraVisible,
 	setPreviewPhotoUri,
+	viewRef,
 }) => {
 	const { width } = useWindowDimensions();
 	const { goBack, navigate } = useNavigation<any>();
@@ -33,11 +35,10 @@ const CameraViewTopBar: FC<CameraViewTopBarProps> = ({
 
 	const handleSaveImage = async () => {
 		try {
-			// const capturedUri = await captureRef(viewRef, {
-			// 	format: "jpg",
-			// 	quality: 0.8,
-			// });
-			const capturedUri = previewPhotoUri;
+			const capturedUri = await captureRef(viewRef, {
+				format: "jpg",
+				quality: 0.8,
+			});
 			navigate("SavePhotoScreen", { capturedUri });
 		} catch (error) {
 			console.error("Something went wrong!", error);
@@ -56,7 +57,7 @@ const CameraViewTopBar: FC<CameraViewTopBarProps> = ({
 				width,
 				top: 0,
 				left: 0,
-				zIndex: 100,
+				zIndex: 10000,
 			}}
 		>
 			<CustomTouchableOpacity
