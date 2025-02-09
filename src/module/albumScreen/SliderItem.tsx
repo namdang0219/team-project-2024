@@ -5,13 +5,21 @@ import { useNavigation } from "@react-navigation/native";
 import { IAlbum } from "types/IAlbum";
 
 const SliderItem = ({ item }: { item: IAlbum }) => {
+	const { navigate } = useNavigation<any>();
+
 	return (
-		<View
+		<CustomTouchableOpacity
 			style={{
 				flex: 1,
 				borderRadius: 10,
 				overflow: "hidden",
 			}}
+			onPress={() =>
+				navigate("GlobalStack", {
+					screen: "AlbumDetailScreen",
+					params: { aid: item.aid },
+				})
+			}
 		>
 			<ImageBackground
 				source={{
@@ -47,7 +55,7 @@ const SliderItem = ({ item }: { item: IAlbum }) => {
 					>{`${item.images.length}枚`}</Text>
 				</View>
 			</ImageBackground>
-		</View>
+		</CustomTouchableOpacity>
 	);
 };
 

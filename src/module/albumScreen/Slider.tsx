@@ -78,9 +78,9 @@ const Slider = () => {
 			</View>
 
 			{/* pagination  */}
-			{/* <Pagination.Basic
+			<Pagination.Basic
 				progress={progress}
-				data={albums}
+				data={albums || []}
 				size={7.5}
 				dotStyle={{
 					backgroundColor: "#ddd6fe",
@@ -95,7 +95,7 @@ const Slider = () => {
 				}}
 				horizontal
 				onPress={onPressPagination}
-			/> */}
+			/>
 		</View>
 	);
 };
