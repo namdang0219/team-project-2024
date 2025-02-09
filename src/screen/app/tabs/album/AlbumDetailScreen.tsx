@@ -33,6 +33,7 @@ import * as FileSystem from "expo-file-system";
 import { Toast } from "toastify-react-native";
 import { useToggle } from "hook/useToggle";
 import AlbumTagFriendModal from "./modal/AlbumTagFriendModal";
+import TaggedFriends from "module/albumDetail/TaggedFriends";
 
 const { width } = Dimensions.get("screen");
 
@@ -51,21 +52,6 @@ const AlbumDetailScreen = () => {
 	const filteredAlbum = albums.find((item: AlbumType) => item.aid === aid);
 	const insets = useSafeAreaInsets();
 	const { navigate, goBack } = useNavigation<any>();
-	const [tagFriendModal, toggleTagFriendModal] = useToggle(false);
-	const [taggedFriendId, setTaggedFriendId] = useState<AlbumType["aid"][]>(
-		filteredAlbum?.taggedFriends || []
-	);
-
-	useEffect(() => {
-		if (!filteredAlbum) return;
-		dispatch(
-			updateAlbum({
-				...filteredAlbum,
-				update_at: Date.now(),
-				taggedFriends: taggedFriendId,
-			})
-		);
-	}, [taggedFriendId]);
 
 	const { colors } = useTheme();
 
@@ -234,94 +220,7 @@ const AlbumDetailScreen = () => {
 					{/* action bottom bar  */}
 					<View style={[styles.actionBottomContainer]}>
 						{/* left container  */}
-						<CustomTouchableOpacity
-							style={{ flexDirection: "row" }}
-							onPress={() => {
-								toggleTagFriendModal();
-							}}
-						>
-							{taggedFriends.length > 0 &&
-								taggedFriends
-									.slice(0, 3)
-									.map((f: UserType, index) => (
-										<View
-											key={f.uid}
-											style={[
-												styles.taggedFriendContainer,
-												{
-													marginLeft:
-														index == 0 ? 0 : -20,
-												},
-											]}
-										>
-											<Image
-												source={{
-													uri: f?.photoURL,
-												}}
-												style={{
-													flex: 1,
-													borderRadius: 1000,
-												}}
-											/>
-										</View>
-									))}
-							{taggedFriends.length > 3 && (
-								<View style={styles.taggedFriendNum4}>
-									<Image
-										source={{
-											uri: taggedFriends[3].photoURL,
-										}}
-										style={[
-											{
-												flex: 1,
-												borderRadius: 1000,
-											},
-											StyleSheet.absoluteFill,
-										]}
-									/>
-									<View
-										style={[
-											{
-												backgroundColor: "black",
-												opacity: 0.35,
-											},
-											StyleSheet.absoluteFill,
-										]}
-									/>
-									<AntDesign
-										name="plus"
-										size={24}
-										color={"white"}
-									/>
-								</View>
-							)}
-							{taggedFriends.length == 0 && (
-								<View
-									style={[
-										styles.taggedFriendNum4,
-										{
-											backgroundColor: colors.input,
-											marginLeft: 0,
-										},
-									]}
-								>
-									<View
-										style={[
-											{
-												backgroundColor: "black",
-												opacity: 0.35,
-											},
-											StyleSheet.absoluteFill,
-										]}
-									/>
-									<AntDesign
-										name="plus"
-										size={24}
-										color={"white"}
-									/>
-								</View>
-							)}
-						</CustomTouchableOpacity>
+						<TaggedFriends aid={aid} />
 
 						{/* right container  */}
 						<View
@@ -432,18 +331,6 @@ const AlbumDetailScreen = () => {
 					</Button>
 				</View>
 			</View>
-
-			<Modal
-				visible={tagFriendModal}
-				animationType="slide"
-				presentationStyle="formSheet"
-			>
-				<AlbumTagFriendModal
-					toggleTagFriendModal={toggleTagFriendModal}
-					taggedFriendId={taggedFriendId}
-					setTaggedFriendId={setTaggedFriendId}
-				/>
-			</Modal>
 		</>
 	);
 };
@@ -462,28 +349,6 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-between",
 		paddingHorizontal: 15,
-	},
-	taggedFriendContainer: {
-		width: 45,
-		aspectRatio: 1,
-		borderColor: "white",
-		backgroundColor: "white",
-		borderWidth: 2,
-		borderRadius: 1000,
-		overflow: "hidden",
-	},
-	taggedFriendNum4: {
-		width: 45,
-		aspectRatio: 1,
-		borderColor: "white",
-		backgroundColor: "white",
-		borderWidth: 2,
-		borderRadius: 1000,
-		overflow: "hidden",
-		marginLeft: -20,
-		position: "relative",
-		alignItems: "center",
-		justifyContent: "center",
 	},
 	reactionIcon: {
 		backgroundColor: "white",

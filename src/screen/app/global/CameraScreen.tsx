@@ -52,6 +52,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Sticker } from "module/camera/Sticker";
 import { Canvas, Path, Skia, SkPath } from "@shopify/react-native-skia";
 import { IconRedo, IconUndo } from "icon/camera-edit/drawPad";
+import ExposureSlider from "module/camera/ExposureSlider";
 
 export type TrackingStickerType = {
 	sid: number;
@@ -83,6 +84,7 @@ const CameraScreen = () => {
 	const [flash, toggleFlash, setFlash] = useToggle(false);
 	const [showExposureSlider, toggleExposureSlider, setExposureSlider] =
 		useToggle(false);
+	const [exposureValue, setExposureValue] = useState<number>(0);
 
 	useEffect(() => {
 		if (previewPhotoUri) {
@@ -326,6 +328,7 @@ const CameraScreen = () => {
 								fps={16}
 								photo
 								format={format}
+								exposure={-(exposureValue / 100)}
 							/>
 						) : (
 							<View
@@ -511,6 +514,12 @@ const CameraScreen = () => {
 							setCapturedPhoto={setCapturedPhoto}
 						/>
 					)}
+
+					<ExposureSlider
+						exposureValue={exposureValue}
+						setExposureValue={setExposureValue}
+						showExposureSlider={showExposureSlider}
+					></ExposureSlider>
 				</View>
 
 				{/* bottom action  */}

@@ -14,7 +14,7 @@ const AlbumWithFriendScreen = () => {
 	const albums = useSelector((state: RootState) => state.albums);
 	const { colors } = useTheme();
 
-	const filteredUser = userMocks.find((u) => u.uid === params.userId);
+	const filteredUser = userMocks.find((u) => u.uid === params.uid);
 
 	const filteredAlbums: AlbumType[] =
 		(albums &&

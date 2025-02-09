@@ -55,12 +55,12 @@ const FriendListScreen = () => {
 				renderItem={({ item }) => (
 					<View key={item.uid}>
 						<CustomTouchableOpacity
-							onPress={() =>
+							onPress={() => {
 								navigate("GlobalStack", {
 									screen: "AlbumWithFriend",
 									params: { userId: item.uid },
-								})
-							}
+								});
+							}}
 						>
 							<Image
 								source={{ uri: item.photoURL }}

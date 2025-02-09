@@ -6,15 +6,29 @@ import {
 	Dimensions,
 	LogBox,
 	useColorScheme,
+	RefreshControl,
+	Alert,
+	SafeAreaView,
+	TouchableOpacity,
+	StyleSheet,
+	PlatformColor,
+	Share,
 } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "layout/Header";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CustomTouchableOpacity } from "components/custom";
 import { useRoute, useTheme } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
-import { AntDesign, Ionicons, Feather } from "@expo/vector-icons";
+import {
+	AntDesign,
+	Ionicons,
+	Feather,
+	FontAwesome5,
+	EvilIcons,
+	MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { Toast } from "toastify-react-native";
 import { useItemWidth } from "hook/useItemWidth";
@@ -26,6 +40,12 @@ import * as FileSystem from "expo-file-system";
 import { removeImage, updateAlbum } from "store/album/albumSlice";
 import { AutoHeightImage } from "components/image";
 import { OptionModal } from "components/modal";
+import TaggedFriends from "module/albumDetail/TaggedFriends";
+import ImageView from "react-native-image-viewing";
+import { ImageSource } from "react-native-image-viewing/dist/@types";
+import memoize from "lodash/memoize";
+import EnhancedImageViewing from "react-native-image-viewing";
+import { formatDate } from "util/func/formatDate";
 
 const GAP = 4;
 const { width } = Dimensions.get("screen");
@@ -38,13 +58,21 @@ const AlbumImageListScreen = () => {
 	const dispatch = useDispatch();
 	const user = useSelector((state: RootState) => state.user);
 	const itemWidth = useItemWidth(GAP, 3, 0);
-	const [showImageModal, setShowImageModal] = useState<boolean>(false);
-	const [showingImage, setShowingImage] = useState<ImageType | null>(null);
+	const [showingImageIndex, setShowingImageIndex] = useState<number>(0);
+	const [showingImageData, setShowingImageData] = useState<ImageType | null>(
+		null
+	);
 	const { colors } = useTheme();
+	const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
 	LogBox.ignoreLogs(["Failed to get size for image file"]);
 
+	const [filteredAlbum, setFilteredAlbum] = useState<AlbumType>();
+
 	const aid = params?.aid;
-	const filteredAlbum = albums && albums.find((a: AlbumType) => aid == a.aid);
+
+	useEffect(() => {
+		setFilteredAlbum(albums && albums.find((a: AlbumType) => aid == a.aid));
+	}, [albums]);
 
 	const pickImages = async () => {
 		let result = await ImagePicker.launchImageLibraryAsync({
@@ -119,12 +147,12 @@ const AlbumImageListScreen = () => {
 			const updatedImages = filteredAlbum.images.filter(
 				(img) => img.iid !== imageId
 			);
-			dispatch(
-				removeImage({
-					albumId: aid,
-					imageId: showingImage?.iid as string,
-				})
-			);
+			// dispatch(
+			// 	removeImage({
+			// 		albumId: aid,
+			// 		// imageId: showingImage?.iid as string,
+			// 	})
+			// );
 
 			dispatch(
 				updateAlbum({
@@ -133,13 +161,47 @@ const AlbumImageListScreen = () => {
 					images: updatedImages,
 				})
 			);
-			setShowImageModal(false);
+			// setShowImageModal(false);
 			Toast.success("写真を削除しました");
 		} catch (error) {
 			console.error("Lỗi khi xóa ảnh:", error);
 			Toast.error("削除失敗");
 		}
 	};
+
+	const onRefresh = () => {
+		setIsRefreshing(true);
+		setTimeout(() => {
+			setIsRefreshing(false);
+		}, 2000);
+	};
+
+	// handle image list
+	const [visible, setIsVisible] = useState(false);
+
+	const onShare = async () => {
+		try {
+			const result = await Share.share({
+				message: "写真をシェアしましょう",
+				title: "写真シェア",
+			});
+
+			if (result.action === Share.sharedAction) {
+				if (result.activityType) {
+					Alert.alert("シェアずみ");
+				} else {
+					Alert.alert("シェアずみ");
+				}
+			} else if (result.action === Share.dismissedAction) {
+				return null;
+			}
+		} catch (error: any) {
+			console.error(error.message);
+		}
+	};
+
+	// edit modal
+	const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
 	if (!filteredAlbum) {
 		return (
@@ -197,11 +259,55 @@ const AlbumImageListScreen = () => {
 					columnWrapperStyle={{
 						gap: GAP,
 					}}
+					refreshControl={
+						<RefreshControl
+							refreshing={isRefreshing}
+							onRefresh={onRefresh}
+							progressViewOffset={
+								insets.top + DIMENTIONS.HEADER_HEIGHT
+							}
+						/>
+					}
+					ListHeaderComponent={
+						<View
+							style={{
+								flexDirection: "row",
+								gap: 0,
+								paddingBottom: 10,
+								paddingHorizontal: DIMENTIONS.APP_PADDING,
+								alignItems: "center",
+							}}
+						>
+							<FontAwesome5 name="user-alt" size={16} />
+							<View
+								style={{
+									transform: [
+										{ scale: 0.8 },
+										{ translateX: -2 },
+									],
+								}}
+							>
+								<TaggedFriends aid={aid} />
+							</View>
+						</View>
+					}
+					ListFooterComponent={
+						<Text
+							style={{
+								color: colors.icon,
+								paddingVertical: 50,
+								textAlign: "center",
+							}}
+						>
+							写真 {filteredAlbum.images.length} 枚
+						</Text>
+					}
 					renderItem={({ item, index }) => (
 						<CustomTouchableOpacity
 							onPress={() => {
-								setShowImageModal(true);
-								setShowingImage(item);
+								setIsVisible(true);
+								setShowingImageIndex(index);
+								setShowingImageData(item);
 							}}
 						>
 							<Animated.Image
@@ -212,98 +318,144 @@ const AlbumImageListScreen = () => {
 						</CustomTouchableOpacity>
 					)}
 				/>
-			</View>
-			<Modal visible={showImageModal}>
-				{/* main container  */}
-				<View
-					style={{
-						flex: 1,
-						backgroundColor: colors.background,
-						alignItems: "center",
-						justifyContent: "center",
-						position: "relative",
-					}}
-				>
-					<View
-						style={{
-							height: DIMENTIONS.HEADER_HEIGHT,
-							position: "absolute",
-							top: 0,
-							left: 0,
-							width,
-							paddingHorizontal: DIMENTIONS.APP_PADDING,
-							marginTop: insets.top,
-							flexDirection: "row",
-							alignItems: "center",
-							justifyContent: "space-between",
-							backgroundColor: colors.background,
-							borderBottomColor: colors.input,
-							borderBottomWidth: 1,
-							zIndex: 100,
-						}}
-					>
-						<CustomTouchableOpacity
-							style={{
-								flexDirection: "row",
-								alignItems: "center",
-								gap: 10,
-							}}
-							onPress={() => setShowImageModal(false)}
-						>
-							<AntDesign
-								name="close"
-								size={22}
-								color={colors.iosBlue}
-							/>
-							<Text
-								style={{ color: colors.iosBlue, fontSize: 18 }}
-							>
-								写真表示
-							</Text>
-						</CustomTouchableOpacity>
 
-						<View
-							style={{
-								flexDirection: "row",
-								alignItems: "center",
-								gap: 20,
-							}}
-						>
-							<CustomTouchableOpacity>
-								<Feather
-									name="edit"
-									color={colors.iosBlue}
-									size={22}
-								/>
-							</CustomTouchableOpacity>
-							<OptionModal
-								iconStyle={{ color: colors.iosBlue }}
-								options={[
-									{
-										label: "写真を削除",
-										icon: (
-											<Ionicons
-												name="trash-outline"
-												size={16}
+				{/* showing image modal  */}
+				{filteredAlbum && (
+					<ImageView
+						images={[...filteredAlbum?.images]
+							.sort((a, b) => b.update_at - a.update_at)
+							.map((i) => i.source)}
+						imageIndex={showingImageIndex}
+						visible={visible}
+						onRequestClose={() => setIsVisible(false)}
+						backgroundColor="white"
+						swipeToCloseEnabled
+						onImageIndexChange={(index) => console.log(index)}
+						HeaderComponent={() => (
+							<View
+								style={{
+									paddingTop: insets.top,
+									backgroundColor: "white",
+								}}
+							>
+								<View
+									style={{
+										backgroundColor: "white",
+										height: DIMENTIONS.HEADER_HEIGHT,
+										flexDirection: "row",
+										alignItems: "center",
+										paddingHorizontal:
+											DIMENTIONS.APP_PADDING,
+										justifyContent: "space-between",
+									}}
+								>
+									<CustomTouchableOpacity
+										onPress={() => setIsVisible(false)}
+									>
+										<AntDesign
+											name="close"
+											size={20}
+											color={PlatformColor("systemBlue")}
+										/>
+									</CustomTouchableOpacity>
+									<View
+										style={{
+											flexDirection: "row",
+											alignItems: "center",
+											gap: 16,
+										}}
+									>
+										<CustomTouchableOpacity
+											onPress={onShare}
+										>
+											<EvilIcons
+												name="share-apple"
+												size={30}
+												color={PlatformColor(
+													"systemBlue"
+												)}
 											/>
-										),
-										action: () => {
-											showingImage &&
-												deleteImageFromAlbum(
-													showingImage?.iid
-												);
-										},
-									},
-								]}
-							/>
-						</View>
-					</View>
-					<AutoHeightImage
-						source={{ uri: showingImage?.source.uri }}
-						width={width}
+										</CustomTouchableOpacity>
+										<OptionModal
+											options={[
+												{
+													label: "写真を削除",
+													icon: (
+														<Ionicons name="trash-outline" />
+													),
+													action: () => {
+														showingImageData &&
+															deleteImageFromAlbum(
+																showingImageData?.iid
+															);
+														setIsVisible(false);
+													},
+												},
+											]}
+											iconStyle={{
+												color: PlatformColor(
+													"systemBlue"
+												),
+											}}
+										/>
+									</View>
+								</View>
+							</View>
+						)}
+						FooterComponent={() => (
+							<View
+								style={{
+									paddingBottom: insets.bottom,
+									backgroundColor: "white",
+								}}
+							>
+								<View
+									style={{
+										height: DIMENTIONS.HEADER_HEIGHT,
+										flexDirection: "row",
+										alignItems: "center",
+										justifyContent: "space-between",
+										paddingHorizontal:
+											DIMENTIONS.APP_PADDING,
+									}}
+								>
+									<Text
+										style={{
+											color: PlatformColor("systemBlue"),
+										}}
+									>
+										{`作成日：${
+											showingImageData &&
+											formatDate(
+												showingImageData?.create_at
+											)
+										}`}
+									</Text>
+									<CustomTouchableOpacity
+										onPress={() => setShowEditModal(true)}
+										style={{
+											flexDirection: "row",
+											alignItems: "center",
+											gap: 10,
+										}}
+									>
+										<Text
+											style={{
+												color: PlatformColor(
+													"systemBlue"
+												),
+												fontSize: 18,
+											}}
+										>
+											編集
+										</Text>
+									</CustomTouchableOpacity>
+								</View>
+							</View>
+						)}
 					/>
-				</View>
-			</Modal>
+				)}
+			</View>
 		</>
 	);
 };

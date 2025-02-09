@@ -54,21 +54,7 @@ const CameraViewBottom: FC<CameraViewBottomProps> = ({
 }) => {
 	const stickerItemWidth = useItemWidth(STICKER_ITEM_GAP, 4);
 	const trackingStickerSheetRef = useRef<ActionSheetRef>(null);
-	// const handleCaptureImage = async () => {
-	// 	if (viewRef.current) {
-	// 		try {
-	// 			const capturedUri = await captureRef(viewRef, {
-	// 				format: "jpg",
-	// 				quality: 0.8,
-	// 			});
-	// 			setPreviewPhotoUri(capturedUri);
-	// 		} catch (error) {
-	// 			console.error("Something went wrong!", error);
-	// 		}
-	// 		setCurrentTrackingSticker(null);
-	// 	}
-	// };
-
+	
 	const handleCaptureImage = async () => {
 		if (cameraRef.current) {
 			try {
@@ -86,9 +72,9 @@ const CameraViewBottom: FC<CameraViewBottomProps> = ({
 							quality: 1,
 						});
 
-						setPreviewPhotoUri(capturedUri); // Ảnh hoàn chỉnh
+						setPreviewPhotoUri(capturedUri);
 					}
-				}, 400); // Đợi một chút để UI update
+				}, 500);
 			} catch (error) {
 				console.error("Something went wrong!", error);
 			}

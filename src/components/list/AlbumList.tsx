@@ -4,6 +4,7 @@ import { DIMENTIONS } from "constant/dimention";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { AlbumItem } from "components/item";
 import { IAlbum } from "types/IAlbum";
+import { CustomTouchableOpacity } from "components/custom";
 
 const AlbumList = ({ data }: { data: IAlbum[] }) => {
 	const insets = useSafeAreaInsets();

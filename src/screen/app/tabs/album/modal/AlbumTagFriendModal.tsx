@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
 		height: 35,
 		paddingHorizontal: 14,
 		borderRadius: 6,
-		color: "white",
+		color: "black",
 	},
 	searchIcon: {
 		position: "absolute",

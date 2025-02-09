@@ -112,10 +112,7 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 		};
 
 		if (!selectedAlbumId) {
-			navigate("AlbumStack", {
-				screen: "AlbumScreen",
-			});
-			return;
+			Alert.alert('アルバムを選択してください')
 		} else if (selectedAlbumId) {
 			Alert.alert("選択したアルバムに追加してもよろしいですか？", "", [
 				{
@@ -333,6 +330,7 @@ const SavePhotoScreen = ({ route }: { route: any }) => {
 				safeAreaInsets={insets}
 				closeOnPressBack={false}
 				closeOnTouchBackdrop={false}
+				gestureEnabled
 			>
 				<View>
 					<Text

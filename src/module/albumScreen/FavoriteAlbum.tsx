@@ -15,6 +15,9 @@ const FavoriteAlbum = () => {
 	const { navigate } = useNavigation<any>();
 	const { colors } = useTheme();
 
+	const sortedAlbums =
+		albums && [...albums].sort((a, b) => b.update_at - a.update_at);
+
 	if (!albums) {
 		return null;
 	}
@@ -55,9 +58,9 @@ const FavoriteAlbum = () => {
 					/>
 				</CustomTouchableOpacity>
 			</View>
-			{albums && albums?.length !== 0 ? (
+			{sortedAlbums && sortedAlbums?.length !== 0 ? (
 				<FlatList
-					data={albums
+					data={sortedAlbums
 						.filter((a) => user.favorites.includes(a.aid))
 						.slice(0, 5)}
 					contentContainerStyle={{
