@@ -4,10 +4,19 @@ import { useTheme } from "@react-navigation/native";
 import { DIMENTIONS } from "constant/dimention";
 import { Tabs, MaterialTabBar } from "react-native-collapsible-tab-view";
 import ProfileHeader from "./ProfileHeader";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
+import { AlbumType } from "types/AlbumType";
 
 const ProfileTab = () => {
 	const { colors } = useTheme();
 	const { width } = useWindowDimensions();
+
+	const albums = useSelector(
+		(state: RootState) => state.albums as AlbumType[]
+	);
+
+	const allImages = albums.flatMap((album) => album.images);
 
 	return (
 		<Tabs.Container
@@ -25,7 +34,7 @@ const ProfileTab = () => {
 		>
 			<Tabs.Tab name="posts" label="投稿">
 				<Tabs.FlatList
-					data={new Array(0).fill(null)}
+					data={allImages}
 					columnWrapperStyle={{ gap: 5 }}
 					contentContainerStyle={{
 						paddingTop: 10,
@@ -38,10 +47,10 @@ const ProfileTab = () => {
 							<View key={index}>
 								<Image
 									source={{
-										uri: "https://i.pinimg.com/564x/7b/6a/dc/7b6adc7c192632eb9e0cd71fad1415ca.jpg",
+										uri: item.source.uri,
 									}}
 									style={{
-										width: (width - 5 * 2 - 3 * 5) / 4,
+										width: (width - 5 * 2 - 3 * 4) / 3,
 										aspectRatio: "1/1",
 										borderRadius: 4,
 									}}

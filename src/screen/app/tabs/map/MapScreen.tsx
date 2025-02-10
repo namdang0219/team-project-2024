@@ -418,7 +418,7 @@ const MapSection = ({
 				</Marker> */}
 
 				{/* cancel button   */}
-				{destination?.latitude !== 0 &&
+				{/* {destination?.latitude !== 0 &&
 					destination?.longitudeDelta !== 0 && (
 						<CustomTouchableOpacity
 							onPress={() =>
@@ -448,7 +448,7 @@ const MapSection = ({
 						>
 							<Feather name="x" size={20} color={"red"} />
 						</CustomTouchableOpacity>
-					)}
+					)} */}
 
 				{destination?.latitude !== 0 &&
 					destination?.longitudeDelta !== 0 && (

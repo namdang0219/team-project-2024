@@ -18,7 +18,7 @@ import React, { useEffect, useState } from "react";
 import Header from "layout/Header";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CustomTouchableOpacity } from "components/custom";
-import { useRoute, useTheme } from "@react-navigation/native";
+import { useNavigation, useRoute, useTheme } from "@react-navigation/native";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store/configureStore";
 import {
@@ -54,6 +54,7 @@ const AlbumImageListScreen = () => {
 	const scheme = useColorScheme();
 	const insets = useSafeAreaInsets();
 	const { params } = useRoute<any>();
+	const { navigate } = useNavigation<any>();
 	const albums = useSelector((state: RootState) => state.albums);
 	const dispatch = useDispatch();
 	const user = useSelector((state: RootState) => state.user);
@@ -201,7 +202,6 @@ const AlbumImageListScreen = () => {
 	};
 
 	// edit modal
-	const [showEditModal, setShowEditModal] = useState<boolean>(false);
 
 	if (!filteredAlbum) {
 		return (
@@ -432,7 +432,16 @@ const AlbumImageListScreen = () => {
 										}`}
 									</Text>
 									<CustomTouchableOpacity
-										onPress={() => setShowEditModal(true)}
+										onPress={() => {
+											setIsVisible(false);
+											navigate("GlobalStack", {
+												screen: "ImageEditScreen",
+												params: {
+													aid,
+													imageData: showingImageData,
+												},
+											});
+										}}
 										style={{
 											flexDirection: "row",
 											alignItems: "center",
