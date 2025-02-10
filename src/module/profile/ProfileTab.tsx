@@ -34,7 +34,7 @@ const ProfileTab = () => {
 		>
 			<Tabs.Tab name="posts" label="投稿">
 				<Tabs.FlatList
-					data={allImages}
+					data={allImages.sort((a, b) => b.update_at - a.update_at)}
 					columnWrapperStyle={{ gap: 5 }}
 					contentContainerStyle={{
 						paddingTop: 10,

@@ -35,6 +35,9 @@ import { OptionModal } from "components/modal";
 import { Ionicons } from "@expo/vector-icons";
 import { AutoHeightImage } from "components/image";
 import MapViewDirections from "react-native-maps-directions";
+import { useSelector } from "react-redux";
+import { RootState } from "store/configureStore";
+import { AlbumType } from "types/AlbumType";
 
 const LATITUDE_DELTA = 0.01;
 const LONGITUDE_DELTA = 0.01;
@@ -69,6 +72,11 @@ const MapSection = ({
 }) => {
 	const mapRef = useRef<MapView | null>(null);
 	const { colors } = useTheme();
+	const albums = useSelector(
+		(state: RootState) => state.albums as AlbumType[]
+	);
+
+	const allImages = albums.flatMap((album) => album.images);
 	const insets = useSafeAreaInsets();
 	const [activeTab, setActiveTab] = useState<"personal" | "explore">(
 		"personal"
@@ -96,8 +104,8 @@ const MapSection = ({
 	};
 
 	const testLocation = {
-		latitude: 37.787094190061325,
-		longitude: -122.40435593090945,
+		latitude: 34.722000444382694,
+		longitude: 135.48978452978812,
 	};
 
 	const getCurrentPosition = async () => {
@@ -195,7 +203,7 @@ const MapSection = ({
 
 	const [viewType, setViewType] = useState<"grid" | "post">("grid");
 
-	const DATA = new Array(20).fill(null);
+	const DATA = allImages.sort((a, b) => b.update_at - a.update_at);
 
 	const [showPostModal, setShowPostModal] = useState<boolean>(false);
 
@@ -226,7 +234,6 @@ const MapSection = ({
 				<Marker
 					coordinate={testLocation}
 					style={{
-						// backgroundColor: "cyan",
 						transform: [{ translateX: 30 }, { translateY: -20 }],
 					}}
 				>
@@ -286,37 +293,35 @@ const MapSection = ({
 								left: 40,
 							}}
 						>
-							{Array(3)
-								.fill(null)
-								.map((_, index) => (
-									<View
-										key={index}
-										style={{
-											borderWidth: 3,
-											borderColor: "white",
-											borderRadius: 15,
-											overflow: "hidden",
-											transform: [
-												{
-													translateX:
-														index === 0
-															? 0
-															: index * -42,
-												},
-											],
+							{DATA.slice(0, 3).map((item, index) => (
+								<View
+									key={index}
+									style={{
+										borderWidth: 3,
+										borderColor: "white",
+										borderRadius: 15,
+										overflow: "hidden",
+										transform: [
+											{
+												translateX:
+													index === 0
+														? 0
+														: index * -42,
+											},
+										],
+									}}
+								>
+									<Image
+										source={{
+											uri: item.source.uri,
 										}}
-									>
-										<Image
-											source={{
-												uri: "https://i.pinimg.com/736x/d8/63/eb/d863eb6c54b3c8c1f9acd218cda19226.jpg",
-											}}
-											style={{
-												width: 50,
-												aspectRatio: 1,
-											}}
-										></Image>
-									</View>
-								))}
+										style={{
+											width: 50,
+											aspectRatio: 1,
+										}}
+									></Image>
+								</View>
+							))}
 						</View>
 					</CustomTouchableOpacity>
 				</Marker>
@@ -565,7 +570,7 @@ const MapSection = ({
 			<ActionSheet
 				ref={actionSheetRef}
 				gestureEnabled
-				snapPoints={[30, 60, 100]}
+				snapPoints={[30, 60, 96]}
 				initialSnapIndex={1}
 				safeAreaInsets={{
 					top: insets.top + 10,
@@ -977,7 +982,7 @@ const MapSection = ({
 									<CustomTouchableOpacity>
 										<Image
 											source={{
-												uri: "https://i.pinimg.com/736x/5d/84/64/5d846442f240aa51c89def1983ca749b.jpg",
+												uri: item.source.uri,
 											}}
 											style={{
 												width: itemWidth,
@@ -1007,7 +1012,7 @@ const MapSection = ({
 										>
 											<Image
 												source={{
-													uri: "https://i.pinimg.com/736x/5d/84/64/5d846442f240aa51c89def1983ca749b.jpg",
+													uri: item.source.uri,
 												}}
 												style={{
 													width:
